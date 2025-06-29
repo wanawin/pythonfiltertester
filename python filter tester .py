@@ -5,7 +5,6 @@ import os
 import re
 from collections import Counter
 
-# V-Trac and mirror mappings
 V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
 MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
 PRIME_DIGITS = {2,3,5,7}
@@ -13,7 +12,6 @@ PRIME_DIGITS = {2,3,5,7}
 def get_v_trac_group(d): return V_TRAC_GROUPS.get(d)
 def get_mirror(d): return MIRROR_PAIRS.get(d)
 
-# Load filters
 filters_list = []
 txt_path = 'filter_intent_summary_corrected_only.csv'
 if os.path.exists(txt_path):
@@ -49,29 +47,41 @@ def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_dr
     set_combo = set(combo_digits)
     set_seed = set(seed_digits)
     last2 = set(prev_seed_digits) | set(prev_prev_draw_digits)
-    common_to_both = set(prev_seed_digits).intersection(prev_prev_draw_digits)
+    common_to_both = set(prev_seed_digits).intersection(set(prev_prev_draw_digits))
+
+    # Explicit robust intersections and issubset logic
     if "issubset(set(seed))" in desc:
-        nums = set(map(int, re.findall(r'\\d', desc)))
+        nums = set(map(int, re.findall(r'\d', desc)))
         return nums.issubset(set_seed) and ("% 2 != 0" not in desc or sum_combo % 2 != 0)
-    if "mirror" in desc:
+
+    if "mirror" in desc.lower():
         return any(get_mirror(x) in combo_digits for x in combo_digits)
+
     if "v-trac" in desc.lower():
         groups = [get_v_trac_group(x) for x in combo_digits]
         return len(set(groups)) == 1
+
     if "common_to_both" in desc:
         return sum(x in common_to_both for x in combo_digits) >= 2
+
     if "< 2" in desc and "last2" in desc:
-        return len(last2.intersection(combo_digits)) < 2
+        return len(last2.intersection(set_combo)) < 2
+
     if ">= 2" in desc and "last2" in desc:
-        return len(last2.intersection(combo_digits)) >= 2
+        return len(last2.intersection(set_combo)) >= 2
+
     if "issubset(last2" in desc:
         return set_combo.issubset(last2)
+
     if "new_seed_digits" in desc:
-        return bool(new_seed_digits) and not new_seed_digits.intersection(combo_digits)
+        return bool(new_seed_digits) and not new_seed_digits.intersection(set_combo)
+
     if "{2, 3}" in desc and "seed_counts" in desc:
         return set(seed_counts.values()) == {2, 3} and sum_combo % 2 == 0
+
     if "prime" in desc.lower() and (">=4" in desc or "≥4" in desc):
         return sum(1 for d in combo_digits if d in PRIME_DIGITS) >= 4
+
     return False
 
 st.sidebar.header("🔢 DC-5 Filter Tracker Full")
