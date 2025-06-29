@@ -121,7 +121,7 @@ for combo in combos:
     cd = [int(c) for c in combo]
     eliminated = False
     for i, desc in enumerate(filters_list):
-        if st.session_state.get(f"filter_{i}", False):
+        if st.session_state.get(f"filter_{i}", select_all):
             if apply_filter(desc, cd, seed_digits, prev_seed_digits, prev_prev_draw_digits, seed_counts, new_seed_digits):
                 eliminated_details[combo] = desc
                 eliminated = True
@@ -143,7 +143,7 @@ if query:
         st.sidebar.info("Not generated.")
 
 st.header("🔧 Active Filters")
-select_all = st.checkbox("Select/Deselect All Filters")
+select_all = st.checkbox("Select/Deselect All Filters", value=False)
 for i, desc in enumerate(filters_list):
     count_elim = sum(apply_filter(desc, [int(c) for c in combo], seed_digits, prev_seed_digits, prev_prev_draw_digits, seed_counts, new_seed_digits) for combo in combos)
     label = f"{desc} — eliminated {count_elim}"
