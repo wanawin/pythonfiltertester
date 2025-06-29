@@ -8,6 +8,7 @@ from collections import Counter
 # V-Trac and mirror mappings
 V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
 MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
+PRIME_DIGITS = {2,3,5,7}
 
 def get_v_trac_group(d): return V_TRAC_GROUPS.get(d)
 def get_mirror(d): return MIRROR_PAIRS.get(d)
@@ -23,7 +24,6 @@ if os.path.exists(txt_path):
             if desc:
                 filters_list.append(desc)
 
-# Always show mirror filter
 mirror_desc = "If a combo contains both a digit and its mirror (0/5, 1/6, 2/7, 3/8, 4/9), eliminate combo"
 if mirror_desc not in filters_list:
     filters_list.append(mirror_desc)
@@ -53,10 +53,6 @@ def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_dr
     last2 = set(prev_seed_digits) | set(prev_prev_draw_digits)
     common_to_both = set(prev_seed_digits).intersection(prev_prev_draw_digits)
 
-    if "prime digits" in desc.lower():
-        prime_digits = {2, 3, 5, 7}
-        prime_count = sum(1 for x in combo_digits if x in prime_digits)
-        return prime_count >= 4
     if "issubset(set(seed))" in desc:
         nums = set(map(int, re.findall(r'\d', desc)))
         return nums.issubset(set_seed) and ("% 2 != 0" not in desc or sum_combo % 2 != 0)
@@ -77,6 +73,8 @@ def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_dr
         return bool(new_seed_digits) and not new_seed_digits.intersection(combo_digits)
     if "{2, 3}" in desc and "seed_counts" in desc:
         return set(seed_counts.values()) == {2, 3} and sum_combo % 2 == 0
+    if "prime" in desc.lower():
+        return sum(1 for d in combo_digits if d in PRIME_DIGITS) >= 4
     return False
 
 # Streamlit UI
