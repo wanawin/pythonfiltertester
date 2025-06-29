@@ -5,13 +5,14 @@ import os
 import re
 from collections import Counter
 
+# V-Trac and mirror mappings
 V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
 MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
-PRIME_DIGITS = {2,3,5,7}
 
 def get_v_trac_group(d): return V_TRAC_GROUPS.get(d)
 def get_mirror(d): return MIRROR_PAIRS.get(d)
 
+# Load filters
 filters_list = []
 txt_path = 'filter_intent_summary_corrected_only.csv'
 if os.path.exists(txt_path):
@@ -22,10 +23,12 @@ if os.path.exists(txt_path):
             if desc:
                 filters_list.append(desc)
 
+# Always show mirror filter
 mirror_desc = "If a combo contains both a digit and its mirror (0/5, 1/6, 2/7, 3/8, 4/9), eliminate combo"
 if mirror_desc not in filters_list:
     filters_list.append(mirror_desc)
 
+# Generate combos
 def generate_combinations(seed, method="2-digit pair"):
     all_digits = '0123456789'
     combos = set()
@@ -42,48 +45,44 @@ def generate_combinations(seed, method="2-digit pair"):
                 combos.add(''.join(sorted(pair + ''.join(p))))
     return sorted(combos)
 
+# Flexible apply_filter with robust pattern matching
 def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_draw_digits, seed_counts, new_seed_digits):
     sum_combo = sum(combo_digits)
     set_combo = set(combo_digits)
     set_seed = set(seed_digits)
     last2 = set(prev_seed_digits) | set(prev_prev_draw_digits)
-    common_to_both = set(prev_seed_digits).intersection(set(prev_prev_draw_digits))
+    common_to_both = set(prev_seed_digits).intersection(prev_prev_draw_digits)
 
-    # Explicit robust intersections and issubset logic
     if "issubset(set(seed))" in desc:
-        nums = set(map(int, re.findall(r'\d', desc)))
-        return nums.issubset(set_seed) and ("% 2 != 0" not in desc or sum_combo % 2 != 0)
-
-    if "mirror" in desc.lower():
+        nums = set(int(x) for x in re.findall(r'\d', desc))
+        if nums.issubset(set_seed):
+            if "% 2 != 0" in desc:
+                return sum_combo % 2 != 0
+            if "% 2 == 0" in desc:
+                return sum_combo % 2 == 0
+            return True
+    if "mirror" in desc:
         return any(get_mirror(x) in combo_digits for x in combo_digits)
-
     if "v-trac" in desc.lower():
         groups = [get_v_trac_group(x) for x in combo_digits]
         return len(set(groups)) == 1
-
     if "common_to_both" in desc:
         return sum(x in common_to_both for x in combo_digits) >= 2
-
     if "< 2" in desc and "last2" in desc:
-        return len(last2.intersection(set_combo)) < 2
-
+        return len(last2.intersection(combo_digits)) < 2
     if ">= 2" in desc and "last2" in desc:
-        return len(last2.intersection(set_combo)) >= 2
-
+        return len(last2.intersection(combo_digits)) >= 2
     if "issubset(last2" in desc:
         return set_combo.issubset(last2)
-
     if "new_seed_digits" in desc:
-        return bool(new_seed_digits) and not new_seed_digits.intersection(set_combo)
-
+        return bool(new_seed_digits) and not new_seed_digits.intersection(combo_digits)
     if "{2, 3}" in desc and "seed_counts" in desc:
         return set(seed_counts.values()) == {2, 3} and sum_combo % 2 == 0
-
-    if "prime" in desc.lower() and (">=4" in desc or "≥4" in desc):
-        return sum(1 for d in combo_digits if d in PRIME_DIGITS) >= 4
-
+    if "Prime Digits" in desc:
+        return sum(1 for x in combo_digits if x in {2,3,5,7}) >= 4
     return False
 
+# Streamlit UI
 st.sidebar.header("🔢 DC-5 Filter Tracker Full")
 select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
 
