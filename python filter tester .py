@@ -92,6 +92,7 @@ def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_dr
         return False
 
 st.sidebar.header("🔢 DC-5 Filter Tracker Full")
+select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
 def input_seed(label, required=True):
     v = st.sidebar.text_input(label).strip()
     if required and not v:
@@ -143,7 +144,6 @@ if query:
         st.sidebar.info("Not generated.")
 
 st.header("🔧 Active Filters")
-select_all = st.checkbox("Select/Deselect All Filters", value=False)
 for i, desc in enumerate(filters_list):
     count_elim = sum(apply_filter(desc, [int(c) for c in combo], seed_digits, prev_seed_digits, prev_prev_draw_digits, seed_counts, new_seed_digits) for combo in combos)
     label = f"{desc} — eliminated {count_elim}"
