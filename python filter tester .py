@@ -14,7 +14,7 @@ def get_mirror(d): return MIRROR_PAIRS.get(d)
 
 # Load filters
 filters_list = []
-txt_path = 'filter_intent_summary_corrected_only(1).csv'
+txt_path = 'filter_intent_summary_corrected_only.csv'
 if os.path.exists(txt_path):
     with open(txt_path, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
