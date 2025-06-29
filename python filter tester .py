@@ -28,7 +28,6 @@ mirror_desc = "If a combo contains both a digit and its mirror (0/5, 1/6, 2/7, 3
 if mirror_desc not in filters_list:
     filters_list.append(mirror_desc)
 
-# Generate combos
 def generate_combinations(seed, method="2-digit pair"):
     all_digits = '0123456789'
     combos = set()
@@ -45,16 +44,14 @@ def generate_combinations(seed, method="2-digit pair"):
                 combos.add(''.join(sorted(pair + ''.join(p))))
     return sorted(combos)
 
-# Flexible apply_filter
 def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_draw_digits, seed_counts, new_seed_digits):
     sum_combo = sum(combo_digits)
     set_combo = set(combo_digits)
     set_seed = set(seed_digits)
     last2 = set(prev_seed_digits) | set(prev_prev_draw_digits)
     common_to_both = set(prev_seed_digits).intersection(prev_prev_draw_digits)
-
     if "issubset(set(seed))" in desc:
-        nums = set(map(int, re.findall(r'\d', desc)))
+        nums = set(map(int, re.findall(r'\\d', desc)))
         return nums.issubset(set_seed) and ("% 2 != 0" not in desc or sum_combo % 2 != 0)
     if "mirror" in desc:
         return any(get_mirror(x) in combo_digits for x in combo_digits)
@@ -73,11 +70,10 @@ def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_dr
         return bool(new_seed_digits) and not new_seed_digits.intersection(combo_digits)
     if "{2, 3}" in desc and "seed_counts" in desc:
         return set(seed_counts.values()) == {2, 3} and sum_combo % 2 == 0
-    if "prime" in desc.lower():
+    if "prime" in desc.lower() and (">=4" in desc or "≥4" in desc):
         return sum(1 for d in combo_digits if d in PRIME_DIGITS) >= 4
     return False
 
-# Streamlit UI
 st.sidebar.header("🔢 DC-5 Filter Tracker Full")
 select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
 
