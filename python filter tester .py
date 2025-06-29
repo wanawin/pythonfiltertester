@@ -23,7 +23,6 @@ if os.path.exists(txt_path):
             if desc:
                 filters_list.append(desc)
 
-# Always show mirror filter
 mirror_desc = "If a combo contains both a digit and its mirror (0/5, 1/6, 2/7, 3/8, 4/9), eliminate combo"
 if mirror_desc not in filters_list:
     filters_list.append(mirror_desc)
@@ -45,33 +44,55 @@ def generate_combinations(seed, method="2-digit pair"):
                 combos.add(''.join(sorted(pair + ''.join(p))))
     return sorted(combos)
 
-# Flexible apply_filter
+# Improved apply_filter that dynamically parses issubset + sum checks
 def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_draw_digits, seed_counts, new_seed_digits):
     sum_combo = sum(combo_digits)
     set_combo = set(combo_digits)
     set_seed = set(seed_digits)
     last2 = set(prev_seed_digits) | set(prev_prev_draw_digits)
     common_to_both = set(prev_seed_digits).intersection(prev_prev_draw_digits)
-    if "issubset(set(seed))" in desc:
-        nums = set(map(int, re.findall(r'\d', desc)))
-        return nums.issubset(set_seed) and ("% 2 != 0" not in desc or sum_combo % 2 != 0)
-    if "mirror" in desc:
+    d = desc.lower().replace('≥', '>=').replace('≤', '<=')
+
+    # Handle issubset general
+    issub_match = re.search(r'\{([\d,\s]+)\}\.issubset\((set\(seed\)|set\(combo\)|last2)\)', d)
+    if issub_match:
+        digits = set(int(x.strip()) for x in issub_match.group(1).split(','))
+        target = issub_match.group(2)
+        target_set = set_seed if 'seed' in target else set_combo if 'combo' in target else last2
+        if '!= 0' in d:
+            return digits.issubset(target_set) and sum_combo % 2 != 0
+        elif '== 0' in d:
+            return digits.issubset(target_set) and sum_combo % 2 == 0
+        else:
+            return digits.issubset(target_set)
+
+    # Handle mirror
+    if "mirror" in d:
         return any(get_mirror(x) in combo_digits for x in combo_digits)
-    if "v-trac" in desc.lower():
+
+    # Handle v-trac
+    if "v-trac" in d:
         groups = [get_v_trac_group(x) for x in combo_digits]
         return len(set(groups)) == 1
-    if "common_to_both" in desc:
+
+    # Handle common_to_both
+    if "common_to_both" in d:
         return sum(x in common_to_both for x in combo_digits) >= 2
-    if "< 2" in desc and "last2" in desc:
+
+    # Handle last2 intersection
+    if "< 2" in d and "last2" in d:
         return len(last2.intersection(combo_digits)) < 2
-    if ">= 2" in desc and "last2" in desc:
+    if ">= 2" in d and "last2" in d:
         return len(last2.intersection(combo_digits)) >= 2
-    if "issubset(last2" in desc:
-        return set_combo.issubset(last2)
-    if "new_seed_digits" in desc:
+
+    # Handle new_seed_digits intersection
+    if "new_seed_digits" in d:
         return bool(new_seed_digits) and not new_seed_digits.intersection(combo_digits)
-    if "{2, 3}" in desc and "seed_counts" in desc:
+
+    # Handle FullHouse with seed_counts
+    if "{2, 3}" in d and "seed_counts" in d:
         return set(seed_counts.values()) == {2, 3} and sum_combo % 2 == 0
+
     return False
 
 # Streamlit UI
