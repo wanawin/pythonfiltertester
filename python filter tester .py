@@ -45,7 +45,7 @@ def generate_combinations(seed, method="2-digit pair"):
                 combos.add(''.join(sorted(pair + ''.join(p))))
     return sorted(combos)
 
-# Robust apply_filter
+# Flexible apply_filter
 def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_draw_digits, seed_counts, new_seed_digits):
     sum_combo = sum(combo_digits)
     set_combo = set(combo_digits)
@@ -53,49 +53,35 @@ def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_dr
     last2 = set(prev_seed_digits) | set(prev_prev_draw_digits)
     common_to_both = set(prev_seed_digits).intersection(prev_prev_draw_digits)
 
-    # Handle issubset(seed) + odd/even
-    issub = re.findall(r'\{([0-9, ]+)\}\.issubset\(set\(seed\)\)', desc)
-    if issub:
-        nums = set(map(int, issub[0].split(',')))
-        if nums.issubset(set_seed):
-            if "% 2 != 0" in desc:
-                return sum_combo % 2 != 0
-            elif "% 2 == 0" in desc:
-                return sum_combo % 2 == 0
-
-    # new_seed_digits logic
-    if "new_seed_digits" in desc and "not new_seed_digits.intersection" in desc:
-        return bool(new_seed_digits) and not new_seed_digits.intersection(combo_digits)
-
-    # V-TRAC
+    # Match original logic
+    if "issubset(set(seed))" in desc:
+        nums = set(map(int, re.findall(r'\d', desc)))
+        return nums.issubset(set_seed) and ("% 2 != 0" not in desc or sum_combo % 2 != 0)
+    if "mirror" in desc:
+        return any(get_mirror(x) in combo_digits for x in combo_digits)
     if "v-trac" in desc.lower():
         groups = [get_v_trac_group(x) for x in combo_digits]
         return len(set(groups)) == 1
-
-    # Mirror
-    if "mirror" in desc.lower():
-        return any(get_mirror(x) in combo_digits for x in combo_digits)
-
-    # Common to both
     if "common_to_both" in desc:
         return sum(x in common_to_both for x in combo_digits) >= 2
-
-    # last2 set conditions
     if "< 2" in desc and "last2" in desc:
         return len(last2.intersection(combo_digits)) < 2
     if ">= 2" in desc and "last2" in desc:
         return len(last2.intersection(combo_digits)) >= 2
     if "issubset(last2" in desc:
         return set_combo.issubset(last2)
-
-    # FullHouse counts
+    if "new_seed_digits" in desc:
+        return bool(new_seed_digits) and not new_seed_digits.intersection(combo_digits)
     if "{2, 3}" in desc and "seed_counts" in desc:
         return set(seed_counts.values()) == {2, 3} and sum_combo % 2 == 0
 
-    # Prime digits
-    if "prime" in desc.lower():
-        primes = {2,3,5,7}
-        return sum(d in primes for d in combo_digits) >= 4
+    # New robust end digit filter
+    if "seed sum end digit" in desc and "combo sum end digit" in desc:
+        m = list(map(int, re.findall(r'\d', desc)))
+        if len(m) >= 2:
+            seed_sum_last = m[0]
+            combo_sum_last = m[1]
+            return (sum(seed_digits) % 10 == seed_sum_last) and (sum_combo % 10 == combo_sum_last)
 
     return False
 
