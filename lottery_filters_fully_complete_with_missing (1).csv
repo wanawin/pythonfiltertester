@@ -1,0 +1,359 @@
+id,name,enabled,applicable_if,expression
+F001,Eliminate the combo if its digit sum equals 1.,True,True,combo_sum == 1
+F002,"If the seed contains 4, 5, 6, and 8 in any order, eliminate all even sum combos.",True,"set(seed_digits).issuperset({4,5,6,8})",combo_sum % 2 == 0
+F003,"If the seed contains 1, 2, 4, and 7 in any order, eliminate all even sum combos.",True,"set(seed_digits).issuperset({1,2,4,7})",combo_sum % 2 == 0
+F004,"If the seed contains 1, 2, 6, and 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1,2,6,8})",combo_sum % 2 != 0
+F005,"If the seed contains 5, 7, 8, and 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({5,7,8,9})",combo_sum % 2 != 0
+F006,"If the seed contains 4, 6, 7, and 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({4,6,7,8})",combo_sum % 2 != 0
+F007,"If the seed contains 4, 5, 6, and 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({4,5,6,7})",combo_sum % 2 != 0
+F008,"If the seed contains 3, 6, 7, and 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({3,6,7,8})",combo_sum % 2 != 0
+F009,"If the seed contains 2, 5, 8, and 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({2,5,8,9})",combo_sum % 2 != 0
+F010,"If the seed contains 3, 4, 5, and 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({3,4,5,8})",combo_sum % 2 == 0
+F011,"If the seed contains 2, 3, 6, and 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({2,3,6,9})",combo_sum % 2 != 0
+F012,"If the seed contains 1, 3, 4, and 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1,3,4,9})",combo_sum % 2 != 0
+F013,"If the seed contains 0, 5, 7, and 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0,5,7,9})",combo_sum % 2 != 0
+F014,"If the seed contains 0, 3, 4, and 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0,3,4,7})",combo_sum % 2 != 0
+F015,"If the seed contains 3, 5, 7, and 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({3,5,7,8})",combo_sum % 2 != 0
+F016,"If the seed contains 2, 4, 5, and 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({2,4,5,7})",combo_sum % 2 != 0
+F017,"If the seed contains 1, 2, 6, and 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1,2,6,7})",combo_sum % 2 != 0
+F018,"If the seed contains 1, 2, 4, and 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1,2,4,6})",combo_sum % 2 != 0
+F019,"If the seed contains 1, 4, 5, and 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1,4,5,9})",combo_sum % 2 != 0
+F020,"If the seed contains 0, 5, 6, and 7, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0,5,6,7})",combo_sum % 2 == 0
+F021,"If the seed contains 1, 5, 6, and 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({1,5,6,9})",combo_sum % 2 == 0
+F022,"If the seed contains 0, 1, 5, and 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0,1,5,9})",combo_sum % 2 == 0
+F023,"If the seed contains 0, 3, 6, and 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 9, 3, 6})",combo_sum % 2 == 0
+F024,"If the seed contains 1, 2, 5, and 7, eliminate all even sum combos.",True,"set(seed_digits).issuperset({1, 2, 5, 7})",combo_sum % 2 == 0
+F025,"If the seed contains 0, 1, 2, and 4, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 1, 2, 4})",combo_sum % 2 == 0
+F026,"If the seed contains 0, 1, 7, and 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 1, 8, 7})",combo_sum % 2 == 0
+F027,"If the seed contains 2, 5, 6, and 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 2, 5, 6})",combo_sum % 2 == 0
+F028,"If the seed contains 0, 1, 5, and 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 1, 5, 8})",combo_sum % 2 == 0
+F029,"If the seed contains 2, 3, 4, and 5, eliminate all even sum combos.",True,"set(seed_digits).issuperset({2, 3, 4, 5})",combo_sum % 2 == 0
+F030,"If the seed contains 0, 4, 5, and 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 8, 4, 5})",combo_sum % 2 == 0
+F031,"If the seed contains 2, 5, 6, and 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({9, 2, 5, 6})",combo_sum % 2 == 0
+F032,"If the seed contains 1, 2, 6, and 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 1, 2, 6})",combo_sum % 2 == 0
+F033,"If the seed contains 0, 5, 8, and 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 8, 5, 9})",combo_sum % 2 == 0
+F034,"If the seed contains 0, 1, 3, and 5, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 1, 3, 5})",combo_sum % 2 == 0
+F035,"If the seed contains 0, 2, 6, and 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 9, 2, 6})",combo_sum % 2 == 0
+F036,"If the seed contains 2, 3, 7, and 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 2, 3, 7})",combo_sum % 2 == 0
+F037,"If the seed contains 1, 3, 7, and 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 1, 3, 7})",combo_sum % 2 == 0
+F038,"If the seed contains 2, 3, 5, and 7, eliminate all even sum combos.",True,"set(seed_digits).issuperset({2, 3, 5, 7})",combo_sum % 2 == 0
+F039,"If the seed contains 1, 2, 3, and 4, eliminate all even sum combos.",True,"set(seed_digits).issuperset({1, 2, 3, 4})",combo_sum % 2 == 0
+F040,"If the seed contains 0, 3, 5, and 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 8, 3, 5})",combo_sum % 2 == 0
+F041,"If the seed contains 0, 2, 3, and 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 9, 2, 3})",combo_sum % 2 == 0
+F042,"If the seed contains 3, 4, 5, and 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({9, 3, 4, 5})",combo_sum % 2 != 0
+F043,"If the seed contains 1, 3, 6, and 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 3, 6, 7})",combo_sum % 2 != 0
+F044,"If the seed contains 1, 2, 3, and 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 2, 3, 6})",combo_sum % 2 != 0
+F045,"If the seed contains 4, 6, 8, and 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 9, 4, 6})",combo_sum % 2 != 0
+F046,"If the seed contains 0, 2, 7, and 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 9, 2, 7})",combo_sum % 2 != 0
+F047,"If the seed contains 0, 2, 4, and 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 2, 4, 6})",combo_sum % 2 != 0
+F048,"If the seed contains 0, 2, 3, and 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 2, 3, 7})",combo_sum % 2 != 0
+F049,"If the seed contains 0, 1, 7, and 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 1, 9, 7})",combo_sum % 2 != 0
+F050,"If the seed contains 0, 1, 3, and 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 1, 3, 6})",combo_sum % 2 != 0
+F051,"If seed is a FullHouse (2 of one digit and 3 of another), eliminate even sum combos.",True,True,"set(seed_counts.values()) == {2,3} and combo_sum % 2 == 0"
+F052,"If seed has new digits not in previous, they must appear in combo.",True,True,new_seed_digits and not new_seed_digits.intersection(combo_digits)
+F053,Eliminate if at least 2 combo digits are in both prev_seed and prev_prev_draw.,True,True,sum(d in common_to_both for d in combo_digits) >= 2
+F054,Eliminate if fewer than 2 combo digits seen in last two draws.,True,True,len(last2.intersection(combo_digits)) < 2
+F055,Eliminate if two or more combo digits seen in last two draws.,True,True,len(last2.intersection(combo_digits)) >= 2
+F056,Eliminate if all combo digits were seen in last two draws.,True,True,set(combo_digits).issubset(last2)
+F057,Eliminate if seed sum ends with 7 and combo sum ends with 8.,True,True,seed_sum % 10 == 7 and combo_sum % 10 == 8
+F058,Eliminate if seed sum ends with 4 and combo sum ends with 8.,True,True,seed_sum % 10 == 4 and combo_sum % 10 == 8
+F059,Eliminate if seed sum ends with 1 and combo sum ends with 7.,True,True,seed_sum % 10 == 1 and combo_sum % 10 == 7
+F060,Eliminate if seed sum ends with 4 and combo sum ends with 7.,True,True,seed_sum % 10 == 4 and combo_sum % 10 == 7
+F061,Eliminate if seed sum ends with 4 and combo sum ends with 6.,True,True,seed_sum % 10 == 4 and combo_sum % 10 == 6
+F062,Eliminate if seed sum ends with 5 and combo sum ends with 6.,True,True,seed_sum % 10 == 5 and combo_sum % 10 == 6
+F063,Eliminate if seed sum ends with 8 and combo sum ends with 5.,True,True,seed_sum % 10 == 8 and combo_sum % 10 == 5
+F064,Eliminate if seed sum ends with 0 and combo sum ends with 4.,True,True,seed_sum % 10 == 0 and combo_sum % 10 == 4
+F065,"If the seed contains 0, 2, 8, and 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 8, 2, 9})",combo_sum % 2 != 0
+F066,"If the seed contains 0, 1, 4, and 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 1, 4, 8})",combo_sum % 2 == 0
+F067,"If the seed contains 0, 3, 5, and 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 3, 5, 7})",combo_sum % 2 != 0
+F068,"If the seed contains 0, 3, 7, 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 8, 3, 7})",combo_sum % 2 != 0
+F069,"If the seed contains 4, 6, 7, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({9, 4, 6, 7})",combo_sum % 2 != 0
+F070,"If the seed contains 4, 5, 6, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({9, 4, 5, 6})",combo_sum % 2 != 0
+F071,"If the seed contains 3, 6, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 9, 3, 6})",combo_sum % 2 != 0
+F072,"If the seed contains 3, 4, 6, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({9, 3, 4, 6})",combo_sum % 2 != 0
+F073,"If the seed contains 3, 4, 6, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({3, 4, 6, 7})",combo_sum % 2 != 0
+F074,"If the seed contains 2, 7, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 9, 2, 7})",combo_sum % 2 != 0
+F075,"If the seed contains 2, 6, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 9, 2, 6})",combo_sum % 2 != 0
+F076,"If the seed contains 2, 4, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 9, 2, 4})",combo_sum % 2 != 0
+F077,"If the seed contains 2, 4, 5, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({9, 2, 4, 5})",combo_sum % 2 != 0
+F078,"If the seed contains 2, 3, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 9, 2, 3})",combo_sum % 2 != 0
+F079,"If the seed contains 2, 3, 5, 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 2, 3, 5})",combo_sum % 2 != 0
+F080,"If the seed contains 1, 7, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 1, 9, 7})",combo_sum % 2 != 0
+F081,"If the seed contains 1, 5, 6, 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 1, 5, 6})",combo_sum % 2 != 0
+F082,"If the seed contains 1, 4, 7, 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 1, 4, 7})",combo_sum % 2 != 0
+F083,"If the seed contains 1, 4, 6, 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 1, 4, 6})",combo_sum % 2 != 0
+F084,"If the seed contains 1, 4, 6, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 4, 6, 7})",combo_sum % 2 != 0
+F085,"If the seed contains 1, 3, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 1, 3, 9})",combo_sum % 2 != 0
+F086,"If the seed contains 0, 6, 7, 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 8, 6, 7})",combo_sum % 2 != 0
+F087,"If the seed contains 0, 3, 7, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 9, 3, 7})",combo_sum % 2 != 0
+F088,"If the seed contains 0, 3, 6, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 3, 6, 7})",combo_sum % 2 != 0
+F089,"If the seed contains 0, 4, 5, 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 9, 4, 5})",combo_sum % 2 == 0
+F090,"If the seed contains 0, 1, 8, 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 1, 8, 9})",combo_sum % 2 == 0
+F091,"If the seed contains 0, 2, 3, 4, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 2, 3, 4})",combo_sum % 2 != 0
+F092,"If the seed contains 0, 4, 5, 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 4, 5, 6})",combo_sum % 2 != 0
+F093,"If the seed contains 0, 1, 2, 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 1, 2, 6})",combo_sum % 2 != 0
+F094,"If the seed contains 0, 2, 6, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 2, 6, 7})",combo_sum % 2 != 0
+F095,"If the seed contains 0, 1, 6, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 1, 6, 9})",combo_sum % 2 != 0
+F096,"If the seed contains 6, 7, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 9, 6, 7})",combo_sum % 2 != 0
+F097,"If the seed contains 2, 3, 6, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({2, 3, 6, 7})",combo_sum % 2 != 0
+F098,Eliminate if seed sum ends with 3 and combo sum ends with 3.,True,True,seed_sum % 10 == 3 and combo_sum % 10 == 3
+F099,"If the seed contains 5, 6, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 9, 5, 6})",combo_sum % 2 != 0
+F100,"If the seed contains 0, 3, 4, 5, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 3, 4, 5})",combo_sum % 2 != 0
+F101,"If the seed contains 3, 7, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 9, 3, 7})",combo_sum % 2 != 0
+F102,"If the seed contains 3, 4, 5, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({3, 4, 5, 7})",combo_sum % 2 != 0
+F103,"If the seed contains 3, 4, 5, 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({3, 4, 5, 6})",combo_sum % 2 != 0
+F104,"If the seed contains 2, 5, 7, 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 2, 5, 7})",combo_sum % 2 != 0
+F105,"If the seed contains 2, 4, 6, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({2, 4, 6, 7})",combo_sum % 2 != 0
+F106,"If the seed contains 2, 4, 5, 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 2, 4, 5})",combo_sum % 2 != 0
+F107,"If the seed contains 1, 5, 7, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 5, 9, 7})",combo_sum % 2 != 0
+F108,"If the seed contains 1, 4, 6, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 4, 6, 9})",combo_sum % 2 != 0
+F109,"If the seed contains 1, 4, 5, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 4, 5, 7})",combo_sum % 2 != 0
+F110,"If the seed contains 3, 4, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 9, 3, 4})",combo_sum % 2 != 0
+F111,"If the seed contains 0, 1, 6, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 1, 6, 7})",combo_sum % 2 != 0
+F112,"If the seed contains 0, 1, 3, 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 1, 3, 8})",combo_sum % 2 != 0
+F113,"If the seed contains 0, 4, 5, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 4, 5, 7})",combo_sum % 2 != 0
+F114,"If the seed contains 4, 7, 8, 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 9, 4, 7})",combo_sum % 2 == 0
+F115,"If the seed contains 2, 3, 4, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 2, 3, 4})",combo_sum % 2 == 0
+F116,"If the seed contains 0, 2, 5, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 8, 2, 5})",combo_sum % 2 == 0
+F117,"If the seed contains 0, 4, 7, 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 9, 4, 7})",combo_sum % 2 == 0
+F118,"If the seed contains 2, 3, 5, 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({9, 2, 3, 5})",combo_sum % 2 == 0
+F119,"If the seed contains 2, 3, 6, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 2, 3, 6})",combo_sum % 2 == 0
+F120,"If the seed contains 0, 4, 7, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 8, 4, 7})",combo_sum % 2 == 0
+F121,"If the seed contains 0, 1, 3, 7, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 1, 3, 7})",combo_sum % 2 == 0
+F122,"If the seed contains 0, 2, 3, 5, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 2, 3, 5})",combo_sum % 2 == 0
+F123,"If the seed contains 0, 3, 5, 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 9, 3, 5})",combo_sum % 2 == 0
+F124,"If the seed contains 1, 2, 4, 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({1, 2, 4, 9})",combo_sum % 2 == 0
+F125,"If the seed contains 3, 4, 6, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 3, 4, 6})",combo_sum % 2 == 0
+F126,"If the seed contains 1, 2, 5, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 1, 2, 5})",combo_sum % 2 == 0
+F127,"If the seed contains 2, 5, 6, 7, eliminate all even sum combos.",True,"set(seed_digits).issuperset({2, 5, 6, 7})",combo_sum % 2 == 0
+F128,"If the seed contains 0, 6, 7, 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 9, 6, 7})",combo_sum % 2 == 0
+F129,"If the seed contains 0, 2, 5, 6, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 2, 5, 6})",combo_sum % 2 == 0
+F130,"If the seed contains 0, 2, 4, 5, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 2, 4, 5})",combo_sum % 2 != 0
+F131,"If the seed contains 0, 2, 6, 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 8, 2, 6})",combo_sum % 2 != 0
+F132,"If the seed contains 1, 4, 5, 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 4, 5, 6})",combo_sum % 2 != 0
+F133,"If the seed contains 1, 3, 7, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 3, 9, 7})",combo_sum % 2 != 0
+F134,"If the seed contains 1, 2, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 1, 2, 9})",combo_sum % 2 != 0
+F135,"If the seed contains 1, 2, 5, 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 2, 5, 6})",combo_sum % 2 != 0
+F136,"If the seed contains 3, 4, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({9, 3, 4})",combo_sum % 2 != 0
+F137,"If the seed contains 4, 6, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({9, 4, 6})",combo_sum % 2 != 0
+F138,"If the seed contains 0, 3, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 3, 7})",combo_sum % 2 != 0
+F139,"If the seed contains 3, 4, 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 3, 4})",combo_sum % 2 != 0
+F140,"If the seed contains 4, 6, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({4, 6, 7})",combo_sum % 2 != 0
+F141,"If the seed contains 1, 3, 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 3, 6})",combo_sum % 2 != 0
+F142,"If the seed contains 2, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 9, 2})",combo_sum % 2 != 0
+F143,"If the seed contains 1, 2, 3, 5, eliminate all even sum combos.",True,"set(seed_digits).issuperset({1, 2, 3, 5})",combo_sum % 2 == 0
+F144,"If the seed contains 2, 3, 5, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 2, 3, 5})",combo_sum % 2 == 0
+F145,"If the seed contains 0, 2, 4, 7, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 2, 4, 7})",combo_sum % 2 == 0
+F146,"If the seed contains 0, 2, 3, 7, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 2, 3, 7})",combo_sum % 2 == 0
+F147,"If the seed contains 1, 3, 5, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 1, 3, 5})",combo_sum % 2 == 0
+F148,"If the seed contains 1, 2, 5, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 1, 2, 5})",combo_sum % 2 == 0
+F149,"If the seed contains 2, 3, 6, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 2, 3, 6})",combo_sum % 2 == 0
+F150,"If the seed contains 1, 4, 6, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 1, 4, 6})",combo_sum % 2 == 0
+F151,"If the seed contains 1, 3, 4, 7, eliminate all even sum combos.",True,"set(seed_digits).issuperset({1, 3, 4, 7})",combo_sum % 2 == 0
+F152,"If the seed contains 0, 2, 4, 6, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 2, 4, 6})",combo_sum % 2 == 0
+F153,"If the seed contains 3, 5, 8, 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 9, 3, 5})",combo_sum % 2 == 0
+F154,"If the seed contains 0, 1, 4, 6, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 1, 4, 6})",combo_sum % 2 == 0
+F155,"If the seed contains 1, 2, 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 2, 6})",combo_sum % 2 != 0
+F156,"If the seed contains 0, 3, 6, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 8, 3, 6})",combo_sum % 2 == 0
+F157,"If the seed contains 4, 5, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({4, 5, 7})",combo_sum % 2 != 0
+F158,"If the seed contains 3, 6, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({9, 3, 6})",combo_sum % 2 != 0
+F159,"If the seed contains 1, 3, 4, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 3, 4, 7})",combo_sum % 2 != 0
+F160,"If the seed contains 1, 3, 5, 7, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 3, 5, 7})",combo_sum % 2 != 0
+F161,"If the seed contains 0, 7, 8, 9, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({0, 8, 9, 7})",combo_sum % 2 != 0
+F162,"If the seed contains 1, 3, 5, 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 3, 5, 6})",combo_sum % 2 != 0
+F163,"If the seed contains 1, 3, 4, 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({1, 3, 4, 6})",combo_sum % 2 != 0
+F164,"If the seed contains 2, 4, 5, 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({2, 4, 5, 6})",combo_sum % 2 != 0
+F165,"If the seed contains 1, 2, 6, 8, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({8, 1, 2, 6})",combo_sum % 2 != 0
+F166,"If the seed contains 0, 1, 4, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 1, 4})",combo_sum % 2 == 0
+F167,"If the seed contains 0, 1, 2, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 1, 2})",combo_sum % 2 == 0
+F168,"If the seed contains 0, 8, 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 8, 9})",combo_sum % 2 == 0
+F169,"If the seed contains 0, 4, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({0, 8, 4})",combo_sum % 2 == 0
+F170,"If the seed contains 1, 2, 5, eliminate all even sum combos.",True,"set(seed_digits).issuperset({1, 2, 5})",combo_sum % 2 == 0
+F171,"If the seed contains 4, 5, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 4, 5})",combo_sum % 2 == 0
+F172,"If the seed contains 1, 7, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 1, 7})",combo_sum % 2 == 0
+F173,"If the seed contains 2, 7, 8, eliminate all even sum combos.",True,"set(seed_digits).issuperset({8, 2, 7})",combo_sum % 2 == 0
+F174,"If the seed contains 2, 3, 5, eliminate all even sum combos.",True,"set(seed_digits).issuperset({2, 3, 5})",combo_sum % 2 == 0
+F175,"If the seed contains 1, 2, 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({1, 2, 9})",combo_sum % 2 == 0
+F176,"If the seed contains 4, 5, 6, eliminate all odd sum combos.",True,"set(seed_digits).issuperset({4, 5, 6})",combo_sum % 2 != 0
+F177,"If the seed contains 1, 2, 5, 9, eliminate all even sum combos.",True,"set(seed_digits).issuperset({1, 2, 5, 9})",combo_sum % 2 == 0
+F178,Eliminate if seed sum ends with 3 and combo sum ends with 1.,True,True,seed_sum % 10 == 3 and combo_sum % 10 == 1
+F179,Eliminate if combo shares 5+ digits with seed and combo sum < 22.,True,True,len(set(seed_digits).intersection(combo_digits)) >= 5 and combo_sum < 22
+F180,Eliminate if seed sum is 16-24 and combo sum is 25-33.,True,True,16 <= seed_sum <= 24 and 25 <= combo_sum <= 33
+F181,Eliminate if seed sum is 25-33 and combo sum is 0-15.,True,True,25 <= seed_sum <= 33 and combo_sum <= 15
+F182,"Eliminate combos with 4 or more prime digits (2,3,5,7).",True,True,"sum(1 for d in combo_digits if d in {2,3,5,7}) >= 4"
+F183,Eliminate combos that include a digit and its mirror.,True,True,any(mirror[d] in combo_digits for d in combo_digits)
+F184,"Eliminate combos containing exactly 3 digits: two appearing twice, one once.",True,True,"len(set(combo_digits)) == 3 and sorted([combo_digits.count(d) for d in set(combo_digits)]) == [1,2,2]"
+F185,Eliminate combos in which 3 digits are identical.,True,True,any(combo_digits.count(d) == 3 for d in set(combo_digits))
+F186,Eliminate combos which contain 4 identical digits.,True,True,any(combo_digits.count(d) == 4 for d in set(combo_digits))
+F187,Eliminate combos whose digit sum matches seed mirror sum.,True,True,combo_sum == sum(mirror[d] for d in seed_digits)
+F188,Eliminate combo if it contains no due digits.,True,True,not any(d in due_digits for d in combo_digits)
+F189,Eliminate combo if combo sum last digit equals seed sum first digit.,True,True,combo_sum % 10 == int(str(seed_sum)[0])
+F190,Eliminate combo if seed contains {}.,True,True,True
+F191,Eliminate combo if seed contains {}.,True,True,True
+F192,Eliminate combo if seed contains {}.,True,True,True
+F193,Eliminate combo if seed contains {}.,True,True,True
+F194,Eliminate combo if seed contains 1.,True,True,set(seed_digits).issuperset({1})
+F195,Eliminate combo if seed contains 5.,True,True,set(seed_digits).issuperset({5})
+F196,Eliminate combo if seed contains 6.,True,True,set(seed_digits).issuperset({6})
+F197,Eliminate combo if no digit is among cold digits.,True,True,not any(d in cold_digits for d in combo_digits)
+F198,Eliminate combo if it does not contain any mirror of seed digits.,True,True,not any(mirror[d] in combo_digits for d in seed_digits)
+F199,Eliminate if any combo digit equals mirror of seed sum last digit.,True,True,any(d == mirror[seed_sum % 10] for d in combo_digits)
+F200,"If seed contains 0 and combo lacks 1,2,3, eliminate combo.",True,True,"0 in seed_digits and not any(d in combo_digits for d in [1,2,3])"
+F201,Eliminate combo if all five digits are >=3.,True,True,all(d >= 3 for d in combo_digits)
+F202,Eliminate combo if it contains 2 or more digits >=8.,True,True,sum(1 for d in combo_digits if d >=8) >=2
+F203,Eliminate combo if digit spread is less than 4.,True,True,max(combo_digits) - min(combo_digits) < 4
+F204,Eliminate combo if seed contains 0.,True,True,set(seed_digits).issuperset({0})
+F205,Eliminate combo if seed contains 0.,True,True,set(seed_digits).issuperset({0})
+F206,Eliminate combo if combo sum is greater than 40.,True,True,combo_sum > 40
+F207,Eliminate combo if seed contains 0.,True,True,set(seed_digits).issuperset({0})
+F208,Eliminate combo if seed contains 0.,True,True,set(seed_digits).issuperset({0})
+F209,Eliminate combo if seed contains 0.,True,True,set(seed_digits).issuperset({0})
+F210,Eliminate combo if seed contains 0.,True,True,set(seed_digits).issuperset({0})
+F211,Eliminate combo if contains double 0.,True,True,combo_digits.count(0) >= 2
+F212,Eliminate if combo is a single <25 and shares >=3 digits with seed.,True,True,len(set(combo_digits)) == 5 and combo_sum < 25 and sum(d in seed_digits for d in combo_digits) >= 3
+F213,Eliminate if none of the combo's v-trac groups is in seed.,True,True,not any(v_trac[d] in [v_trac[s] for s in seed_digits] for d in combo_digits)
+F214,Eliminate if all v-trac groups from seed are in combo.,True,True,all(v_trac[d] in [v_trac[s] for s in seed_digits] for d in combo_digits)
+F215,Eliminate if each combo digit is from a different v-trac group.,True,True,len(set(v_trac[d] for d in combo_digits)) == 5
+F216,Eliminate if all combo digits represent <=2 v-trac groups.,True,True,len(set(v_trac[d] for d in combo_digits)) <= 2
+F217,Eliminate if all digits in combo share a single v-trac group.,True,True,len(set(v_trac[d] for d in combo_digits)) == 1
+F218,"If seed contains 2 and combo lacks 4 or 5, eliminate combo.",True,True,"2 in seed_digits and not any(d in combo_digits for d in [4,5])"
+F219,"If seed contains 1 and combo lacks 2, 3, or 4, eliminate combo.",True,True,"1 in seed_digits and not any(d in combo_digits for d in [2,3,4])"
+F220,Eliminate combo if seed contains 8.,True,True,set(seed_digits).issuperset({8})
+F221,Eliminate combo if seed contains 7.,True,True,set(seed_digits).issuperset({7})
+F222,Eliminate combo if seed contains 4.,True,True,set(seed_digits).issuperset({4})
+F223,Eliminate combo if seed contains 9.,True,True,set(seed_digits).issuperset({9})
+F224,Eliminate combo if sum=37 unless seed sum >=30.,True,True,combo_sum == 37 and seed_sum < 30
+F225,Eliminate combo if sum equals 10.,True,True,combo_sum == 10
+F226,Eliminate combo if sum=39 unless seed sum >=30.,True,True,combo_sum == 39 and seed_sum < 30
+F227,Eliminate combo if sum=40 unless seed sum >=30.,True,True,combo_sum == 40 and seed_sum < 30
+F228,Eliminate combo if sum=38 unless seed sum >=30.,True,True,combo_sum == 38 and seed_sum < 30
+F229,Eliminate combo if sum equals 9.,True,True,combo_sum == 9
+F230,Eliminate combo if sum equals 8.,True,True,combo_sum == 8
+F231,Eliminate combo if sum equals 7.,True,True,combo_sum == 7
+F232,Eliminate combo if sum equals 6.,True,True,combo_sum == 6
+F233,Eliminate combo if sum=36 unless seed sum >=30.,True,True,combo_sum == 36 and seed_sum < 30
+F234,Eliminate combo if sum=45 unless seed sum >=30.,True,True,combo_sum == 45 and seed_sum < 30
+F235,Eliminate combo if sum=44 unless seed sum >=30.,True,True,combo_sum == 44 and seed_sum < 30
+F236,Eliminate combo if sum=43 unless seed sum >=30.,True,True,combo_sum == 43 and seed_sum < 30
+F237,Eliminate combo if sum=42 unless seed sum >=30.,True,True,combo_sum == 42 and seed_sum < 30
+F238,Eliminate combo if sum=41 unless seed sum >=30.,True,True,combo_sum == 41 and seed_sum < 30
+F239,Eliminate combo if sum equals 5.,True,True,combo_sum == 5
+F240,Eliminate combo if sum equals 4.,True,True,combo_sum == 4
+F241,Eliminate combo if sum equals 3.,True,True,combo_sum == 3
+F242,Eliminate combo if sum equals 2.,True,True,combo_sum == 2
+F243,Eliminate combo if sum=34 unless seed sum >=30.,True,True,combo_sum == 34 and seed_sum < 30
+F244,Eliminate if <=4 digits follow in consecutive order regardless of position.,True,True,any(sorted(combo_digits)[i]+1 == sorted(combo_digits)[i+1] for i in range(len(sorted(combo_digits))-1))
+F245,Eliminate combo if seed contains 2.,True,True,set(seed_digits).issuperset({2})
+F246,"If seed sum=16 and combo sum <12 or >20, eliminate combo.",True,True,seed_sum == 16 and (combo_sum < 12 or combo_sum > 20)
+F247,Eliminate combo if seed contains 3.,True,True,set(seed_digits).issuperset({3})
+F248,Eliminate combo if seed contains 0.,True,True,set(seed_digits).issuperset({0})
+F249,Eliminate combo if seed contains 1.,True,True,set(seed_digits).issuperset({1})
+F250,Eliminate combo if seed contains 2.,True,True,set(seed_digits).issuperset({2})
+F251,"Keep combos sum 20-28 if seed sum >=26, else eliminate.",True,True,seed_sum >= 26 and not (20 <= combo_sum <= 28)
+F252,"Keep combos sum 19-25 if seed sum =17, else eliminate.",True,True,seed_sum == 17 and not (19 <= combo_sum <= 25)
+F253,"Keep combos sum 16-25 if seed sum 22-23, else eliminate.",True,True,22 <= seed_sum <=23 and not (16 <= combo_sum <= 25)
+F254,"Keep combos sum 14-24 if seed sum 19-21, else eliminate.",True,True,19 <= seed_sum <=21 and not (14 <= combo_sum <= 24)
+F255,"Keep combos sum 14-22 if seed sum 13-15, else eliminate.",True,True,13 <= seed_sum <=15 and not (14 <= combo_sum <= 22)
+F256,"Keep combos sum 12-25 if seed sum =12, else eliminate.",True,True,seed_sum == 12 and not (12 <= combo_sum <= 25)
+F257,"Keep combos sum 12-20 if seed sum =16, else eliminate.",True,True,seed_sum == 16 and not (12 <= combo_sum <= 20)
+F258,"Keep combos sum 11-26 if seed sum 17-18, else eliminate.",True,True,(seed_sum ==17 or seed_sum==18) and not (11 <= combo_sum <=26)
+F259,"Keep combos sum 19-25 if seed sum 24-25, else eliminate.",True,True,24 <= seed_sum <=25 and not (19 <= combo_sum <=25)
+F260,"Keep combos sum 16-25 if seed sum 22-23, else eliminate.",True,True,22 <= seed_sum <=23 and not (16 <= combo_sum <=25)
+F261,"Keep combos sum 14-24 if seed sum 19-21, else eliminate.",True,True,19 <= seed_sum <=21 and not (14 <= combo_sum <=24)
+F262,"Keep combos sum 14-22 if seed sum 13-15, else eliminate.",True,True,13 <= seed_sum <=15 and not (14 <= combo_sum <=22)
+F263,"Keep combos sum 12-25 if seed sum <=12, else eliminate.",True,True,seed_sum <=12 and not (12 <= combo_sum <=25)
+F264,"Keep combos sum 11-26 if seed sum 17-18, else eliminate.",True,True,(seed_sum==17 or seed_sum==18) and not (11 <= combo_sum <=26)
+F265,Eliminate if seed sum ends with 2 and combo sum ends with 0.,True,True,seed_sum % 10 ==2 and combo_sum %10 ==0
+F266,"Keep combos sum 14-22 if seed sum 13-15, else eliminate.",True,True,13 <= seed_sum <=15 and not (14 <= combo_sum <=22)
+F267,"Keep combos sum 11-26 if seed sum 17-18, else eliminate.",True,True,(seed_sum==17 or seed_sum==18) and not (11 <= combo_sum <=26)
+F268,Eliminate if combo shares >=4 digits with seed and combo sum < 34.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 34
+F269,Eliminate if combo shares >=4 digits with seed and combo sum < 33.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 33
+F270,Eliminate if combo shares >=4 digits with seed and combo sum < 32.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 32
+F271,Eliminate if combo shares >=4 digits with seed and combo sum < 31.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 31
+F272,Eliminate if combo shares >=4 digits with seed and combo sum < 30.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 30
+F273,Eliminate if combo shares >=4 digits with seed and combo sum < 29.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 29
+F274,Eliminate if combo shares >=4 digits with seed and combo sum < 28.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 28
+F275,Eliminate if combo shares >=4 digits with seed and combo sum < 27.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 27
+F276,Eliminate if combo shares >=4 digits with seed and combo sum < 35.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 35
+F277,Eliminate if combo shares >=4 digits with seed and combo sum < 26.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 26
+F278,Eliminate if combo shares >=4 digits with seed and combo sum < 24.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 24
+F279,Eliminate if combo shares >=4 digits with seed and combo sum < 22.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 22
+F280,Eliminate if combo shares >=4 digits with seed and combo sum < 21.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 21
+F281,Eliminate if combo shares >=4 digits with seed and combo sum < 20.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 20
+F282,Eliminate if combo shares >=4 digits with seed and combo sum < 19.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 19
+F283,Eliminate if combo shares >=4 digits with seed and combo sum < 18.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 18
+F284,Eliminate if combo shares ≥4 digits with seed and combo sum < 17.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 17
+F285,Eliminate if combo shares ≥4 digits with seed and combo sum < 16.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 16
+F286,Eliminate if combo shares ≥4 digits with seed and combo sum < 25.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 25
+F287,Eliminate if combo shares ≥4 digits with seed and combo sum < 36.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 36
+F288,Eliminate if combo shares ≥4 digits with seed and combo sum < 37.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 37
+F289,Eliminate if combo shares ≥4 digits with seed and combo sum < 38.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 38
+F290,Eliminate if combo shares ≥4 digits with seed and combo sum < 45.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 45
+F291,Eliminate if combo shares ≥4 digits with seed and combo sum < 44.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 44
+F292,Eliminate if combo shares ≥4 digits with seed and combo sum < 43.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 43
+F293,Eliminate if combo shares ≥4 digits with seed and combo sum < 42.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 42
+F294,Eliminate if combo shares ≥4 digits with seed and combo sum < 41.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 41
+F295,Eliminate if combo shares ≥4 digits with seed and combo sum < 40.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 40
+F296,Eliminate if combo shares ≥4 digits with seed and combo sum < 39.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 39
+F297,Eliminate if combo shares ≥4 digits with seed and combo sum < 15.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 15
+F298,Eliminate if combo shares ≥4 digits with seed and combo sum < 13.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 13
+F299,Eliminate if combo shares ≥4 digits with seed and combo sum < 12.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 12
+F300,Eliminate if combo shares ≥4 digits with seed and combo sum < 11.,True,True,sum(d in seed_digits for d in combo_digits) >=4 and combo_sum < 11
+F301,Eliminate if combo shares ≥5 digits with seed and combo sum < 21.,True,True,sum(d in seed_digits for d in combo_digits) >=5 and combo_sum < 21
+F302,Eliminate if combo shares ≥5 digits with seed and combo sum < 20.,True,True,sum(d in seed_digits for d in combo_digits) >=5 and combo_sum < 20
+F303,Eliminate if combo shares ≥5 digits with seed and combo sum < 19.,True,True,sum(d in seed_digits for d in combo_digits) >=5 and combo_sum < 19
+F304,Eliminate if combo shares ≥5 digits with seed and combo sum < 18.,True,True,sum(d in seed_digits for d in combo_digits) >=5 and combo_sum < 18
+F305,Eliminate if combo shares ≥5 digits with seed and combo sum < 17.,True,True,sum(d in seed_digits for d in combo_digits) >=5 and combo_sum < 17
+F306,Eliminate if combo shares ≥5 digits with seed and combo sum < 16.,True,True,sum(d in seed_digits for d in combo_digits) >=5 and combo_sum < 16
+F307,Eliminate if combo shares ≥5 digits with seed and combo sum < 15.,True,True,sum(d in seed_digits for d in combo_digits) >=5 and combo_sum < 15
+F308,Eliminate if combo shares ≥5 digits with seed and combo sum < 14.,True,True,sum(d in seed_digits for d in combo_digits) >=5 and combo_sum < 14
+F309,Eliminate if combo shares ≥5 digits with seed and combo sum < 13.,True,True,sum(d in seed_digits for d in combo_digits) >=5 and combo_sum < 13
+F310,Eliminate if combo shares ≥5 digits with seed and combo sum < 12.,True,True,sum(d in seed_digits for d in combo_digits) >=5 and combo_sum < 12
+F311,Eliminate if combo shares ≥5 digits with seed and combo sum < 11.,True,True,sum(d in seed_digits for d in combo_digits) >=5 and combo_sum < 11
+F312,Eliminate if combo shares ≥5 digits with seed and combo sum < 10.,True,True,sum(d in seed_digits for d in combo_digits) >=5 and combo_sum < 10
+F313,Eliminate if combo sum differs from seed sum by exactly 15.,True,True,abs(combo_sum - seed_sum) == 15
+F314,Eliminate if combo sum differs from seed sum by exactly 14.,True,True,abs(combo_sum - seed_sum) == 14
+F315,Eliminate if combo sum differs from seed sum by exactly 13.,True,True,abs(combo_sum - seed_sum) == 13
+F316,Eliminate combos with same root sum as seed.,True,True,sum(int(d) for d in str(combo_sum)) == sum(int(d) for d in str(seed_sum))
+F317,Eliminate if combo has same number of odd digits as seed.,True,True,sum(1 for d in combo_digits if d % 2 != 0) == sum(1 for d in seed_digits if d % 2 != 0)
+F318,Eliminate if combo has same number of even digits as seed.,True,True,sum(1 for d in combo_digits if d % 2 == 0) == sum(1 for d in seed_digits if d % 2 == 0)
+F319,"If combo has 5 unique digits and sum >25, must have at least 3 digits matching seed.",True,True,len(set(combo_digits)) == 5 and combo_sum > 25 and sum(d in seed_digits for d in combo_digits) < 3
+F320,"If combo has more than 3 unique digits, must contain at least 1 cold digit.",True,True,len(set(combo_digits)) > 3 and not any(d in cold_digits for d in combo_digits)
+F321,Eliminate if combo spread differs from seed spread by more than 3.,True,True,abs((max(combo_digits)-min(combo_digits)) - (max(seed_digits)-min(seed_digits))) > 3
+F322,Eliminate if all 5 digits in combo are >=5.,True,True,all(d >=5 for d in combo_digits)
+F323,Eliminate if all 5 digits in combo are <=4.,True,True,all(d <=4 for d in combo_digits)
+F324,Eliminate if all 5 digits in combo are odd.,True,True,all(d %2 !=0 for d in combo_digits)
+F325,Eliminate if all 5 digits in combo are even.,True,True,all(d %2 ==0 for d in combo_digits)
+F326,"If seed sum is 24-25, combo sum must be 19-25.",True,True,24 <= seed_sum <= 25 and not (19 <= combo_sum <= 25)
+F327,"If seed sum >=26, combo sum must be 20-28.",True,True,seed_sum >=26 and not (20 <= combo_sum <=28)
+F328,"If seed sum <=12, combo sum must be 12-25.",True,True,seed_sum <=12 and not (12 <= combo_sum <=25)
+F329,"If seed sum 24-25, combo sum must be 19-25.",True,True,24 <= seed_sum <= 25 and not (19 <= combo_sum <= 25)
+F330,"If seed sum 22-23, combo sum must be 16-25.",True,True,22 <= seed_sum <= 23 and not (16 <= combo_sum <= 25)
+F331,"If seed sum 19-21, combo sum must be 14-24.",True,True,19 <= seed_sum <= 21 and not (14 <= combo_sum <= 24)
+F332,Eliminate if combo sum equals mirror of seed sum.,True,True,combo_sum == sum(mirror[d] for d in seed_digits)
+F333,"If seed sum=16, combo sum must be 12-20.",True,True,seed_sum ==16 and not (12 <= combo_sum <=20)
+F334,Eliminate if no digit in combo is a mirror of any in seed.,True,True,not any(mirror[d] in combo_digits for d in seed_digits)
+F335,Eliminate if combo shares ≥3 digits with seed and combo sum < 18.,True,True,sum(d in seed_digits for d in combo_digits) >=3 and combo_sum < 18
+F336,Eliminate if combo shares ≥3 digits with seed and combo sum < 17.,True,True,sum(d in seed_digits for d in combo_digits) >=3 and combo_sum < 17
+F337,Eliminate if combo shares ≥3 digits with seed and combo sum < 16.,True,True,sum(d in seed_digits for d in combo_digits) >=3 and combo_sum < 16
+F338,Eliminate if combo shares ≥3 digits with seed and combo sum < 15.,True,True,sum(d in seed_digits for d in combo_digits) >=3 and combo_sum < 15
+F339,Eliminate if combo shares ≥3 digits with seed and combo sum < 14.,True,True,sum(d in seed_digits for d in combo_digits) >=3 and combo_sum < 14
+F340,Eliminate if combo shares ≥3 digits with seed and combo sum < 13.,True,True,sum(d in seed_digits for d in combo_digits) >=3 and combo_sum < 13
+F341,Eliminate if combo shares ≥3 digits with seed and combo sum < 12.,True,True,sum(d in seed_digits for d in combo_digits) >=3 and combo_sum < 12
+F342,Eliminate if combo shares ≥3 digits with seed and combo sum < 11.,True,True,sum(d in seed_digits for d in combo_digits) >=3 and combo_sum < 11
+F343,Eliminate if combo shares ≥3 digits with seed and combo sum < 10.,True,True,sum(d in seed_digits for d in combo_digits) >=3 and combo_sum < 10
+F344,Eliminate if combo shares ≥2 digits with seed and sum <14.,True,True,sum(d in seed_digits for d in combo_digits) >=2 and combo_sum < 14
+F345,Eliminate if combo shares ≥2 digits with seed and sum <13.,True,True,sum(d in seed_digits for d in combo_digits) >=2 and combo_sum < 13
+F346,Eliminate if combo shares ≥2 digits with seed and sum <12.,True,True,sum(d in seed_digits for d in combo_digits) >=2 and combo_sum < 12
+F347,Eliminate if combo shares ≥2 digits with seed and sum <11.,True,True,sum(d in seed_digits for d in combo_digits) >=2 and combo_sum < 11
+F348,Eliminate if combo shares ≥2 digits with seed and sum <10.,True,True,sum(d in seed_digits for d in combo_digits) >=2 and combo_sum < 10
+F349,Eliminate if combo shares ≥1 digit with seed and sum <12.,True,True,sum(d in seed_digits for d in combo_digits) >=1 and combo_sum < 12
+F350,Eliminate if combo shares ≥1 digit with seed and sum <11.,True,True,sum(d in seed_digits for d in combo_digits) >=1 and combo_sum < 11
+F351,Eliminate if combo shares ≥1 digit with seed and sum <10.,True,True,sum(d in seed_digits for d in combo_digits) >=1 and combo_sum < 10
+F352,Eliminate if combo contains both a digit and its mirror.,True,True,any(mirror[d] in combo_digits for d in combo_digits)
+F353,Eliminate if any combo digit equals mirror of last digit of seed sum.,True,True,any(d == mirror[seed_sum % 10] for d in combo_digits)
+F354,"If seed contains 0 and 8, eliminate even sum combos.",True,True,"set(seed_digits).issuperset({0,8}) and combo_sum % 2 == 0"
+F355,Eliminate combo if seed contains 5.,True,True,set(seed_digits).issuperset({5})
+F356,Eliminate combo if seed contains 3.,True,True,set(seed_digits).issuperset({3})
+F357,Eliminate combo if seed contains 8.,True,True,set(seed_digits).issuperset({8})
+F358,Eliminate combo if seed contains 7.,True,True,set(seed_digits).issuperset({7})
