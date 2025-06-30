@@ -12,32 +12,23 @@ MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
 def get_v_trac_group(d): return V_TRAC_GROUPS.get(d)
 def get_mirror(d): return MIRROR_PAIRS.get(d)
 
-filters_by_group = {
-    "Subset Filters": [],
-    "Mirror Filters": [],
-    "V-Trac Filters": [],
-    "Sum End Digit Filters": [],
-    "Other Filters": []
-}
-
-# Load filters into groups
+# Load filters
+filters_list = []
 txt_path = 'filter_intent_summary_corrected_only.csv'
 if os.path.exists(txt_path):
     with open(txt_path, 'r', encoding='utf-8') as f:
         reader = csv.reader(f)
         for row in reader:
             desc = row[0].strip().strip('"')
-            if "issubset" in desc:
-                filters_by_group["Subset Filters"].append(desc)
-            elif "mirror" in desc.lower():
-                filters_by_group["Mirror Filters"].append(desc)
-            elif "v-trac" in desc.lower():
-                filters_by_group["V-Trac Filters"].append(desc)
-            elif "end digit" in desc.lower() or "sum end" in desc.lower():
-                filters_by_group["Sum End Digit Filters"].append(desc)
-            else:
-                filters_by_group["Other Filters"].append(desc)
+            if desc:
+                filters_list.append(desc)
 
+# Ensure mirror filter present
+mirror_desc = "If a combo contains both a digit and its mirror (0/5, 1/6, 2/7, 3/8, 4/9), eliminate combo"
+if mirror_desc not in filters_list:
+    filters_list.append(mirror_desc)
+
+# Generate combos
 def generate_combinations(seed, method="2-digit pair"):
     all_digits = '0123456789'
     combos = set()
@@ -54,6 +45,7 @@ def generate_combinations(seed, method="2-digit pair"):
                 combos.add(''.join(sorted(pair + ''.join(p))))
     return sorted(combos)
 
+# Apply filters
 def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_draw_digits, seed_counts, new_seed_digits):
     sum_combo = sum(combo_digits)
     set_combo = set(combo_digits)
@@ -63,7 +55,7 @@ def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_dr
     if "issubset(set(seed))" in desc:
         nums = set(map(int, re.findall(r'\d', desc)))
         return nums.issubset(set_seed) and ("% 2 != 0" not in desc or sum_combo % 2 != 0)
-    if "mirror" in desc.lower():
+    if "mirror" in desc:
         return any(get_mirror(x) in combo_digits for x in combo_digits)
     if "v-trac" in desc.lower():
         groups = [get_v_trac_group(x) for x in combo_digits]
@@ -82,8 +74,9 @@ def apply_filter(desc, combo_digits, seed_digits, prev_seed_digits, prev_prev_dr
         return set(seed_counts.values()) == {2, 3} and sum_combo % 2 == 0
     return False
 
-st.sidebar.header("🔢 DC-5 Filter Tracker Grouped")
-select_all_groups = st.sidebar.checkbox("Select/Deselect All Groups", value=True)
+# Streamlit UI
+st.sidebar.header("🔢 DC-5 Filter Tracker Full")
+select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
 
 seed = st.sidebar.text_input("Current 5-digit seed (required):").strip()
 if len(seed) != 5 or not seed.isdigit():
@@ -105,16 +98,12 @@ survivors, eliminated_details = [], {}
 for combo in combos:
     cd = [int(c) for c in combo]
     eliminated = False
-    for group_name, filter_list in filters_by_group.items():
-        if st.sidebar.checkbox(f"{group_name} ({len(filter_list)} filters)", value=select_all_groups, key=f"group_{group_name}"):
-            for i, desc in enumerate(filter_list):
-                if st.session_state.get(f"filter_{group_name}_{i}", True):
-                    if apply_filter(desc, cd, seed_digits, prev_seed_digits, prev_prev_draw_digits, seed_counts, new_seed_digits):
-                        eliminated_details[combo] = desc
-                        eliminated = True
-                        break
-        if eliminated:
-            break
+    for i, desc in enumerate(filters_list):
+        if st.session_state.get(f"filter_{i}", select_all):
+            if apply_filter(desc, cd, seed_digits, prev_seed_digits, prev_prev_draw_digits, seed_counts, new_seed_digits):
+                eliminated_details[combo] = desc
+                eliminated = True
+                break
     if not eliminated:
         survivors.append(combo)
 
@@ -130,11 +119,9 @@ if query:
         st.sidebar.info("Not generated.")
 
 st.header("🔧 Active Filters")
-for group_name, filter_list in filters_by_group.items():
-    with st.expander(group_name):
-        for i, desc in enumerate(filter_list):
-            count = sum(apply_filter(desc, [int(c) for c in combo], seed_digits, prev_seed_digits, prev_prev_draw_digits, seed_counts, new_seed_digits) for combo in combos)
-            st.checkbox(f"{desc} — eliminated {count}", value=True, key=f"filter_{group_name}_{i}")
+for i, desc in enumerate(filters_list):
+    count = sum(apply_filter(desc, [int(c) for c in combo], seed_digits, prev_seed_digits, prev_prev_draw_digits, seed_counts, new_seed_digits) for combo in combos)
+    st.checkbox(f"{desc} — eliminated {count}", value=select_all, key=f"filter_{i}")
 
 with st.expander("Show remaining combinations"):
     for c in survivors:
