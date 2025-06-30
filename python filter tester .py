@@ -150,8 +150,8 @@ if query:
 # Active Filters display
 st.header("🔧 Active Filters")
 for flt in filters:
-    # Count how many combos this filter would eliminate
     count = 0
+    error_msg = None
     for combo in combos:
         combo_digits = [int(c) for c in combo]
         ctx = {
@@ -170,13 +170,18 @@ for flt in filters:
             'cold_digits': cold_digits,
             'due_digits': due_digits
         }
-        # Only evaluate if applicable
-        if not eval(flt['applicable_code'], {}, ctx):
-            continue
-        # If the filter would eliminate this combo, increment
-        if eval(flt['expr_code'], {}, ctx):
-            count += 1
-    st.checkbox(f"{flt['name']} — eliminated {count}", key=f"filter_{flt['id']}", value=select_all and flt['enabled_default'])
+        try:
+            if not eval(flt['applicable_code'], {}, ctx):
+                continue
+            if eval(flt['expr_code'], {}, ctx):
+                count += 1
+        except Exception as e:
+            error_msg = str(e)
+            break
+    label = f"{flt['name']} — eliminated {count}"
+    if error_msg:
+        label += f" (Error: {error_msg})"
+    st.checkbox(label, key=f"filter_{flt['id']}", value=select_all and flt['enabled_default'])
 
 # Show remaining combinations
 with st.expander("Show remaining combinations"):
