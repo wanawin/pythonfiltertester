@@ -2,6 +2,7 @@ import streamlit as st
 from itertools import product
 import csv
 import os
+import re
 from collections import Counter
 
 # V-Trac and mirror mappings
@@ -20,7 +21,6 @@ if not os.path.exists(FILTERS_CSV):
 with open(FILTERS_CSV, newline='', encoding='utf-8') as f:
     reader = csv.DictReader(f)
     for row in reader:
-        # Compile code
         row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
         row['expr_code'] = compile(row['expression'], '<expr>', 'eval')
         row['enabled_default'] = row['enabled'].strip().lower() == 'true'
@@ -55,6 +55,11 @@ prev_seed = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
 prev_prev_draw = st.sidebar.text_input("Draw before previous seed (optional):").strip()
 method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
 
+# Hot/Cold/Due digits inputs
+hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
+cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
+due_input = st.sidebar.text_input("Due digits (comma-separated):").strip()
+
 # Validate seed
 if len(seed) != 5 or not seed.isdigit():
     st.sidebar.error("Seed must be exactly 5 digits")
@@ -63,9 +68,12 @@ if len(seed) != 5 or not seed.isdigit():
 # Prepare context values
 seed_digits = [int(d) for d in seed]
 seed_counts = Counter(seed_digits)
-prev_seed_digits = [int(d) for d in prev_seed] if prev_seed.isdigit() else []
-prev_prev_draw_digits = [int(d) for d in prev_prev_draw] if prev_prev_draw.isdigit() else []
+prev_seed_digits = [int(d) for d in prev_seed.split(',') if d.strip().isdigit()]
+prev_prev_draw_digits = [int(d) for d in prev_prev_draw.split(',') if d.strip().isdigit()]
 new_seed_digits = set(seed_digits) - set(prev_seed_digits)
+hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
+cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
+due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
 
 # Generate combos
 combos = generate_combinations(seed, method)
@@ -86,7 +94,10 @@ for combo in combos:
         'prev_seed_digits': prev_seed_digits,
         'prev_prev_draw_digits': prev_prev_draw_digits,
         'common_to_both': set(prev_seed_digits).intersection(prev_prev_draw_digits),
-        'last2': set(prev_seed_digits) | set(prev_prev_draw_digits)
+        'last2': set(prev_seed_digits) | set(prev_prev_draw_digits),
+        'hot_digits': hot_digits,
+        'cold_digits': cold_digits,
+        'due_digits': due_digits
     }
     eliminated = False
     for flt in filters:
@@ -119,35 +130,32 @@ if query:
 # Active Filters display
 st.header("🔧 Active Filters")
 for flt in filters:
-    count = sum(
-        eval(flt['expr_code'], {}, {
+    # Count how many combos this filter would eliminate
+    count = 0
+    for combo in combos:
+        combo_digits = [int(c) for c in combo]
+        ctx = {
             'seed_digits': seed_digits,
-            'combo_digits': [int(c) for c in combo],
+            'combo_digits': combo_digits,
             'seed_sum': sum(seed_digits),
-            'combo_sum': sum(int(c) for c in combo),
+            'combo_sum': sum(combo_digits),
             'seed_counts': seed_counts,
             'mirror': MIRROR,
             'new_seed_digits': new_seed_digits,
             'prev_seed_digits': prev_seed_digits,
             'prev_prev_draw_digits': prev_prev_draw_digits,
             'common_to_both': set(prev_seed_digits).intersection(prev_prev_draw_digits),
-            'last2': set(prev_seed_digits) | set(prev_prev_draw_digits)
-        })
-        for combo in combos
-        if eval(flt['applicable_code'], {}, {
-            'seed_digits': seed_digits,
-            'combo_digits': [int(c) for c in combo],
-            'seed_sum': sum(seed_digits),
-            'combo_sum': sum(int(c) for c in combo),
-            'seed_counts': seed_counts,
-            'mirror': MIRROR,
-            'new_seed_digits': new_seed_digits,
-            'prev_seed_digits': prev_seed_digits,
-            'prev_prev_draw_digits': prev_prev_draw_digits,
-            'common_to_both': set(prev_seed_digits).intersection(prev_prev_draw_digits),
-            'last2': set(prev_seed_digits) | set(prev_prev_draw_digits)
-        })
-    )
+            'last2': set(prev_seed_digits) | set(prev_prev_draw_digits),
+            'hot_digits': hot_digits,
+            'cold_digits': cold_digits,
+            'due_digits': due_digits
+        }
+        # Only evaluate if applicable
+        if not eval(flt['applicable_code'], {}, ctx):
+            continue
+        # If the filter would eliminate this combo, increment
+        if eval(flt['expr_code'], {}, ctx):
+            count += 1
     st.checkbox(f"{flt['name']} — eliminated {count}", key=f"filter_{flt['id']}", value=select_all and flt['enabled_default'])
 
 # Show remaining combinations
