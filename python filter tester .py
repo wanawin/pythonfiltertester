@@ -1,8 +1,5 @@
-# Generate combos if undefined
-try:
-    combos
-except NameError:
-    combos = generate_combinations(seed, method)
+# Generate combos
+combos = generate_combinations(seed, method)
 
 # Evaluate filters
 survivors = []
@@ -38,6 +35,8 @@ for combo in combos:
         survivors.append(combo)
 
 # Summary
+st.sidebar.markdown(f"**Total:** {len(combos)} &nbsp;&nbsp;Eliminated: {len(eliminated_details)} &nbsp;&nbsp;Survivors: {len(survivors)}")
+
 st.sidebar.markdown(f"**Total:** {len(combos)} &nbsp;&nbsp;Eliminated: {len(eliminated_details)} &nbsp;&nbsp;Survivors: {len(survivors)}")
 
 # Combo checker
