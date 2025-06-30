@@ -83,6 +83,3 @@ for flt in filters:
 with st.expander("Show remaining combinations"):
     for combo in survivors:
         st.write(combo)
-("Show remaining combinations"):
-    for combo in survivors:
-        st.write(combo)
