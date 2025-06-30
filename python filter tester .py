@@ -136,29 +136,23 @@ for flt in filters:
     count = 0
     error_msg = None
     for combo in combos:
-        # Rebuild context per filter
-tmp_context = {
-    'seed_digits': seed_digits,
-    'seed_sum': sum(seed_digits),
-    'seed_counts': seed_counts,
-    'mirror': MIRROR,
-    'new_seed_digits': new_seed_digits,
-    'prev_seed_digits': prev_seed_digits,
-    'prev_prev_seed_digits': prev_prev_seed_digits,
-    'common_to_both': set(prev_seed_digits).intersection(prev_prev_seed_digits),
-    'last2': set(prev_seed_digits) | set(prev_prev_seed_digits),
-    'hot_digits': hot_digits,
-    'cold_digits': cold_digits,
-    'due_digits': due_digits
-}
-ctx = tmp_context.copy()
         combo_digits = [int(c) for c in combo]
-        ctx.update({
+        ctx = {
+            'seed_digits': seed_digits,
             'combo_digits': combo_digits,
+            'seed_sum': sum(seed_digits),
             'combo_sum': sum(combo_digits),
+            'seed_counts': seed_counts,
+            'mirror': MIROR,
+            'new_seed_digits': new_seed_digits,
+            'prev_seed_digits': prev_seed_digits,
+            'prev_prev_seed_digits': prev_prev_seed_digits,
             'common_to_both': set(prev_seed_digits).intersection(prev_prev_seed_digits),
-            'last2': set(prev_seed_digits) | set(prev_prev_seed_digits)
-        })
+            'last2': set(prev_seed_digits) | set(prev_prev_seed_digits),
+            'hot_digits': hot_digits,
+            'cold_digits': cold_digits,
+            'due_digits': due_digits
+        }
         try:
             if not eval(flt['applicable_code'], {}, ctx):
                 continue
