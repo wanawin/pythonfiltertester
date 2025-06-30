@@ -2,7 +2,6 @@ import streamlit as st
 from itertools import product
 import csv
 import os
-import re
 from collections import Counter
 
 # V-Trac and mirror mappings
@@ -13,18 +12,21 @@ MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
 MIRROR = MIRROR_PAIRS
 
 # Load filters from CSV
-FILTERS_CSV = 'filters.csv'
-filters = []
-if not os.path.exists(FILTERS_CSV):
-    st.error(f"Filter file not found: {FILTERS_CSV}")
-    st.stop()
-with open(FILTERS_CSV, newline='', encoding='utf-8') as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
-        row['expr_code'] = compile(row['expression'], '<expr>', 'eval')
-        row['enabled_default'] = row['enabled'].strip().lower() == 'true'
-        filters.append(row)
+def load_filters(path='filters.csv'):
+    if not os.path.exists(path):
+        st.error(f"Filter file not found: {path}")
+        st.stop()
+    flts = []
+    with open(path, newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
+            row['expr_code'] = compile(row['expression'], '<expr>', 'eval')
+            row['enabled_default'] = row['enabled'].strip().lower() == 'true'
+            flts.append(row)
+    return flts
+
+filters = load_filters()
 
 # Combination generator
 def generate_combinations(seed, method):
@@ -38,7 +40,7 @@ def generate_combinations(seed, method):
             for p in product(all_digits, repeat=4):
                 combos.add(''.join(sorted(d + ''.join(p))))
     else:
-        pairs = set(''.join(sorted((seed_sorted[i], seed_sorted[j]))) 
+        pairs = set(''.join(sorted((seed_sorted[i], seed_sorted[j])))
                     for i in range(len(seed_sorted)) for j in range(i+1, len(seed_sorted)))
         for pair in pairs:
             for p in product(all_digits, repeat=3):
@@ -52,7 +54,7 @@ select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
 # Seed inputs
 seed = st.sidebar.text_input("Current 5-digit seed (required):").strip()
 prev_seed = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
-prev_prev_draw = st.sidebar.text_input("Draw before previous seed (optional):").strip()
+prev_prev_seed = st.sidebar.text_input("Previous previous 5-digit seed (optional):").strip()
 method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
 
 # Hot/Cold/Due digits inputs
@@ -68,34 +70,14 @@ if len(seed) != 5 or not seed.isdigit():
 # Prepare context values
 seed_digits = [int(d) for d in seed]
 seed_counts = Counter(seed_digits)
-prev_seed_digits = [int(d) for d in prev_seed.split(',') if d.strip().isdigit()]
-prev_prev_draw_digits = [int(d) for d in prev_prev_draw.split(',') if d.strip().isdigit()]
+prev_seed_digits = [int(d) for d in prev_seed if d.isdigit()]
+prev_prev_seed_digits = [int(d) for d in prev_prev_seed if d.isdigit()]
 new_seed_digits = set(seed_digits) - set(prev_seed_digits)
 hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
 cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
 due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
 
 # Generate combos
-# Ensure the generator is defined before use
-def generate_combinations(seed, method):
-    all_digits = '0123456789'
-    combos = set()
-    seed_sorted = ''.join(sorted(seed))
-    if len(seed_sorted) < 2:
-        return []
-    if method == '1-digit':
-        for d in seed_sorted:
-            for p in product(all_digits, repeat=4):
-                combos.add(''.join(sorted(d + ''.join(p))))
-    else:
-        pairs = set(''.join(sorted((seed_sorted[i], seed_sorted[j]))) 
-                    for i in range(len(seed_sorted)) for j in range(i+1, len(seed_sorted)))
-        for pair in pairs:
-            for p in product(all_digits, repeat=3):
-                combos.add(''.join(sorted(pair + ''.join(p))))
-    return sorted(combos)
-
-# Now generate combos
 combos = generate_combinations(seed, method)
 
 # Evaluate filters
@@ -112,9 +94,10 @@ for combo in combos:
         'mirror': MIRROR,
         'new_seed_digits': new_seed_digits,
         'prev_seed_digits': prev_seed_digits,
-        'prev_prev_draw_digits': prev_prev_draw_digits,
-        'common_to_both': set(prev_seed_digits).intersection(prev_prev_draw_digits),
-        'last2': set(prev_seed_digits) | set(prev_prev_draw_digits),
+        'prev_prev_seed_digits': prev_prev_seed_digits,
+        
+        'common_to_both': set(prev_seed_digits).intersection(prev_prev_seed_digits),
+        'last2': set(prev_seed_digits) | set(prev_prev_seed_digits),
         'hot_digits': hot_digits,
         'cold_digits': cold_digits,
         'due_digits': due_digits
@@ -122,9 +105,7 @@ for combo in combos:
     eliminated = False
     for flt in filters:
         active = st.session_state.get(f"filter_{flt['id']}", select_all and flt['enabled_default'])
-        if not active:
-            continue
-        if not eval(flt['applicable_code'], {}, context):
+        if not active or not eval(flt['applicable_code'], {}, context):
             continue
         if eval(flt['expr_code'], {}, context):
             eliminated_details[combo] = flt['name']
@@ -134,7 +115,9 @@ for combo in combos:
         survivors.append(combo)
 
 # Summary
-st.sidebar.markdown(f"**Total:** {len(combos)} &nbsp;&nbsp;Eliminated: {len(eliminated_details)} &nbsp;&nbsp;Survivors: {len(survivors)}")
+total = len(combos)
+elim_count = len(eliminated_details)
+st.sidebar.markdown(f"**Total:** {total} &nbsp;&nbsp;Eliminated: {elim_count} &nbsp;&nbsp;Survivors: {total - elim_count}")
 
 # Combo checker
 query = st.sidebar.text_input("Check specific combo:")
@@ -153,23 +136,29 @@ for flt in filters:
     count = 0
     error_msg = None
     for combo in combos:
+        # Rebuild context per filter
+tmp_context = {
+    'seed_digits': seed_digits,
+    'seed_sum': sum(seed_digits),
+    'seed_counts': seed_counts,
+    'mirror': MIRROR,
+    'new_seed_digits': new_seed_digits,
+    'prev_seed_digits': prev_seed_digits,
+    'prev_prev_seed_digits': prev_prev_seed_digits,
+    'common_to_both': set(prev_seed_digits).intersection(prev_prev_seed_digits),
+    'last2': set(prev_seed_digits) | set(prev_prev_seed_digits),
+    'hot_digits': hot_digits,
+    'cold_digits': cold_digits,
+    'due_digits': due_digits
+}
+ctx = tmp_context.copy()
         combo_digits = [int(c) for c in combo]
-        ctx = {
-            'seed_digits': seed_digits,
+        ctx.update({
             'combo_digits': combo_digits,
-            'seed_sum': sum(seed_digits),
             'combo_sum': sum(combo_digits),
-            'seed_counts': seed_counts,
-            'mirror': MIRROR,
-            'new_seed_digits': new_seed_digits,
-            'prev_seed_digits': prev_seed_digits,
-            'prev_prev_draw_digits': prev_prev_draw_digits,
-            'common_to_both': set(prev_seed_digits).intersection(prev_prev_draw_digits),
-            'last2': set(prev_seed_digits) | set(prev_prev_draw_digits),
-            'hot_digits': hot_digits,
-            'cold_digits': cold_digits,
-            'due_digits': due_digits
-        }
+            'common_to_both': set(prev_seed_digits).intersection(prev_prev_seed_digits),
+            'last2': set(prev_seed_digits) | set(prev_prev_seed_digits)
+        })
         try:
             if not eval(flt['applicable_code'], {}, ctx):
                 continue
