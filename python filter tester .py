@@ -1,3 +1,9 @@
+# Generate combos if undefined
+try:
+    combos
+except NameError:
+    combos = generate_combinations(seed, method)
+
 # Evaluate filters
 survivors = []
 eliminated_details = {}
