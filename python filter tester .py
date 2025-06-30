@@ -143,7 +143,7 @@ for flt in filters:
             'seed_sum': sum(seed_digits),
             'combo_sum': sum(combo_digits),
             'seed_counts': seed_counts,
-            'mirror': MIROR,
+            'mirror': MIRROR,
             'new_seed_digits': new_seed_digits,
             'prev_seed_digits': prev_seed_digits,
             'prev_prev_seed_digits': prev_prev_seed_digits,
