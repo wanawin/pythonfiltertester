@@ -54,7 +54,7 @@ F052,"If seed is FullHouse structure, eliminate even-sum combos",TRUE,"""set(see
 F053,Eliminate combo missing new digits from seed vs prev_seed,TRUE,"""new_seed_digits and not new_seed_digits.intersection(combo_digits)""","""True"""
 F054,Eliminate combo with <2 digits from both prev draws,TRUE,"""sum(d in common_to_both for d in combo_digits) < 2""","""True"""
 F055,Eliminate combo missing at least 2 digits from last 2 draws,TRUE,"""len(last2.intersection(combo_digits)) < 2""","""True"""
-F056,XXXXXXXXXXX Eliminate combo with at least 2 distinct digits from last 2 draws,TRUE,"""sum(1 for d in set(combo_digits) if d in last2) >= 2""","""True"""
+F056,XXXXXXXXXXX Eliminate combo with <2 distinct digits from last 2 draws,TRUE,"""sum(1 for d in set(combo_digits) if d in last2) < 2""","""True"""
 F057,Eliminate combo missing any new digit vs last 2 draws,TRUE,"""not any(d not in last2 for d in combo_digits)""","""True"""
 F058,If seed_sum ends in 7 and combo_sum ends in 8 eliminate,TRUE,"""seed_sum % 10 == 7""","""combo_sum % 10 == 8"""
 F059,If seed_sum ends in 4 and combo_sum ends in 8 eliminate,TRUE,"""seed_sum % 10 == 4""","""combo_sum % 10 == 8"""
