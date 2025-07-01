@@ -21,6 +21,9 @@ def load_filters(path='lottery_filters_batch10.csv'):
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
+            # Strip literal quotes if present from CSV fields
+            row['applicable_if'] = row['applicable_if'].strip().strip('"').strip("'")
+            row['expression']    = row['expression'].strip().strip('"').strip("'")
             row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
             row['expr_code'] = compile(row['expression'], '<expr>', 'eval')
             row['enabled_default'] = row['enabled'].strip().lower() == 'true'
