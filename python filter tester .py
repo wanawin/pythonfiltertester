@@ -24,17 +24,18 @@ def load_filters(path='lottery_filters_batch10.csv'):
             # Strip literal quotes if present from CSV fields
             row['applicable_if'] = row['applicable_if'].strip().strip('"').strip("'")
             row['expression']    = row['expression'].strip().strip('"').strip("'")
+            # Compile filters with error handling
             try:
-            row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
-        except SyntaxError as e:
-            st.error(f"Syntax error in applicable_if for filter {row['id']}: {row['applicable_if']}")
-            continue
+                row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
+            except SyntaxError as e:
+                st.error(f"Syntax error in applicable_if for filter {row.get('id','')} : {row['applicable_if']}")
+                continue
             try:
-            row['expr_code'] = compile(row['expression'], '<expr>', 'eval')
-        except SyntaxError as e:
-            st.error(f"Syntax error in expression for filter {row['id']}: {row['expression']}")
-            continue
-            row['enabled_default'] = row['enabled'].strip().lower() == 'true'
+                row['expr_code'] = compile(row['expression'], '<expr>', 'eval')
+            except SyntaxError as e:
+                st.error(f"Syntax error in expression for filter {row.get('id','')} : {row['expression']}")
+                continue
+            row['enabled_default'] = row.get('enabled', '').strip().lower() == 'true'
             flts.append(row)
     return flts
 
