@@ -22,28 +22,26 @@ def load_filters(path='lottery_filters_batch10.csv'):
         reader = csv.DictReader(f)
         for row in reader:
             # Strip literal quotes and normalize operators
-ow['applicable_if'] = row['applicable_if'].strip().strip('"').strip("'")
+            row['applicable_if'] = row['applicable_if'].strip().strip('"').strip("'")
             row['expression']    = row['expression'].strip().strip('"').strip("'")
             # Replace JavaScript-style not-equals
             row['expression']    = row['expression'].replace('!==', '!=')
-            row['applicable_if'] = row['applicable_if'].strip().strip('"').strip("'")
-            row['expression']    = row['expression'].strip().strip('"').strip("'")
             # Compile filters with error handling
             try:
                 row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
-            except SyntaxError as e:
+            except SyntaxError:
                 st.error(f"Syntax error in applicable_if for filter {row.get('id','')} : {row['applicable_if']}")
                 continue
             try:
                 row['expr_code'] = compile(row['expression'], '<expr>', 'eval')
-            except SyntaxError as e:
+            except SyntaxError:
                 st.error(f"Syntax error in expression for filter {row.get('id','')} : {row['expression']}")
                 continue
             row['enabled_default'] = row.get('enabled', '').strip().lower() == 'true'
             flts.append(row)
     return flts
 
-filters = load_filters()  # loads lottery_filters_final_with_historical.csv by default
+filters = load_filters()  # loads lottery_filters_batch10.csv by default
 
 # Combination generator
 def generate_combinations(seed, method):
