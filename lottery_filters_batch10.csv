@@ -31,7 +31,7 @@ F029,"If seed includes 0,1,5,8 eliminate all even-sum combos",TRUE,"""set(seed_d
 F030,"If seed includes 2,3,4,5 eliminate all even-sum combos",TRUE,"""set(seed_digits).issuperset({2,3,4,5})""","""combo_sum % 2 == 0"""
 F031,"If seed includes 0,4,5,8 eliminate all even-sum combos",TRUE,"""set(seed_digits).issuperset({0,4,5,8})""","""combo_sum % 2 == 0"""
 F032,"If seed includes 2,5,6,9 eliminate all even-sum combos",TRUE,"""set(seed_digits).issuperset({2,5,6,9})""","""combo_sum % 2 == 0"""
-F033,"If seed includes 1,2,6,8 eliminate all odd-sum combos",TRUE,"""set(seed_digits).issuperset({1,2,6,8})""","""combo_sum % 2 !== 0"""
+F033,"If combo does not contain a hot digit",TRUE,"""True""","""not any(d in hot_digits for d in combo_digits)"""
 F034,"If seed includes 0,5,8,9 eliminate all even-sum combos",TRUE,"""set(seed_digits).issuperset({0,5,8,9})""","""combo_sum % 2 == 0"""
 F035,"If seed includes 0,1,3,5 eliminate all even-sum combos",TRUE,"""set(seed_digits).issuperset({0,1,3,5})""","""combo_sum % 2 == 0"""
 F036,"If seed includes 0,2,6,9 eliminate all even-sum combos",TRUE,"""set(seed_digits).issuperset({0,2,6,9})""","""combo_sum % 2 == 0"""
