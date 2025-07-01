@@ -76,8 +76,6 @@ method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
 hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
 cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
 
-
-
 # Validate seed
 if len(seed) != 5 or not seed.isdigit():
     st.sidebar.error("Seed must be exactly 5 digits")
@@ -92,8 +90,11 @@ prev_prev_seed_digits = [int(d) for d in prev_prev_seed if d.isdigit()]
 new_seed_digits = set(seed_digits) - set(prev_seed_digits)
 hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
 cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
-# Auto-compute due digits: digits not in seed, prev_seed, or prev_prev_seed
-due_digits = [d for d in range(10) if d not in seed_digits and d not in prev_seed_digits and d not in prev_prev_seed_digits]
+# Auto-compute due digits: digits not appeared in the last two draws (prev_seed and prev_prev_seed)
+due_digits = [
+    d for d in range(10)
+    if d not in prev_seed_digits and d not in prev_prev_seed_digits
+]
 
 # Generate combos
 combos = generate_combinations(seed, method)
