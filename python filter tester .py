@@ -74,8 +74,9 @@ method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
 
 # Hot/Cold digits inputs
 hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
-cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip():").strip()
-:").strip()
+cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
+
+
 
 # Validate seed
 if len(seed) != 5 or not seed.isdigit():
