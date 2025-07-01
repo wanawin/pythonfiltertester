@@ -21,7 +21,11 @@ def load_filters(path='lottery_filters_batch10.csv'):
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
-            # Strip literal quotes if present from CSV fields
+            # Strip literal quotes and normalize operators
+ow['applicable_if'] = row['applicable_if'].strip().strip('"').strip("'")
+            row['expression']    = row['expression'].strip().strip('"').strip("'")
+            # Replace JavaScript-style not-equals
+            row['expression']    = row['expression'].replace('!==', '!=')
             row['applicable_if'] = row['applicable_if'].strip().strip('"').strip("'")
             row['expression']    = row['expression'].strip().strip('"').strip("'")
             # Compile filters with error handling
