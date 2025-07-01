@@ -2,6 +2,7 @@ import streamlit as st
 from itertools import product
 import csv
 import os
+import re
 from collections import Counter
 
 # V-Trac and mirror mappings
@@ -12,7 +13,7 @@ MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
 MIRROR = MIRROR_PAIRS
 
 # Load filters from CSV
-def load_filters(path='filters.csv'):
+def load_filters(path='lottery_filters_batch10.csv'):
     if not os.path.exists(path):
         st.error(f"Filter file not found: {path}")
         st.stop()
@@ -26,7 +27,7 @@ def load_filters(path='filters.csv'):
             flts.append(row)
     return flts
 
-filters = load_filters()
+filters = load_filters()  # loads lottery_filters_final_with_historical.csv by default
 
 # Combination generator
 def generate_combinations(seed, method):
@@ -70,6 +71,7 @@ if len(seed) != 5 or not seed.isdigit():
 # Prepare context values
 seed_digits = [int(d) for d in seed]
 seed_counts = Counter(seed_digits)
+seed_vtracs = set(V_TRAC_GROUPS[d] for d in seed_digits)
 prev_seed_digits = [int(d) for d in prev_seed if d.isdigit()]
 prev_prev_seed_digits = [int(d) for d in prev_prev_seed if d.isdigit()]
 new_seed_digits = set(seed_digits) - set(prev_seed_digits)
@@ -85,18 +87,19 @@ survivors = []
 eliminated_details = {}
 for combo in combos:
     combo_digits = [int(c) for c in combo]
+    combo_vtracs = set(V_TRAC_GROUPS[d] for d in combo_digits)
     context = {
         'seed_digits': seed_digits,
         'combo_digits': combo_digits,
         'seed_sum': sum(seed_digits),
         'combo_sum': sum(combo_digits),
         'seed_counts': seed_counts,
-            'Counter': Counter,
+        'seed_vtracs': seed_vtracs,
+        'combo_vtracs': combo_vtracs,
         'mirror': MIRROR,
         'new_seed_digits': new_seed_digits,
         'prev_seed_digits': prev_seed_digits,
         'prev_prev_seed_digits': prev_prev_seed_digits,
-        
         'common_to_both': set(prev_seed_digits).intersection(prev_prev_seed_digits),
         'last2': set(prev_seed_digits) | set(prev_prev_seed_digits),
         'hot_digits': hot_digits,
@@ -138,12 +141,15 @@ for flt in filters:
     error_msg = None
     for combo in combos:
         combo_digits = [int(c) for c in combo]
+        combo_vtracs = set(V_TRAC_GROUPS[d] for d in combo_digits)
         ctx = {
             'seed_digits': seed_digits,
             'combo_digits': combo_digits,
             'seed_sum': sum(seed_digits),
             'combo_sum': sum(combo_digits),
             'seed_counts': seed_counts,
+            'seed_vtracs': seed_vtracs,
+            'combo_vtracs': combo_vtracs,
             'mirror': MIRROR,
             'new_seed_digits': new_seed_digits,
             'prev_seed_digits': prev_seed_digits,
