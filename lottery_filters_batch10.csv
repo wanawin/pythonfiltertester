@@ -352,6 +352,6 @@ F350,If combo ≥2 shared digits and sum<10,TRUE,"""True""","""sum(1 for d in co
 F351,If combo ≥1 shared digits and sum<12,TRUE,"""True""","""sum(1 for d in combo_digits if d in seed_digits)>=1 and combo_sum<12"""
 F352,If combo ≥1 shared digits and sum<11,TRUE,"""True""","""sum(1 for d in combo_digits if d in seed_digits)>=1 and combo_sum<11"""
 F353,If combo ≥1 shared digits and sum<10,TRUE,"""True""","""sum(1 for d in combo_digits if d in seed_digits)>=1 and combo_sum<10"""
-F354,If combo contains digit and its mirror,TRUE,"""True""","""any(mirror.get(d,-1) in combo_digits for d in combo_digits)"""
+F354,"If combo does not contain any digit and its mirror", TRUE, """True""", """not any(mirror.get(d,-1) in combo_digits for d in combo_digits)"""
 F355,If any combo digit = mirror of seed sum last digit,TRUE,"""True""","""any(d == mirror.get(int(str(seed_sum)[-1]),-1) for d in combo_digits)"""
 F356,"If seed has 0,8 eliminate combos with even sum",TRUE,"""set(seed_digits).issuperset({0,8})""","""combo_sum%2==0"""
