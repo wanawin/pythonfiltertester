@@ -123,9 +123,9 @@ for combo in combos:
     eliminated = False
     for flt in filters:
         active = st.session_state.get(f"filter_{flt['id']}", select_all and flt['enabled_default'])
-        if not active or not eval(flt['applicable_code'], {}, context):
+        if not active or not eval(flt['applicable_code'], context, context):
             continue
-        if eval(flt['expr_code'], {}, context):
+        if eval(flt['expr_code'], context, context):
             eliminated_details[combo] = flt['name']
             eliminated = True
             break
@@ -175,9 +175,9 @@ for flt in filters:
             'due_digits': due_digits
         }
         try:
-            if not eval(flt['applicable_code'], {}, ctx):
+            if not eval(flt['applicable_code'], ctx, ctx):
                 continue
-            if eval(flt['expr_code'], {}, ctx):
+            if eval(flt['expr_code'], ctx, ctx):
                 count += 1
         except Exception as e:
             error_msg = str(e)
