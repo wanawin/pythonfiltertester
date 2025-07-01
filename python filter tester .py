@@ -119,6 +119,8 @@ for combo in combos:
         'hot_digits': hot_digits,
         'cold_digits': cold_digits,
         'due_digits': due_digits
+    ,
+        'Counter': Counter
     }
     eliminated = False
     for flt in filters:
@@ -173,6 +175,8 @@ for flt in filters:
             'hot_digits': hot_digits,
             'cold_digits': cold_digits,
             'due_digits': due_digits
+        ,
+            'Counter': Counter
         }
         try:
             if not eval(flt['applicable_code'], ctx, ctx):
