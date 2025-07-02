@@ -26,6 +26,13 @@ def load_filters(path='lottery_filters_batch10.csv'):
             row['applicable_if'] = row.get('applicable_if','').strip().strip('"').strip("'")
             row['expression']    = row.get('expression','').strip().strip('"').strip("'")
             row['expression']    = row['expression'].replace('!==', '!=')
+            # Auto-generate applicability for odd/even-sum filters with True default
+            if row['applicable_if'].lower() == 'true':
+                m = re.match(r"If seed includes ([0-9,]+) eliminate all (even|odd)-sum combos", row['name'], re.IGNORECASE)
+                if m:
+                    digits = m.group(1).split(',')
+                    row['applicable_if'] = f"set([{','.join(digits)}]).issubset(seed_digits)"
+            row['expression']    = row['expression'].replace('!==', '!=')
             # Compile with error handling
             try:
                 row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
