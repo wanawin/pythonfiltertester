@@ -20,12 +20,13 @@ def load_filters(path='lottery_filters_batch10.csv'):
     flts = []
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
-        for row in reader:
+        for rawrow in reader:
+            # Normalize keys to lowercase
+            row = {k.lower(): v for k, v in rawrow.items()}
             # Strip literal quotes and normalize operators
             row['applicable_if'] = row['applicable_if'].strip().strip('"').strip("'")
             row['expression']    = row['expression'].strip().strip('"').strip("'")
             # Replace JavaScript-style not-equals
-            row['expression']    = row['expression'].replace('!==', '!=')
             # Compile filters with error handling
             try:
                 row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
