@@ -136,7 +136,7 @@ for flt in filters:
     for combo in combos:
         combo_digits=[int(c) for c in combo]
         combo_vtracs=set(V_TRAC_GROUPS[d] for d in combo_digits)
-        ctx.update({'combo_digits':combo_digits,'combo_vtracs':combo_vtracs})
+        ctx.update({'combo_digits':combo_digits,'combo_vtracs':combo_vtracs,'combo_sum': sum(combo_digits)})
         try:
             if eval(flt['applicable_code'],ctx,ctx) and eval(flt['expr_code'],ctx,ctx): count+=1
         except Exception as e: error=str(e); break
