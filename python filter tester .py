@@ -189,7 +189,7 @@ for flt in filters:
         except Exception as e:
             error_msg = str(e)
             break
-    label = f"{flt['name']} — eliminated {count}"
+    label = f"{flt['id']}: {flt['name']} — eliminated {count}"
     if error_msg:
         label += f" (Error: {error_msg})"
     st.checkbox(label, key=f"filter_{flt['id']}", value=select_all and flt['enabled_default'])
