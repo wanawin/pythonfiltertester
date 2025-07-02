@@ -22,22 +22,22 @@ def load_filters(path='lottery_filters_batch10.csv'):
             # Normalize keys and alias fid to id
             row = {k.lower(): v for k, v in rawrow.items()}
             row['id'] = row.get('id') or row.get('fid')
-            # Strip quotes and normalize operators
+            # Strip quotes
             row['applicable_if'] = row.get('applicable_if','').strip().strip('"').strip("'")
             row['expression']    = row.get('expression','').strip().strip('"').strip("'")
+            # Fix operators in expression
             row['expression']    = row['expression'].replace('!==', '!=')
-            # Auto-generate applicability for odd/even-sum filters with True default
-            if row['applicable_if'].lower() == 'true':
-                name_l = row['name'].lower()
-                if 'eliminate all even-sum combos' in name_l or 'eliminate all odd-sum combos' in name_l:
-                    # extract the digits listed between 'includes' and 'eliminate'
-                    try:
-                        parts = name_l.split('includes ')[1].split(' eliminate')[0]
-                        digits = [d.strip() for d in parts.split(',') if d.strip().isdigit()]
-                        row['applicable_if'] = f"set([{','.join(digits)}]).issubset(seed_digits)"
-                    except Exception:
-                        pass
-            row['expression']    = row['expression'].replace('!==', '!=')
+            # Clean up odd/even naming
+            row['name'] = row['name'].replace('allodd-sum','all odd-sum').replace('allodd sum','all odd-sum')
+            # Auto-generate applicability for odd/even-sum filters
+            name_l = row['name'].lower()
+            if 'eliminate all even-sum combos' in name_l or 'eliminate all odd-sum combos' in name_l:
+                try:
+                    parts = name_l.split('includes ')[1].split(' eliminate')[0]
+                    digits = [d.strip() for d in parts.split(',') if d.strip().isdigit()]
+                    row['applicable_if'] = f"set([{','.join(digits)}]).issubset(seed_digits)"
+                except Exception:
+                    pass
             # Compile with error handling
             try:
                 row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
