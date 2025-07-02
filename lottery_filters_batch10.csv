@@ -1,4 +1,4 @@
-id,name,enabled,applicable_if,expression
+fid,name,enabled,applicable_if,expression
 F001,Eliminate combos where combo sum equals 1,TRUE,"""True""","""combo_sum == 1"""
 F002,"If seed includes 4,5,6,8 eliminate all even-sum combos",TRUE,"""set(seed_digits).issuperset({4,5,6,8})""","""combo_sum % 2 == 0"""
 F003,"If seed includes 1,2,4,7 eliminate all even-sum combos",TRUE,"""set(seed_digits).issuperset({1,2,4,7})""","""combo_sum % 2 == 0"""
@@ -54,7 +54,7 @@ F052,"If seed is FullHouse structure, eliminate even-sum combos",TRUE,"""set(see
 F053,Eliminate combo missing new digits from seed vs prev_seed,TRUE,"""new_seed_digits and not new_seed_digits.intersection(combo_digits)""","""True"""
 F054,Eliminate combo with <2 digits from both prev draws,TRUE,"""sum(d in common_to_both for d in combo_digits) < 2""","""True"""
 F055,Eliminate combo missing at least 2 digits from last 2 draws,TRUE,"""len(last2.intersection(combo_digits)) < 2""","""True"""
-F056,XXXXXXXXXXX Eliminate combo with <2 distinct digits from last 2 draws,TRUE,"""sum(1 for d in set(combo_digits) if d in last2) < 2""","""True"""
+F056,Eliminate if no combo digit in hot_digits,TRUE,"""True""","""not any(d in hot_digits for d in combo_digits)"""
 F057,Eliminate combo missing any new digit vs last 2 draws,TRUE,"""not any(d not in last2 for d in combo_digits)""","""True"""
 F058,If seed_sum ends in 7 and combo_sum ends in 8 eliminate,TRUE,"""seed_sum % 10 == 7""","""combo_sum % 10 == 8"""
 F059,If seed_sum ends in 4 and combo_sum ends in 8 eliminate,TRUE,"""seed_sum % 10 == 4""","""combo_sum % 10 == 8"""
