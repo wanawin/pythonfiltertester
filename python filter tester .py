@@ -38,6 +38,11 @@ def load_filters(path='lottery_filters_batch10.csv'):
                     row['applicable_if'] = f"set([{','.join(digits)}]).issubset(seed_digits)"
                 except Exception:
                     pass
+            # Override expression for odd/even-sum filters to ensure correct code
+            if 'eliminate all odd-sum combos' in name_l:
+                row['expression'] = 'combo_sum % 2 != 0'
+            elif 'eliminate all even-sum combos' in name_l:
+                row['expression'] = 'combo_sum % 2 == 0'
             # Compile with error handling
             try:
                 row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
