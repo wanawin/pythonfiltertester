@@ -19,15 +19,16 @@ def load_filters(path='lottery_filters_batch10.csv'):
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for rawrow in reader:
+            # normalize keys
             row = {k.lower(): v for k, v in rawrow.items()}
             # unify fid/id
             row['id'] = row.get('fid') or row.get('id') or ''
-            row['name'] = row.get('name','').strip()
+            row['name'] = row.get('name', '').strip()
             # clean conditions & expressions
-            row['applicable_if'] = row.get('applicable_if','').strip().strip('"').strip("'")
-            row['expression']    = row.get('expression','').strip().strip('"').strip("'")
+            row['applicable_if'] = row.get('applicable_if', '').strip().strip('"').strip("'")
+            row['expression']    = row.get('expression',    '').strip().strip('"').strip("'")
             # fix JS-style operators
-            row['expression']    = row['expression'].replace('!==','!=')
+            row['expression']    = row['expression'].replace('!==', '!=')
             name_l = row['name'].lower()
             # auto-applicability for odd/even-sum filters
             if 'eliminate all even-sum combos' in name_l or 'eliminate all odd-sum combos' in name_l:
@@ -54,14 +55,14 @@ def load_filters(path='lottery_filters_batch10.csv'):
                     row['expression'] = expr
                 except Exception:
                     pass
-            # compile
+            # compile condition and expression
             try:
                 row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
                 row['expr_code']       = compile(row['expression'],    '<expr>',       'eval')
             except SyntaxError as e:
                 st.error(f"Syntax error in filter {row['id']}: {e}")
                 continue
-            row['enabled_default'] = row.get('enabled','').lower() == 'true'
+            row['enabled_default'] = row.get('enabled', '').lower() == 'true'
             flts.append(row)
     return flts
 
@@ -77,7 +78,7 @@ def generate_combinations(seed, method):
             for p in product(all_digits, repeat=4):
                 combos.add(''.join(sorted(d + ''.join(p))))
     else:
-        pairs = set(''.join(sorted((seed_sorted[i], seed_sorted[j])))
+        pairs = set(''.join(sorted((seed_sorted[i], seed_sorted[j]))) 
                     for i in range(len(seed_sorted)) for j in range(i+1, len(seed_sorted)))
         for pair in pairs:
             for p in product(all_digits, repeat=3):
