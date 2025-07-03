@@ -1,8 +1,16 @@
 import os
 import csv
 import streamlit as st
+from itertools import product
+from collections import Counter
+import re
 
-# Load filters from CSV (fixed odd/even syntax)
+# V-Trac and mirror mappings
+V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
+MIRROR_PAIRS   = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
+MIRROR         = MIRROR_PAIRS
+
+# Load filters from CSV (fixed odd/even syntax, unified ID)
 def load_filters(path='lottery_filters_batch10.csv'):
     if not os.path.exists(path):
         st.error(f"Filter file not found: {path}")
@@ -12,16 +20,16 @@ def load_filters(path='lottery_filters_batch10.csv'):
         reader = csv.DictReader(f)
         for rawrow in reader:
             row = {k.lower(): v for k, v in rawrow.items()}
-            row['id'] = row.get('id') or row.get('fid')
+            # unify fid/id
+            row['id'] = row.get('fid') or row.get('id') or ''
             row['name'] = row.get('name','').strip()
+            # clean conditions & expressions
             row['applicable_if'] = row.get('applicable_if','').strip().strip('"').strip("'")
             row['expression']    = row.get('expression','').strip().strip('"').strip("'")
-
-            # Clean up odd/even naming and fix operators
-            row['expression'] = row['expression'].replace('!==', '!=')
+            # fix JS-style operators
+            row['expression']    = row['expression'].replace('!==','!=')
             name_l = row['name'].lower()
-
-            # Auto-generate applicability for odd/even-sum filters
+            # auto-applicability for odd/even-sum filters
             if 'eliminate all even-sum combos' in name_l or 'eliminate all odd-sum combos' in name_l:
                 try:
                     parts = name_l.split('includes ')[1].split(' eliminate')[0]
@@ -29,20 +37,51 @@ def load_filters(path='lottery_filters_batch10.csv'):
                     row['applicable_if'] = f"set([{','.join(digits)}]).issubset(seed_digits)"
                 except Exception:
                     pass
-
-            # Override expression for odd/even-sum filters to ensure correct code
+            # override sum test
             if 'eliminate all odd-sum combos' in name_l:
                 row['expression'] = 'combo_sum % 2 != 0'
             if 'eliminate all even-sum combos' in name_l:
                 row['expression'] = 'combo_sum % 2 == 0'
-
-            # Compile into executable code
+            # shared-digit filters
+            if 'shared digits with seed' in name_l:
+                try:
+                    n = int(re.search(r'≥?(\d+)', row['name']).group(1))
+                    expr = f"len(set(combo_digits)&set(seed_digits)) >= {n}"
+                    m = re.search(r'sum <\s*(\d+)', row['name'])
+                    if m:
+                        t = int(m.group(1))
+                        expr += f" and combo_sum < {t}"
+                    row['expression'] = expr
+                except Exception:
+                    pass
+            # compile
             try:
                 row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
-                row['expr_code']       = compile(row['expression'],    '<expr>',      'eval')
+                row['expr_code']       = compile(row['expression'],    '<expr>',       'eval')
             except SyntaxError as e:
                 st.error(f"Syntax error in filter {row['id']}: {e}")
                 continue
             row['enabled_default'] = row.get('enabled','').lower() == 'true'
             flts.append(row)
     return flts
+
+filters = load_filters()
+
+# Generate all candidate combos based on method
+def generate_combinations(seed, method):
+    all_digits = '0123456789'
+    combos = set()
+    seed_sorted = ''.join(sorted(seed))
+    if method == '1-digit':
+        for d in seed_sorted:
+            for p in product(all_digits, repeat=4):
+                combos.add(''.join(sorted(d + ''.join(p))))
+    else:
+        pairs = set(''.join(sorted((seed_sorted[i], seed_sorted[j])))
+                    for i in range(len(seed_sorted)) for j in range(i+1, len(seed_sorted)))
+        for pair in pairs:
+            for p in product(all_digits, repeat=3):
+                combos.add(''.join(sorted(pair + ''.join(p))))
+    return sorted(combos)
+
+# --- rest of app remains unchanged ---
