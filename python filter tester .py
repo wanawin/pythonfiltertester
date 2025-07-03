@@ -111,7 +111,26 @@ eliminated, survivors = {}, []
 for combo in combos:
     combo_digits = [int(c) for c in combo]
     combo_vtracs = set(V_TRAC_GROUPS[d] for d in combo_digits)
-    ctx = {**locals(),**{'mirror':MIRROR,'Counter':Counter}}
+    # build explicit context for evaluation
+    ctx = {
+        'seed_digits': seed_digits,
+        'combo_digits': combo_digits,
+        'seed_sum': sum(seed_digits),
+        'combo_sum': sum(combo_digits),
+        'seed_counts': seed_counts,
+        'seed_vtracs': seed_vtracs,
+        'combo_vtracs': combo_vtracs,
+        'mirror': MIRROR,
+        'Counter': Counter,
+        'new_seed_digits': new_seed_digits,
+        'prev_seed_digits': prev_seed_digits,
+        'prev_prev_seed_digits': prev_prev_seed_digits,
+        'common_to_both': set(prev_seed_digits) & set(prev_prev_seed_digits),
+        'last2': set(prev_seed_digits) | set(prev_prev_seed_digits),
+        'hot_digits': hot_digits,
+        'cold_digits': cold_digits,
+        'due_digits': due_digits,
+    }
     for flt in filters:
         active = st.session_state.get(f"filter_{flt['id']}", select_all and flt['enabled_default'])
         if not active or not eval(flt['applicable_code'],ctx,ctx): continue
