@@ -31,17 +31,21 @@ def load_filters(path='lottery_filters_batch10.csv'):
             row['expression']    = row['expression'].replace('!==', '!=')
             name_l = row['name'].lower()
             # auto-applicability for odd/even-sum filters
-            if 'eliminate all even-sum combos' in name_l or 'eliminate all odd-sum combos' in name_l:
+            if 'eliminate all odd-sum combos' in name_l:
                 try:
                     parts = name_l.split('includes ')[1].split(' eliminate')[0]
                     digits = [d.strip() for d in parts.split(',') if d.strip().isdigit()]
                     row['applicable_if'] = f"set([{','.join(digits)}]).issubset(seed_digits)"
                 except Exception:
                     pass
-            # override sum test
-            if 'eliminate all odd-sum combos' in name_l:
                 row['expression'] = 'combo_sum % 2 != 0'
-            if 'eliminate all even-sum combos' in name_l:
+            elif 'eliminate all even-sum combos' in name_l:
+                try:
+                    parts = name_l.split('includes ')[1].split(' eliminate')[0]
+                    digits = [d.strip() for d in parts.split(',') if d.strip().isdigit()]
+                    row['applicable_if'] = f"set([{','.join(digits)}]).issubset(seed_digits)"
+                except Exception:
+                    pass
                 row['expression'] = 'combo_sum % 2 == 0'
             # shared-digit filters
             if 'shared digits with seed' in name_l:
