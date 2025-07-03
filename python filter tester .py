@@ -44,7 +44,8 @@ def load_filters(path='lottery_filters_batch10.csv'):
                     pass
                 row['expression'] = 'combo_sum % 2 == 0'
             # shared-digit filters
-            if 'shared digits with seed' in name_l:
+                        # shared-digit filters (any rule containing 'shared digits')
+            if 'shared digits' in name_l:
                 try:
                     n = int(re.search(r'≥?(\d+)',row['name']).group(1))
                     expr = f"len(set(combo_digits)&set(seed_digits)) >= {n}"
