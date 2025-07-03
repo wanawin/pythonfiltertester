@@ -44,6 +44,11 @@ def load_filters(path='lottery_filters_batch10.csv'):
                     pass
                 row['expression'] = 'combo_sum % 2 == 0'
             # shared-digit filters
+            # special-case F054: eliminate combos sharing more than 2 common-to-both digits
+            if row['id']=='F054':
+                row['expression'] = 'len(set(combo_digits) & common_to_both) > 2'
+                # skip generic shared-digit override for this filter
+            elif 'shared digits' in name_l:
                         # shared-digit filters (any rule containing 'shared digits')
             if 'shared digits' in name_l:
                 try:
