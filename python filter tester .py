@@ -43,6 +43,24 @@ def load_filters(path='lottery_filters_batch10.csv'):
                 row['expression'] = 'combo_sum % 2 != 0'
             elif 'eliminate all even-sum combos' in name_l:
                 row['expression'] = 'combo_sum % 2 == 0'
+                elif 'eliminate all even-sum combos' in name_l:
+    row['expression'] = 'combo_sum % 2 == 0'
+# Shared-digit filters: combos sharing at least N digits with the seed
+elif 'shared digits with seed' in name_l:
+    try:
+        # extract the threshold N (e.g. ≥5)
+        n = int(re.search(r'≥?(\d+)', row['name']).group(1))
+        # build base expression: at least N shared unique digits
+        expr = f"len(set(combo_digits) & set(seed_digits)) >= {n}"
+        # optional sum constraint if specified (e.g. sum <22)
+        m = re.search(r'sum <\s*(\d+)', row['name'])
+        if m:
+            t = int(m.group(1))
+            expr += f" and combo_sum < {t}"
+        row['expression'] = expr
+    except Exception:
+        pass
+
             # Compile with error handling
             try:
                 row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
