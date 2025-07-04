@@ -20,17 +20,16 @@ def load_filters(path='lottery_filters_batch10.csv'):
         reader = csv.DictReader(f)
         for rawrow in reader:
             row = {k.lower(): v for k, v in rawrow.items()}
-            # alias
             row['id'] = row.get('id') or row.get('fid')
-            # clean text
+            # Clean up text fields
             for key in ('name','applicable_if','expression'):
                 if key in row and isinstance(row[key], str):
                     row[key] = row[key].strip().strip('"').strip("'")
-            # normalize operators
+            # Normalize operators
             row['expression'] = row['expression'].replace('!==','!=')
             name_l = row['name'].lower()
 
-            # auto-generate odd/even-sum applicability
+            # Odd/Even-sum auto applicability
             if 'eliminate all odd-sum combos' in name_l or 'eliminate all even-sum combos' in name_l:
                 try:
                     parts = name_l.split('includes ')[1].split(' eliminate')[0]
@@ -38,19 +37,17 @@ def load_filters(path='lottery_filters_batch10.csv'):
                     row['applicable_if'] = f"set([{','.join(digs)}]).issubset(seed_digits)"
                 except:
                     pass
-            # override odd/even expression
+            # Override odd/even expression
             if 'eliminate all odd-sum combos' in name_l:
                 row['expression'] = 'combo_sum % 2 != 0'
             elif 'eliminate all even-sum combos' in name_l:
                 row['expression'] = 'combo_sum % 2 == 0'
 
-            # shared-digit filters
+            # Shared-digit filters
             elif 'shared digits' in name_l:
                 try:
-                    # threshold
                     n = int(re.search(r'≥?(\d+)', row['name']).group(1))
                     expr = f"len(set(combo_digits) & set(seed_digits)) >= {n}"
-                    # optional sum cap
                     m = re.search(r'sum <\s*(\d+)', row['name'])
                     if m:
                         t = int(m.group(1))
@@ -59,17 +56,16 @@ def load_filters(path='lottery_filters_batch10.csv'):
                 except:
                     pass
 
-            # keep-range filters: invert +/- logic
+            # Keep-range filters: eliminate outside range
             elif 'keep combo sum' in name_l:
                 try:
-                    m = re.search(r'combo sum ([0-9]+)-([0-9]+)', name_l)
+                    m = re.search(r'combo sum (\d+)-(\d+)', name_l)
                     lo, hi = m.groups()
-                    # eliminate if outside inclusive range
                     row['expression'] = f"not ({lo} <= combo_sum <= {hi})"
                 except:
                     pass
 
-            # compile
+            # Compile codes
             try:
                 row['applicable_code'] = compile(row.get('applicable_if','True'), '<applicable>', 'eval')
                 row['expr_code'] = compile(row.get('expression','False'), '<expr>', 'eval')
@@ -80,6 +76,7 @@ def load_filters(path='lottery_filters_batch10.csv'):
             filters.append(row)
     return filters
 
+# Load filters early
 filters = load_filters()
 
-# ... rest of your app unchanged (sidebar, generate_combinations, evaluation, UI) ...
+# (rest of app unchanged)
