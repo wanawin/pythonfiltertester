@@ -176,7 +176,7 @@ F174,"If seed includes 2,7,8 eliminate even-sum combos",TRUE,"""set(seed_digits)
 F175,"If seed includes 2,3,5 eliminate even-sum combos",TRUE,"""set(seed_digits).issuperset({2,3,5})""","""combo_sum % 2 == 0"""
 F176,"If seed includes 1,2,9 eliminate even-sum combos",TRUE,"""set(seed_digits).issuperset({1,2,9})""","""combo_sum % 2 == 0"""
 F177,"If seed includes 4,5,6 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({4,5,6})""","""combo_sum % 2 != 0"""
-F178,"If seed includes 1,2,5,9 eliminate even-sum combos",TRUE,"""set(seed_digits).issuperset({1,2,5,9})""","""combo_sum % 2 == 0"""
+F178,"If seed includes 1,2,5,9 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({1,2,5,9})""","""combo_sum % 2 != 0"""
 F179,If seed_sum ends in 3 and combo_sum ends in 1 eliminate,TRUE,"""seed_sum % 10 == 3""","""combo_sum % 10 == 1"""
 F180,Eliminate combo with ≥5 shared digits with seed and sum <22,TRUE,"""True""","""sum(1 for d in combo_digits if d in seed_digits) >=5 and combo_sum <22"""
 F181,Eliminate if seed sum 16-24 and combo sum 25-33,TRUE,"""16 <= seed_sum <= 24""","""25 <= combo_sum <= 33"""
