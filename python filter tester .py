@@ -33,7 +33,6 @@ def load_filters(path='lottery_filters_batch10.csv'):
 
             # odd/even-sum filters
             if 'eliminate all odd-sum combos' in name_l:
-                # applicability: only if seed contains listed digits
                 m = re.search(r'includes ([\d,]+)', name_l)
                 if m:
                     digs = [d for d in m.group(1).split(',')]
@@ -78,9 +77,6 @@ def load_filters(path='lottery_filters_batch10.csv'):
     return flts
 
 # load filters before building UI
-def main():
-    filters = load_filters()
-    # ... rest of your Streamlit UI code unchanged ...
+filters = load_filters()
 
-if __name__ == '__main__':
-    main()
+# rest of your Streamlit UI code unchanged...
