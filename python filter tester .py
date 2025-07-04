@@ -10,7 +10,6 @@ V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
 MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
 MIRROR = MIRROR_PAIRS
 
-
 def load_filters(path='lottery_filters_batch10.csv'):
     if not os.path.exists(path):
         st.error(f"Filter file not found: {path}")
@@ -50,11 +49,13 @@ def load_filters(path='lottery_filters_batch10.csv'):
 
             # shared-digit filters
             elif 'shared digits' in name_l:
-                m = re.search(r'≥?(\d+)', row['name'])
+                # look for threshold (>= or unicode ≥)
+                m = re.search(r'(?:>=|≥)\s*(\d+)', name_l)
                 if m:
                     n = int(m.group(1))
                     expr = f"sum(1 for d in combo_digits if d in seed_digits) >= {n}"
-                    m2 = re.search(r'sum <\s*(\d+)', name_l)
+                    # optional sum upper bound
+                    m2 = re.search(r'sum\s*<\s*(\d+)', name_l)
                     if m2:
                         t = int(m2.group(1))
                         expr += f" and combo_sum < {t}"
