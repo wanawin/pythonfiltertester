@@ -22,13 +22,11 @@ def load_filters(path='lottery_filters_batch10.csv'):
             row = {k.lower(): v for k, v in raw.items()}
             row['id'] = row.get('id') or row.get('fid')
 
-            # strip and sanitize fields
             for key in ('name', 'applicable_if', 'expression'):
                 if key in row and isinstance(row[key], str):
                     row[key] = row[key].strip().strip('"').strip("'")
 
             name_l = row['name'].lower()
-            # normalize operators
             if 'expression' in row:
                 row['expression'] = row['expression'].replace('!==', '!=')
 
@@ -49,26 +47,23 @@ def load_filters(path='lottery_filters_batch10.csv'):
 
             # shared-digit filters
             elif 'shared digits' in name_l:
-                # look for threshold (>= or unicode ≥)
                 m = re.search(r'(?:>=|≥)\s*(\d+)', name_l)
                 if m:
                     n = int(m.group(1))
                     expr = f"sum(1 for d in combo_digits if d in seed_digits) >= {n}"
-                    # optional sum upper bound
                     m2 = re.search(r'sum\s*<\s*(\d+)', name_l)
                     if m2:
                         t = int(m2.group(1))
                         expr += f" and combo_sum < {t}"
                     row['expression'] = expr
 
-            # keep-range filters: eliminate combos outside the specified sum range
+            # keep-range filters
             elif 'keep combo sum' in name_l:
                 m = re.search(r'combo sum (\d+)-(\d+)', name_l)
                 if m:
                     lo, hi = m.groups()
                     row['expression'] = f"not ({lo} <= combo_sum <= {hi})"
 
-            # compile code
             try:
                 row['applicable_code'] = compile(row.get('applicable_if', 'True'), '<applicable>', 'eval')
                 row['expr_code'] = compile(row.get('expression', 'False'), '<expr>', 'eval')
@@ -79,10 +74,10 @@ def load_filters(path='lottery_filters_batch10.csv'):
             flts.append(row)
     return flts
 
-# Load filters before UI
+# Load filters
 filters = load_filters()
 
-# Sidebar UI
+# Sidebar
 st.sidebar.header("🔢 DC-5 Filter Tracker Full")
 select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
 seed = st.sidebar.text_input("Current 5-digit seed (required):").strip()
@@ -91,13 +86,14 @@ prev_prev_seed = st.sidebar.text_input("Previous previous 5-digit seed (optional
 method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
 hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
 cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
+check_combo = st.sidebar.text_input("Check specific combo:").strip()
 
 # Validate seed
 if len(seed) != 5 or not seed.isdigit():
     st.sidebar.error("Seed must be exactly 5 digits")
     st.stop()
 
-# Context values
+# Context
 seed_digits = [int(d) for d in seed]
 prev_seed_digits = [int(d) for d in prev_seed if d.isdigit()]
 prev_prev_seed_digits = [int(d) for d in prev_prev_seed if d.isdigit()]
@@ -128,29 +124,21 @@ combos = generate_combinations(seed, method)
 eliminated, survivors = {}, []
 for combo in combos:
     cdigits = [int(c) for c in combo]
-    ctx = {
-        'seed_digits': seed_digits,
-        'combo_digits': cdigits,
-        'seed_sum': sum(seed_digits),
-        'combo_sum': sum(cdigits),
-        'seed_counts': seed_counts,
-        'seed_vtracs': seed_vtracs,
-        'combo_vtracs': set(V_TRAC_GROUPS[d] for d in cdigits),
-        'mirror': MIRROR,
-        'new_seed_digits': new_seed_digits,
-        'prev_seed_digits': prev_seed_digits,
-        'prev_prev_seed_digits': prev_prev_seed_digits,
-        'common_to_both': set(prev_seed_digits) & set(prev_prev_seed_digits),
-        'last2': set(prev_seed_digits) | set(prev_prev_seed_digits),
-        'hot_digits': hot_digits,
-        'cold_digits': cold_digits,
-        'due_digits': due_digits,
-        'Counter': Counter
-    }
+    ctx = dict(
+        seed_digits=seed_digits, combo_digits=cdigits,
+        seed_sum=sum(seed_digits), combo_sum=sum(cdigits),
+        seed_counts=seed_counts, seed_vtracs=seed_vtracs,
+        combo_vtracs=set(V_TRAC_GROUPS[d] for d in cdigits),
+        mirror=MIRROR, new_seed_digits=new_seed_digits,
+        prev_seed_digits=prev_seed_digits, prev_prev_seed_digits=prev_prev_seed_digits,
+        common_to_both=set(prev_seed_digits)&set(prev_prev_seed_digits),
+        last2=set(prev_seed_digits)|set(prev_prev_seed_digits),
+        hot_digits=hot_digits, cold_digits=cold_digits,
+        due_digits=due_digits, Counter=Counter
+    )
     for flt in filters:
         active = st.session_state.get(f"filter_{flt['id']}", select_all and flt['enabled_default'])
-        if not active or not eval(flt['applicable_code'], ctx, ctx):
-            continue
+        if not active or not eval(flt['applicable_code'], ctx, ctx): continue
         if eval(flt['expr_code'], ctx, ctx):
             eliminated[combo] = flt['name']
             break
@@ -159,16 +147,23 @@ for combo in combos:
 
 # Summary
 st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
+# Show check combo
+if check_combo:
+    if check_combo in eliminated:
+        st.sidebar.info(f"Combo {check_combo} was eliminated by: {eliminated[check_combo]}")
+    elif check_combo in survivors:
+        st.sidebar.success(f"Combo {check_combo} survived all filters")
+    else:
+        st.sidebar.warning(f"Combo {check_combo} not found in generated list")
 
 # Active filters
 st.header("🔧 Active Filters")
 for flt in filters:
-    count = 0
-    for combo in combos:
-        cd = [int(c) for c in combo]
-        ctx.update(combo_digits=cd, combo_vtracs=set(V_TRAC_GROUPS[d] for d in cd), combo_sum=sum(cd))
-        if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
-            count += 1
+    count = sum(
+        1 for c in combos
+        if eval(flt['applicable_code'], {**ctx, 'combo_digits':[int(x) for x in c], 'combo_sum':sum(int(x) for x in c)}, {})
+        and eval(flt['expr_code'], {**ctx, 'combo_digits':[int(x) for x in c], 'combo_sum':sum(int(x) for x in c)}, {})
+    )
     label = f"{flt['id']}: {flt['name']} — eliminated {count}"
     st.checkbox(label, key=f"filter_{flt['id']}", value=select_all and flt['enabled_default'])
 
