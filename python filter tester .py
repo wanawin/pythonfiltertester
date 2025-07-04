@@ -50,7 +50,7 @@ def load_filters(path='lottery_filters_batch10.csv'):
                 m = re.search(r'≥?(\d+)', row['name'])
                 if m:
                     n = int(m.group(1))
-                    expr = f"len(set(combo_digits) & set(seed_digits)) >= {n}"
+                                        expr = f"sum(1 for d in combo_digits if d in seed_digits) >= {n}"
                     m2 = re.search(r'sum <\s*(\d+)', name_l)
                     if m2:
                         t = int(m2.group(1))
