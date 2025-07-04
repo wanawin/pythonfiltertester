@@ -30,12 +30,11 @@ def load_filters(path='lottery_filters_batch10.csv'):
 
             # odd/even-sum overrides
             if 'eliminate all odd-sum combos' in name_l:
-                # set applicability based on seed digits
                 try:
                     parts = name_l.split('includes ')[1].split(' eliminate')[0]
                     digits = [d.strip() for d in parts.split(',') if d.strip().isdigit()]
                     row['applicable_if'] = f"set([{','.join(digits)}]).issubset(seed_digits)"
-                except Exception:
+                except:
                     pass
                 row['expression'] = 'combo_sum % 2 != 0'
             elif 'eliminate all even-sum combos' in name_l:
@@ -43,24 +42,28 @@ def load_filters(path='lottery_filters_batch10.csv'):
                     parts = name_l.split('includes ')[1].split(' eliminate')[0]
                     digits = [d.strip() for d in parts.split(',') if d.strip().isdigit()]
                     row['applicable_if'] = f"set([{','.join(digits)}]).issubset(seed_digits)"
-                except Exception:
+                except:
                     pass
                 row['expression'] = 'combo_sum % 2 == 0'
 
             # F054: eliminate combos sharing more than 2 digits common to both previous draws
             if row['id'] == 'F054':
                 row['expression'] = 'len(set(combo_digits) & common_to_both) > 2'
-            # shared-digit filters override for others
+
+            # shared-digit filters override
             elif 'shared digits' in name_l:
                 try:
+                    # threshold N
                     n = int(re.search(r'≥?(\d+)', row['name']).group(1))
-                    expr = f"len(set(combo_digits) & set(seed_digits)) >= {n}"
+                    # use full count (including duplicates)
+                    expr = f"sum(1 for d in combo_digits if d in seed_digits) >= {n}"
+                    # optional sum constraint
                     m = re.search(r'sum <\s*(\d+)', row['name'])
                     if m:
                         t = int(m.group(1))
                         expr += f" and combo_sum < {t}"
                     row['expression'] = expr
-                except Exception:
+                except:
                     pass
 
             # compile expressions
