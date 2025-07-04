@@ -200,7 +200,7 @@ F198,Eliminate if no combo digit is cold digit,TRUE,"""True""","""not any(d in c
 F199,Eliminate if combo lacks mirrors of any seed digits,TRUE,"""True""","""not any(mirror.get(d,None) in combo_digits for d in seed_digits)"""
 F200,Eliminate if combo has any digit equal to mirror of seed sum last digit,TRUE,"""True""","""any(d == mirror.get(int(str(seed_sum)[-1]),-1) for d in combo_digits)"""
 F201,"Eliminate if seed has 0 and combo lacks 1,2,3",TRUE,"""0 in seed_digits""","""1 not in combo_digits and 2 not in combo_digits and 3 not in combo_digits"""
-F202,Eliminate if all combo digits >=3,TRUE,"""True""","""all(d >=3 for d in combo_digits)"""
+F202,Eliminate if all combo digits >3,TRUE,"""True""","""all(d >3 for d in combo_digits)"""
 F203,Eliminate if combo has 2 or more digits >=8,TRUE,"""True""","""sum(1 for d in combo_digits if d >=8) >=2"""
 F204,Eliminate if combo spread <4,TRUE,"""True""","""max(combo_digits) - min(combo_digits) <4"""
 F205,"Eliminate if seed has 0,7 and combo sum <8 or >28",TRUE,"""set(seed_digits).issuperset({0,7})""","""combo_sum <8 or combo_sum >28"""
