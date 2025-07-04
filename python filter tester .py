@@ -43,81 +43,80 @@ def load_filters(path='lottery_filters_batch10.csv'):
                 except Exception:
                     pass
                 row['expression'] = 'combo_sum % 2 == 0'
-            # shared-digit filters
-            # special-case F054: eliminate combos sharing more than 2 common-to-both digits
-            if row['id']=='F054':
+            # shared-digit filters override
+            if row['id'] == 'F054':
+                # eliminate combos sharing more than 2 digits common to both previous draws
                 row['expression'] = 'len(set(combo_digits) & common_to_both) > 2'
-                # skip generic shared-digit override for this filter
             elif 'shared digits' in name_l:
-                        # shared-digit filters (any rule containing 'shared digits')
-            if 'shared digits' in name_l:
                 try:
-                    n = int(re.search(r'≥?(\d+)',row['name']).group(1))
-                    expr = f"len(set(combo_digits)&set(seed_digits)) >= {n}"
+                    n = int(re.search(r'≥?(\d+)', row['name']).group(1))
+                    expr = f"len(set(combo_digits) & set(seed_digits)) >= {n}"
                     m = re.search(r'sum <\s*(\d+)', row['name'])
                     if m:
-                        expr += f" and combo_sum < {int(m.group(1))}"
+                        t = int(m.group(1))
+                        expr += f" and combo_sum < {t}"
                     row['expression'] = expr
                 except Exception:
                     pass
-            # compile
+            # Compile with error handling
             try:
-                row['applicable_code'] = compile(row['applicable_if'],'<applicable>','eval')
-                row['expr_code']       = compile(row['expression'],   '<expr>','eval')
+                row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
+                row['expr_code']       = compile(row['expression'],   '<expr>', 'eval')
             except SyntaxError as e:
                 st.error(f"Syntax error in filter {row['id']}: {e}")
                 continue
-            row['enabled_default'] = row.get('enabled','').lower()=='true'
+            row['enabled_default'] = row.get('enabled','').lower() == 'true'
             flts.append(row)
     return flts
 
 filters = load_filters()
 
-# combination generation
-def generate_combinations(seed,method):
+# Generate combinations
+def generate_combinations(seed, method):
     digits = '0123456789'
     combos = set()
     s = ''.join(sorted(seed))
-    if method=='1-digit':
+    if method == '1-digit':
         for d in s:
-            for p in product(digits,repeat=4):
-                combos.add(''.join(sorted(d+''.join(p))))
+            for p in product(digits, repeat=4):
+                combos.add(''.join(sorted(d + ''.join(p))))
     else:
-        pairs = set(''.join(sorted((s[i],s[j]))) for i in range(len(s)) for j in range(i+1,len(s)))
+        pairs = set(''.join(sorted((s[i], s[j]))) for i in range(len(s)) for j in range(i+1, len(s)))
         for pair in pairs:
-            for p in product(digits,repeat=3):
-                combos.add(''.join(sorted(pair+''.join(p))))
+            for p in product(digits, repeat=3):
+                combos.add(''.join(sorted(pair + ''.join(p))))
     return sorted(combos)
 
-# sidebar inputs
+# Sidebar UI
 st.sidebar.header("🔢 DC-5 Filter Tracker Full")
-select_all = st.sidebar.checkbox("Select/Deselect All Filters",value=True)
+select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
 seed = st.sidebar.text_input("Current 5-digit seed (required):").strip()
 prev_seed = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
 prev_prev_seed = st.sidebar.text_input("Previous previous 5-digit seed (optional):").strip()
-method = st.sidebar.selectbox("Generation Method:",["1-digit","2-digit pair"])
+method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
 hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
 cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
 
-if len(seed)!=5 or not seed.isdigit(): st.sidebar.error("Seed must be exactly 5 digits"); st.stop()
+if len(seed) != 5 or not seed.isdigit():
+    st.sidebar.error("Seed must be exactly 5 digits")
+    st.stop()
 
-# context build
+# Context values
 seed_digits = [int(d) for d in seed]
 prev_seed_digits = [int(d) for d in prev_seed if d.isdigit()]
 prev_prev_seed_digits = [int(d) for d in prev_prev_seed if d.isdigit()]
-new_seed_digits = set(seed_digits)-set(prev_seed_digits)
+new_seed_digits = set(seed_digits) - set(prev_seed_digits)
 hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
 cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
 due_digits = [d for d in range(10) if d not in prev_seed_digits and d not in prev_prev_seed_digits]
 seed_counts = Counter(seed_digits)
 seed_vtracs = set(V_TRAC_GROUPS[d] for d in seed_digits)
 
-combos = generate_combinations(seed,method)
-eliminated, survivors = {}, []
+combos = generate_combinations(seed, method)
+eliminated_details, survivors = {}, []
 for combo in combos:
     combo_digits = [int(c) for c in combo]
     combo_vtracs = set(V_TRAC_GROUPS[d] for d in combo_digits)
-    # build explicit context for evaluation
     ctx = {
         'seed_digits': seed_digits,
         'combo_digits': combo_digits,
@@ -139,33 +138,42 @@ for combo in combos:
     }
     for flt in filters:
         active = st.session_state.get(f"filter_{flt['id']}", select_all and flt['enabled_default'])
-        if not active or not eval(flt['applicable_code'],ctx,ctx): continue
-        if eval(flt['expr_code'],ctx,ctx):
-            eliminated[combo]=flt['name']; break
+        if not active or not eval(flt['applicable_code'], ctx, ctx):
+            continue
+        if eval(flt['expr_code'], ctx, ctx):
+            eliminated_details[combo] = flt['name']
+            break
     else:
         survivors.append(combo)
 
-# summary & UI
-st.sidebar.markdown(f"**Total:**{len(combos)} Elim:{len(eliminated)} Remain:{len(survivors)}")
+# Summary & UI
+st.sidebar.markdown(f"**Total:**{len(combos)} Elim:{len(eliminated_details)} Remain:{len(survivors)}")
 query = st.sidebar.text_input("Check specific combo:")
 if query:
-    key=''.join(sorted(query.strip()))
-    if key in eliminated: st.sidebar.warning(f"Eliminated by: {eliminated[key]}")
-    elif key in survivors: st.sidebar.success("Survives!")
-    else: st.sidebar.info("Not generated.")
+    key = ''.join(sorted(query.strip()))
+    if key in eliminated_details:
+        st.sidebar.warning(f"Eliminated by: {eliminated_details[key]}")
+    elif key in survivors:
+        st.sidebar.success("Survives!")
+    else:
+        st.sidebar.info("Not generated.")
 
 st.header("🔧 Active Filters")
 for flt in filters:
-    count=0;err=None
+    count = 0
+    err = None
     for combo in combos:
-        combo_digits=[int(c) for c in combo]
-        ctx.update({'combo_digits':combo_digits,'combo_sum':sum(combo_digits),'combo_vtracs':set(V_TRAC_GROUPS[d] for d in combo_digits)})
+        combo_digits = [int(c) for c in combo]
+        ctx.update({'combo_digits': combo_digits, 'combo_sum': sum(combo_digits), 'combo_vtracs': set(V_TRAC_GROUPS[d] for d in combo_digits)})
         try:
-            if eval(flt['applicable_code'],ctx,ctx) and eval(flt['expr_code'],ctx,ctx): count+=1
+            if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
+                count += 1
         except Exception as e:
-            err=str(e); break
+            err = str(e)
+            break
     label = f"{flt['id']}: {flt['name']} — eliminated {count}" + (f" (Error: {err})" if err else "")
-    st.checkbox(label,key=f"filter_{flt['id']}",value=select_all and flt['enabled_default'])
+    st.checkbox(label, key=f"filter_{flt['id']}", value=select_all and flt['enabled_default'])
 
 with st.expander("Show remaining combinations"):
-    for c in survivors: st.write(c)
+    for c in survivors:
+        st.write(c)
