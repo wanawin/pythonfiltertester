@@ -10,77 +10,76 @@ V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
 MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
 MIRROR = MIRROR_PAIRS
 
-# Load filters from CSV
+
 def load_filters(path='lottery_filters_batch10.csv'):
     if not os.path.exists(path):
         st.error(f"Filter file not found: {path}")
         st.stop()
-
-    flts = []
+    filters = []
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for rawrow in reader:
-            # Normalize keys and alias fid to id
             row = {k.lower(): v for k, v in rawrow.items()}
+            # alias
             row['id'] = row.get('id') or row.get('fid')
-            # Strip quotes
-            row['applicable_if'] = row.get('applicable_if', '')
-            row['expression']    = row.get('expression', '')
-            for key in ['applicable_if', 'expression', 'name']:
+            # clean text
+            for key in ('name','applicable_if','expression'):
                 if key in row and isinstance(row[key], str):
                     row[key] = row[key].strip().strip('"').strip("'")
-            # Fix operators and naming
-            row['expression'] = row['expression'].replace('!==', '!=')
-            row['name']       = row['name'].replace('allodd-sum','all odd-sum').replace('allodd sum','all odd-sum')
-
-            # Auto-generate applicability & override expressions
+            # normalize operators
+            row['expression'] = row['expression'].replace('!==','!=')
             name_l = row['name'].lower()
-            # odd/even-sum filters
+
+            # auto-generate odd/even-sum applicability
+            if 'eliminate all odd-sum combos' in name_l or 'eliminate all even-sum combos' in name_l:
+                try:
+                    parts = name_l.split('includes ')[1].split(' eliminate')[0]
+                    digs = [d.strip() for d in parts.split(',') if d.strip().isdigit()]
+                    row['applicable_if'] = f"set([{','.join(digs)}]).issubset(seed_digits)"
+                except:
+                    pass
+            # override odd/even expression
             if 'eliminate all odd-sum combos' in name_l:
-                digits = re.findall(r'(?<=includes )([0-9,]+)', name_l)
-                if digits:
-                    dlist = digits[0].split(',')
-                    row['applicable_if'] = f"set([{','.join(dlist)}]).issubset(seed_digits)"
                 row['expression'] = 'combo_sum % 2 != 0'
             elif 'eliminate all even-sum combos' in name_l:
-                digits = re.findall(r'(?<=includes )([0-9,]+)', name_l)
-                if digits:
-                    dlist = digits[0].split(',')
-                    row['applicable_if'] = f"set([{','.join(dlist)}]).issubset(seed_digits)"
                 row['expression'] = 'combo_sum % 2 == 0'
+
             # shared-digit filters
             elif 'shared digits' in name_l:
                 try:
-                    n      = int(re.search(r'≥?(\d+)', row['name']).group(1))
-                    # invert for 'keep' vs 'eliminate'
-                    expr   = f"len(set(combo_digits)&set(seed_digits)) >= {n}"
-                    # if sum constraint
-                    m      = re.search(r'sum *[<>=]+ *?(\d+)', row['name'])
+                    # threshold
+                    n = int(re.search(r'≥?(\d+)', row['name']).group(1))
+                    expr = f"len(set(combo_digits) & set(seed_digits)) >= {n}"
+                    # optional sum cap
+                    m = re.search(r'sum <\s*(\d+)', row['name'])
                     if m:
-                        bound = m.group(0).replace('sum', 'combo_sum')
-                        expr += f" and not ({bound})" if 'keep' in name_l else f" and combo_sum {m.group(0).split('sum')[1].strip()}"
+                        t = int(m.group(1))
+                        expr += f" and combo_sum < {t}"
                     row['expression'] = expr
                 except:
                     pass
-            # keep-combo-sum filters: invert to eliminate outside range
+
+            # keep-range filters: invert +/- logic
             elif 'keep combo sum' in name_l:
                 try:
-                    rng = re.findall(r'(\d+)[^\d]+(\d+)', row['name'])[0]
-                    lo, hi = rng
+                    m = re.search(r'combo sum ([0-9]+)-([0-9]+)', name_l)
+                    lo, hi = m.groups()
+                    # eliminate if outside inclusive range
                     row['expression'] = f"not ({lo} <= combo_sum <= {hi})"
                 except:
                     pass
 
-            # Compile with error handling
+            # compile
             try:
-                row['applicable_code'] = compile(row['applicable_if'], '<applicable>', 'eval')
-                row['expr_code']       = compile(row['expression'], '<expr>', 'eval')
+                row['applicable_code'] = compile(row.get('applicable_if','True'), '<applicable>', 'eval')
+                row['expr_code'] = compile(row.get('expression','False'), '<expr>', 'eval')
             except SyntaxError as e:
                 st.error(f"Syntax error in filter {row['id']}: {e}")
                 continue
             row['enabled_default'] = row.get('enabled','').lower() == 'true'
-            flts.append(row)
-    return flts
+            filters.append(row)
+    return filters
 
-# Load filters
 filters = load_filters()
+
+# ... rest of your app unchanged (sidebar, generate_combinations, evaluation, UI) ...
