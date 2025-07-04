@@ -15,57 +15,58 @@ def load_filters(path='lottery_filters_batch10.csv'):
     if not os.path.exists(path):
         st.error(f"Filter file not found: {path}")
         st.stop()
-    filters = []
+
+    flts = []
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
-        for rawrow in reader:
-            row = {k.lower(): v for k, v in rawrow.items()}
+        for raw in reader:
+            row = {k.lower(): v for k,v in raw.items()}
             row['id'] = row.get('id') or row.get('fid')
-            # Clean up text fields
+            # sanitize text fields
             for key in ('name','applicable_if','expression'):
                 if key in row and isinstance(row[key], str):
                     row[key] = row[key].strip().strip('"').strip("'")
-            # Normalize operators
-            row['expression'] = row['expression'].replace('!==','!=')
             name_l = row['name'].lower()
+            # normalize operators
+            if 'expression' in row:
+                row['expression'] = row['expression'].replace('!==','!=')
 
-            # Odd/Even-sum auto applicability
-            if 'eliminate all odd-sum combos' in name_l or 'eliminate all even-sum combos' in name_l:
-                try:
-                    parts = name_l.split('includes ')[1].split(' eliminate')[0]
-                    digs = [d.strip() for d in parts.split(',') if d.strip().isdigit()]
-                    row['applicable_if'] = f"set([{','.join(digs)}]).issubset(seed_digits)"
-                except:
-                    pass
-            # Override odd/even expression
+            # odd/even-sum filters
             if 'eliminate all odd-sum combos' in name_l:
+                # applicability: only if seed contains listed digits
+                m = re.search(r'includes ([\d,]+)', name_l)
+                if m:
+                    digs = [d for d in m.group(1).split(',')]
+                    row['applicable_if'] = f"set({digs}).issubset(seed_digits)"
                 row['expression'] = 'combo_sum % 2 != 0'
             elif 'eliminate all even-sum combos' in name_l:
+                m = re.search(r'includes ([\d,]+)', name_l)
+                if m:
+                    digs = [d for d in m.group(1).split(',')]
+                    row['applicable_if'] = f"set({digs}).issubset(seed_digits)"
                 row['expression'] = 'combo_sum % 2 == 0'
 
-            # Shared-digit filters
+            # shared-digit filters
             elif 'shared digits' in name_l:
-                try:
-                    n = int(re.search(r'≥?(\d+)', row['name']).group(1))
+                m = re.search(r'≥?(\d+)', row['name'])
+                if m:
+                    n = int(m.group(1))
                     expr = f"len(set(combo_digits) & set(seed_digits)) >= {n}"
-                    m = re.search(r'sum <\s*(\d+)', row['name'])
-                    if m:
-                        t = int(m.group(1))
+                    m2 = re.search(r'sum <\s*(\d+)', name_l)
+                    if m2:
+                        t = int(m2.group(1))
                         expr += f" and combo_sum < {t}"
                     row['expression'] = expr
-                except:
-                    pass
 
-            # Keep-range filters: eliminate outside range
+            # keep-range filters: rescue combos inside range, eliminate others
             elif 'keep combo sum' in name_l:
-                try:
-                    m = re.search(r'combo sum (\d+)-(\d+)', name_l)
+                m = re.search(r'combo sum (\d+)-(\d+)', name_l)
+                if m:
                     lo, hi = m.groups()
+                    # eliminate combos outside the keep range
                     row['expression'] = f"not ({lo} <= combo_sum <= {hi})"
-                except:
-                    pass
 
-            # Compile codes
+            # compile code
             try:
                 row['applicable_code'] = compile(row.get('applicable_if','True'), '<applicable>', 'eval')
                 row['expr_code'] = compile(row.get('expression','False'), '<expr>', 'eval')
@@ -73,10 +74,13 @@ def load_filters(path='lottery_filters_batch10.csv'):
                 st.error(f"Syntax error in filter {row['id']}: {e}")
                 continue
             row['enabled_default'] = row.get('enabled','').lower() == 'true'
-            filters.append(row)
-    return filters
+            flts.append(row)
+    return flts
 
-# Load filters early
-filters = load_filters()
+# load filters before building UI
+def main():
+    filters = load_filters()
+    # ... rest of your Streamlit UI code unchanged ...
 
-# (rest of app unchanged)
+if __name__ == '__main__':
+    main()
