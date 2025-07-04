@@ -5,9 +5,10 @@ from itertools import product
 from collections import Counter
 import re
 
-# V-Trac and mirror mappings\ nV_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
-MIRROR_PAIRS   = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
-MIRROR         = MIRROR_PAIRS
+# V-Trac and mirror mappings
+V_TRAC_GROUPS = {0:1, 5:1, 1:2, 6:2, 2:3, 7:3, 3:4, 8:4, 4:5, 9:5}
+MIRROR_PAIRS = {0:5, 5:0, 1:6, 6:1, 2:7, 7:2, 3:8, 8:3, 4:9, 9:4}
+MIRROR = MIRROR_PAIRS
 
 # Load filters from CSV (fixed odd/even and shared-digit logic)
 def load_filters(path='lottery_filters_batch10.csv'):
@@ -52,11 +53,8 @@ def load_filters(path='lottery_filters_batch10.csv'):
             # shared-digit filters override
             elif 'shared digits' in name_l:
                 try:
-                    # threshold N
                     n = int(re.search(r'≥?(\d+)', row['name']).group(1))
-                    # full count of shared digits
                     expr = f"sum(1 for d in combo_digits if d in seed_digits) >= {n}"
-                    # optional sum constraint
                     m = re.search(r'sum <\s*(\d+)', row['name'])
                     if m:
                         t = int(m.group(1))
@@ -158,7 +156,7 @@ for combo in combos:
         survivors.append(combo)
 
 # Summary and combo checker
-st.sidebar.markdown(f"**Total:** {len(combos)} &nbsp;&nbsp;Eliminated: {len(eliminated_details)} &nbsp;&nbsp;Survivors: {len(survivors)}")
+st.sidebar.markdown(f"**Total:** {len(combos)} • Eliminated: {len(eliminated_details)} • Survivors: {len(survivors)}")
 query = st.sidebar.text_input("Check specific combo:")
 if query:
     key = ''.join(sorted(query.strip()))
