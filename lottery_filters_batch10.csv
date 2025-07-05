@@ -355,7 +355,7 @@ F353,If combo ≥1 shared digits and sum<10,TRUE,"""True""","""sum(1 for d in co
 F354,"If combo does not contain any digit and its mirror","True","True","not any(mirror.get(d, -1) in combo_digits for d in combo_digits)"
 F355,If any combo digit = mirror of seed sum last digit,TRUE,"""True""","""any(d == mirror.get(int(str(seed_sum)[-1]),-1) for d in combo_digits)"""
 F356,"If seed has 0,8 eliminate combos with even sum",TRUE,"""set(seed_digits).issuperset({0,8})""","""combo_sum%2==0"""
-F357,If prev_seed sum > 20 and seed sum < 20 and sum < 20 eliminate combo,TRUE,"prev_seed_sum > 20 and seed_sum < 20 and combo_sum < 20","" 
+F357,If prev_seed sum > 20 and seed sum < 20 and sum < 20 eliminate combo,TRUE,"prev_seed_sum > 20 and seed_sum < 20 and combo_sum < 20"
 F358,"If last three seeds are ('Low', 'Even', 'Low', 'Even', 'Mid', 'Odd') eliminate combos outside Low (80% over 5 cases)",TRUE,"""(prev1 == ('Low', 'Even') and prev2 == ('Low', 'Even') and prev3 == ('Mid', 'Odd') and combo_sum_range != 'Low')""","""eliminate combo"""
 F359,"If last three seeds are ('Low', 'Even', 'Mid', 'Even', 'Low', 'Odd') eliminate combos outside Low (80% over 5 cases)",TRUE,"""(prev1 == ('Low', 'Even') and prev2 == ('Mid', 'Even') and prev3 == ('Low', 'Odd') and combo_sum_range != 'Low')""","""eliminate combo"""
 F360,"If last three seeds are ('Low', 'Odd', 'Low', 'Even', 'Mid', 'Odd') eliminate combos outside Mid (80% over 5 cases)",TRUE,"""(prev1 == ('Low', 'Odd') and prev2 == ('Low', 'Even') and prev3 == ('Mid', 'Odd') and combo_sum_range != 'Mid')""","""eliminate combo"""
