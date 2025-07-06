@@ -8,7 +8,7 @@ from collections import Counter
 # V-Trac and mirror mappings
 V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
 MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
-MIRROR = MIRROR_PAIRS  # Fix typo
+MIRROR = MIRROR_PAIRS
 
 def sum_category(s: int) -> str:
     """Categorize sum into buckets."""
@@ -20,7 +20,6 @@ def sum_category(s: int) -> str:
         return 'Mid'
     else:
         return 'High'
-
 
 def load_filters(path='lottery_filters_batch10.csv'):
     """Load and compile filter definitions from CSV."""
@@ -139,7 +138,7 @@ def main():
     seed_digits           = [int(d) for d in seed]
     prev_seed_digits      = [int(d) for d in prev_seed if d.isdigit()]
     prev_prev_seed_digits = [int(d) for d in prev_prev_seed if d.isdigit()]
-    new_seed_digits       = set(seed_digits) - set(prev_seed_digits)  # added
+    new_seed_digits       = set(seed_digits) - set(prev_seed_digits)
     hot_digits            = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
     cold_digits           = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
     due_digits            = [d for d in range(10) if d not in prev_seed_digits and d not in prev_prev_seed_digits]
@@ -159,7 +158,7 @@ def main():
 
     # Context generator
     def generate_context(cdigits):
-        combo_sum     = sum(cdigits)
+        combo_sum      = sum(cdigits)
         return {
             'seed_digits':           seed_digits,
             'prev_seed_digits':      prev_seed_digits,
@@ -186,7 +185,7 @@ def main():
     # Generate combos
     def generate_combinations(seed, method):
         all_d = '0123456789'
-    combos     = generate_combinations(seed, method) set()
+        combos = set()
         s_sort = ''.join(sorted(seed))
         if method == '1-digit':
             for d in s_sort:
@@ -199,7 +198,7 @@ def main():
                     combos.add(''.join(sorted(pair + ''.join(p))))
         return sorted(combos)
 
-        combos     = generate_combinations(seed, method)
+    combos = generate_combinations(seed, method)
     eliminated = {}
     survivors  = []
 
@@ -212,13 +211,11 @@ def main():
             active = st.session_state.get(key, select_all and flt['enabled_default'])
             if not active:
                 continue
-            # Safely evaluate applicability
             try:
                 if not eval(flt['applicable_code'], ctx, ctx):
                     continue
             except Exception:
                 continue
-            # Safely evaluate expression
             try:
                 if eval(flt['expr_code'], ctx, ctx):
                     eliminated[combo] = flt['name']
@@ -239,9 +236,9 @@ def main():
         elif norm in survivors:
             st.sidebar.success(f"Combo {check_combo} survived all filters")
         else:
-            st.sidebar.warning("Combo not found in generated list")
+            st.sidebar.warning("Combo not found")
 
-    # Active filters
+    # Active filters UI
     st.header("🔧 Active Filters")
     for flt in filters:
         count = sum(
