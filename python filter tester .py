@@ -19,7 +19,7 @@ def sum_category(s: int) -> str:
     else:               return 'High'
 
 
-def load_filters(path='lottery_filters_batch11_complete.csv'):
+def load_filters(path='lottery_filters_batch10.csv'):
     """Load and compile filter definitions from CSV."""
     if not os.path.exists(path):
         st.error(f"Filter file not found: {path}")
@@ -31,13 +31,10 @@ def load_filters(path='lottery_filters_batch11_complete.csv'):
         for raw in reader:
             row = {k.lower(): v for k, v in raw.items()}
             row['id'] = row.get('id') or row.get('fid')
-            # Clean and normalize fields
             for key in ('name','applicable_if','expression'):
                 if key in row and isinstance(row[key], str):
                     row[key] = row[key].strip().strip('"').strip("'")
-
             name_l = row.get('name','').lower()
-            # Normalize operators
             row['expression'] = row.get('expression','').replace('!==','!=')
 
             # Odd/even sum filters
@@ -226,4 +223,19 @@ def main():
             for combo in combos
         )
         label = f"{flt['id']}: {flt['name']} — eliminated {count}"
-        st.checkbox(label, key=f"filter_{flt['id']}"
+        st.checkbox(
+            label,
+            key=f"filter_{flt['id']}",
+            value=st.session_state.get(
+                f"filter_{flt['id']}",
+                select_all and flt['enabled_default']
+            )
+        )
+
+    # Display survivors
+    with st.expander("Show remaining combinations"):
+        for c in survivors:
+            st.write(c)
+
+if __name__ == '__main__':
+    main()
