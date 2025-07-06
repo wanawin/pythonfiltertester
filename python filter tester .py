@@ -28,24 +28,76 @@ def load_filters(path='lottery_filters_batch10.csv'):
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for raw in reader:
+            # Normalize keys
             row = {k.lower(): v for k, v in raw.items()}
             row['id'] = row.get('id') or row.get('fid')
+            # Clean strings
             for key in ('name','applicable_if','expression'):
                 if key in row and isinstance(row[key], str):
                     row[key] = row[key].strip().strip('"').strip("'")
             name_l = row.get('name','').lower()
+            # Normalize operators
             row['expression'] = row.get('expression','').replace('!==','!=')
 
-            # existing filter logic...
-            # (omitted for brevity)
+            # Odd/Even sum filters
+            if 'eliminate all odd-sum combos' in name_l:
+                m = re.search(r'includes ([\d,]+)', name_l)
+                if m:
+                    digs = m.group(1).split(',')
+                    row['applicable_if'] = f"set({digs}).issubset(seed_digits)"
+                row['expression'] = 'combo_sum % 2 != 0'
+            elif 'eliminate all even-sum combos' in name_l:
+                m = re.search(r'includes ([\d,]+)', name_l)
+                if m:
+                    digs = m.group(1).split(',')
+                    row['applicable_if'] = f"set({digs}).issubset(seed_digits)"
+                row['expression'] = 'combo_sum % 2 == 0'
 
-            # Compile codes
+            # Shared-digit filters
+            elif 'shared digits' in name_l:
+                m = re.search(r'(?:>=|≥)\s*(\d+)', name_l)
+                if m:
+                    n = int(m.group(1))
+                    expr = f"sum(1 for d in combo_digits if d in seed_digits) >= {n}"
+                    m2 = re.search(r'sum\s*<\s*(\d+)', name_l)
+                    if m2:
+                        t = int(m2.group(1))
+                        expr += f" and combo_sum < {t}"
+                    row['expression'] = expr
+
+            # Keep-range filters
+            elif 'keep combo sum' in name_l:
+                m = re.search(r'combo sum (\d+)-(\d+)', name_l)
+                if m:
+                    lo, hi = m.groups()
+                    row['expression'] = f"not ({lo} <= combo_sum <= {hi})"
+
+            # Sum-category-transition filters
+            elif 'previous sum category is' in name_l:
+                m = re.search(r'previous sum category is (\w+).*eliminate\s+(.+)', name_l)
+                if m:
+                    prev_cat, bad = m.groups()
+                    bad_list = [b.strip().capitalize() for b in bad.split('or')]
+                    row['applicable_if'] = f"prev_sum_cat == '{prev_cat.capitalize()}'"
+                    row['expression']    = f"combo_sum_cat in {bad_list}"
+
+            # Last-three-seeds pattern filters
+            elif 'last three seeds are' in name_l:
+                m = re.search(r'last three seeds are \(([^)]+)\).*eliminate combos outside (\w+)', name_l)
+                if m:
+                    pats_raw, bad_cat = m.groups()
+                    patt_list = [p.strip().strip('"').strip("'") for p in pats_raw.split(',')]
+                    row['applicable_if'] = f"prev_pattern == {patt_list}"
+                    row['expression']    = f"combo_sum_cat != '{bad_cat.capitalize()}'"
+
+            # Compile code objects
             try:
                 row['applicable_code'] = compile(row.get('applicable_if','True'), '<applicable>', 'eval')
                 row['expr_code']       = compile(row.get('expression','False'),    '<expr>',       'eval')
             except SyntaxError as e:
                 st.error(f"Syntax error in filter {row['id']}: {e}")
                 continue
+
             row['enabled_default'] = row.get('enabled','').lower() == 'true'
             flts.append(row)
     return flts
@@ -71,16 +123,16 @@ def main():
         st.stop()
 
     # Build context values
-    seed_digits        = [int(d) for d in seed]
-    prev_seed_digits   = [int(d) for d in prev_seed if d.isdigit()]
+    seed_digits           = [int(d) for d in seed]
+    prev_seed_digits      = [int(d) for d in prev_seed if d.isdigit()]
     prev_prev_seed_digits = [int(d) for d in prev_prev_seed if d.isdigit()]
-    hot_digits         = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
-    cold_digits        = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
-    due_digits         = [d for d in range(10) if d not in prev_seed_digits and d not in prev_prev_seed_digits]
-    seed_counts        = Counter(seed_digits)
-    seed_vtracs        = set(V_TRAC_GROUPS[d] for d in seed_digits)
+    hot_digits            = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
+    cold_digits           = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
+    due_digits            = [d for d in range(10) if d not in prev_seed_digits and d not in prev_prev_seed_digits]
+    seed_counts           = Counter(seed_digits)
+    seed_vtracs           = set(V_TRAC_GROUPS[d] for d in seed_digits)
 
-    # Precompute seed sum and category
+    # Precompute seed sums and categories
     seed_sum    = sum(seed_digits)
     prev_sum_cat= sum_category(seed_sum)
 
@@ -92,35 +144,35 @@ def main():
         prev_pattern.extend([sc, parity])
 
     # Context generator
-    def generate_context(cdigits):
-        combo_sum    = sum(cdigits)
-        return {
-            'seed_digits':          seed_digits,
-            'prev_seed_digits':     prev_seed_digits,
-            'prev_prev_seed_digits':prev_prev_seed_digits,
-            'prev_pattern':         prev_pattern,
-            'hot_digits':           hot_digits,
-            'cold_digits':          cold_digits,
-            'due_digits':           due_digits,
-            'seed_counts':          seed_counts,
-            'seed_sum':             seed_sum,
-            'prev_sum_cat':         prev_sum_cat,
-            'combo_digits':         cdigits,
-            'combo_sum':            combo_sum,
-            'combo_sum_cat':        sum_category(combo_sum),
-            'seed_vtracs':          seed_vtracs,
-            'combo_vtracs':         set(V_TRAC_GROUPS[d] for d in cdigits),
-            'mirror':               MIRROR,
-            'common_to_both':       set(prev_seed_digits) & set(prev_prev_seed_digits),
-            'last2':                set(prev_seed_digits) | set(prev_prev_seed_digits),
-            'Counter':              Counter
-        }
+def generate_context(cdigits):
+    combo_sum            = sum(cdigits)
+    return {
+        'seed_digits':          seed_digits,
+        'prev_seed_digits':     prev_seed_digits,
+        'prev_prev_seed_digits':prev_prev_seed_digits,
+        'prev_pattern':         prev_pattern,
+        'hot_digits':           hot_digits,
+        'cold_digits':          cold_digits,
+        'due_digits':           due_digits,
+        'seed_counts':          seed_counts,
+        'seed_sum':             seed_sum,
+        'prev_sum_cat':         prev_sum_cat,
+        'combo_digits':         cdigits,
+        'combo_sum':            combo_sum,
+        'combo_sum_cat':        sum_category(combo_sum),
+        'seed_vtracs':          seed_vtracs,
+        'combo_vtracs':         set(V_TRAC_GROUPS[d] for d in cdigits),
+        'mirror':               MIRROR,
+        'common_to_both':       set(prev_seed_digits) & set(prev_prev_seed_digits),
+        'last2':                set(prev_seed_digits) | set(prev_prev_seed_digits),
+        'Counter':              Counter
+    }
 
     # Combination generator
     def generate_combinations(seed, method):
-        all_d   = '0123456789'
-        combos  = set()
-        s_sort  = ''.join(sorted(seed))
+        all_d  = '0123456789'
+        combos = set()
+        s_sort = ''.join(sorted(seed))
         if method == '1-digit':
             for d in s_sort:
                 for p in product(all_d, repeat=4):
@@ -138,7 +190,7 @@ def main():
 
     # Apply filters
     for combo in combos:
-        cdigits= [int(c) for c in combo]
+        cdigits = [int(c) for c in combo]
         ctx     = generate_context(cdigits)
         for flt in filters:
             key    = f"filter_{flt['id']}"
@@ -154,7 +206,7 @@ def main():
     # Sidebar summary
     st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
 
-    # Normalize user-input combo for lookup
+    # Normalize and check user-input combo
     if check_combo:
         norm = ''.join(sorted(check_combo))
         if norm in eliminated:
@@ -173,7 +225,8 @@ def main():
             for combo in combos
         )
         label = f"{flt['id']}: {flt['name']} — eliminated {count}"
-        st.checkbox(label, key=f"filter_{flt['id']}", value=st.session_state.get(f"filter_{flt['id']}", select_all and flt['enabled_default']))
+        st.checkbox(label, key=f"filter_{flt['id']}",
+                    value=st.session_state.get(f"filter_{flt['id']}", select_all and flt['enabled_default']))
 
     # Display survivors
     with st.expander("Show remaining combinations"):
