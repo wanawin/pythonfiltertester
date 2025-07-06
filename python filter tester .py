@@ -19,4 +19,4 @@ def sum_category(s: int) -> str:
     else:               return 'High'
 
 
-def load_filters(path='lottery_filters_batch11_complete.csv'):
+def load_filters(path='lottery_filters_batch10.csv'):
