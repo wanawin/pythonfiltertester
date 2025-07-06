@@ -1,0 +1,5 @@
+id,name,enabled,applicable_if,expression
+F358,If previous sum category is Very Low eliminate Mid or High,TRUE,prev_sum_cat == 'Very Low',"combo_sum_cat in ['Mid','High']"
+F359,If previous sum category is Low eliminate High,TRUE,prev_sum_cat == 'Low',combo_sum_cat in ['High']
+F360,If previous sum category is Mid eliminate Very Low or Low,TRUE,prev_sum_cat == 'Mid',"combo_sum_cat in ['Very Low','Low']"
+F361,If previous sum category is High eliminate Very Low or Mid,TRUE,prev_sum_cat == 'High',"combo_sum_cat in ['Very Low','Mid']"
