@@ -8,8 +8,7 @@ from collections import Counter
 # V-Trac and mirror mappings
 V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
 MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
-MIRROR = MIRROR_PAIRS
-
+MIRROR = MIROR_PAIRS if False else MIRROR_PAIRS
 
 def sum_category(s: int) -> str:
     """Categorize sum into buckets."""
@@ -22,7 +21,6 @@ def sum_category(s: int) -> str:
     else:
         return 'High'
 
-
 def load_filters(path='lottery_filters_batch10.csv'):
     """Load and compile filter definitions from CSV."""
     if not os.path.exists(path):
@@ -33,18 +31,15 @@ def load_filters(path='lottery_filters_batch10.csv'):
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for raw in reader:
-            # lower-case keys
             row = {k.lower(): v for k, v in raw.items()}
             row['id'] = row.get('id') or row.get('fid')
-            # clean text
+            # clean strings
             for key in ('name', 'applicable_if', 'expression'):
                 if key in row and isinstance(row[key], str):
                     row[key] = row[key].strip().strip('"').strip("'")
             name_l = (row.get('name') or '').lower()
-
-            # normalize operator in raw expression
-            if 'expression' in row:
-                row['expression'] = row['expression'].replace('!==', '!=')
+            # normalize operators
+            row['expression'] = row.get('expression', '').replace('!==', '!=')
 
             # odd/even-sum filters
             if 'eliminate all odd-sum combos' in name_l:
@@ -79,7 +74,7 @@ def load_filters(path='lottery_filters_batch10.csv'):
                     lo, hi = m.groups()
                     row['expression'] = f"not ({lo} <= combo_sum <= {hi})"
 
-            # tail-digit filters (seed_sum and combo_sum endings)
+            # tail-digit filters
             elif 'seed_sum ends in' in name_l and 'combo_sum ends in' in name_l:
                 m = re.search(r'seed_sum ends in (\d+).*combo_sum ends in (\d+)', name_l)
                 if m:
@@ -87,7 +82,7 @@ def load_filters(path='lottery_filters_batch10.csv'):
                     row['applicable_if'] = f"seed_sum % 10 == {s_end}"
                     row['expression']    = f"combo_sum % 10 == {c_end}"
 
-            # sum-category-transition filters
+            # sum-category-transition
             elif 'previous sum category is' in name_l:
                 m = re.search(r'previous sum category is (\w+).*eliminate\s+(.+)', name_l)
                 if m:
@@ -96,7 +91,7 @@ def load_filters(path='lottery_filters_batch10.csv'):
                     row['applicable_if'] = f"prev_sum_cat == '{prev_cat.capitalize()}'"
                     row['expression']    = f"combo_sum_cat in {bad_list}"
 
-            # last-three-seeds pattern filters
+            # last-three-seeds pattern
             elif 'last three seeds are' in name_l:
                 m = re.search(r'last three seeds are \(([^)]+)\).*eliminate combos outside (\w+)', name_l)
                 if m:
@@ -105,12 +100,12 @@ def load_filters(path='lottery_filters_batch10.csv'):
                     row['applicable_if'] = f"prev_pattern == {patt_list}"
                     row['expression']    = f"combo_sum_cat != '{bad_cat.capitalize()}'"
 
-            # compile code objects, defaulting empty to True/False
+            # compile code
             a_if = row.get('applicable_if') or 'True'
             expr = row.get('expression') or 'False'
             try:
                 row['applicable_code'] = compile(a_if, '<applicable>', 'eval')
-                row['expr_code']       = compile(expr, '<expr>', 'eval')
+                row['expr_code']       = compile(expr, '<expr>',       'eval')
             except SyntaxError as e:
                 st.error(f"Syntax error in filter {row['id']}: {e}")
                 continue
@@ -139,7 +134,7 @@ def main():
         st.sidebar.error("Seed must be exactly 5 digits")
         st.stop()
 
-    # build context base
+    # base context
     seed_digits           = [int(d) for d in seed]
     prev_seed_digits      = [int(d) for d in prev_seed if d.isdigit()]
     prev_prev_seed_digits = [int(d) for d in prev_prev_seed if d.isdigit()]
@@ -149,41 +144,41 @@ def main():
     seed_counts           = Counter(seed_digits)
     seed_vtracs           = set(V_TRAC_GROUPS[d] for d in seed_digits)
 
-    # compute seed sums and categories
+    # precompute sums
     seed_sum     = sum(seed_digits)
     prev_sum_cat = sum_category(seed_sum)
 
-    # build previous sum/odd-even pattern
+    # build prev_pattern
     prev_pattern = []
     for digs in [prev_prev_seed_digits, prev_seed_digits, seed_digits]:
         sc     = sum_category(sum(digs))
         parity = 'Even' if sum(digs) % 2 == 0 else 'Odd'
         prev_pattern.extend([sc, parity])
 
-    # context generator
-def generate_context(cdigits):
-    combo_sum     = sum(cdigits)
-    return {
-        'seed_digits':           seed_digits,
-        'prev_seed_digits':      prev_seed_digits,
-        'prev_prev_seed_digits': prev_prev_seed_digits,
-        'prev_pattern':          prev_pattern,
-        'hot_digits':            hot_digits,
-        'cold_digits':           cold_digits,
-        'due_digits':            due_digits,
-        'seed_counts':           seed_counts,
-        'seed_sum':              seed_sum,
-        'prev_sum_cat':          prev_sum_cat,
-        'combo_digits':          cdigits,
-        'combo_sum':             combo_sum,
-        'combo_sum_cat':         sum_category(combo_sum),
-        'seed_vtracs':           seed_vtracs,
-        'combo_vtracs':          set(V_TRAC_GROUPS[d] for d in cdigits),
-        'mirror':                MIRROR,
-        'common_to_both':        set(prev_seed_digits) & set(prev_prev_seed_digits),
-        'last2':                 set(prev_seed_digits) | set(prev_prev_seed_digits),
-        'Counter':               Counter
-    }
+    # context function
+    def generate_context(cdigits):
+        combo_sum      = sum(cdigits)
+        return {
+            'seed_digits':           seed_digits,
+            'prev_seed_digits':      prev_seed_digits,
+            'prev_prev_seed_digits': prev_prev_seed_digits,
+            'prev_pattern':          prev_pattern,
+            'hot_digits':            hot_digits,
+            'cold_digits':           cold_digits,
+            'due_digits':            due_digits,
+            'seed_counts':           seed_counts,
+            'seed_sum':              seed_sum,
+            'prev_sum_cat':          prev_sum_cat,
+            'combo_digits':          cdigits,
+            'combo_sum':             combo_sum,
+            'combo_sum_cat':         sum_category(combo_sum),
+            'seed_vtracs':           seed_vtracs,
+            'combo_vtracs':          set(V_TRAC_GROUPS[d] for d in cdigits),
+            'mirror':                MIRROR,
+            'common_to_both':        set(prev_seed_digits) & set(prev_prev_seed_digits),
+            'last2':                 set(prev_seed_digits) | set(prev_prev_seed_digits),
+            'Counter':               Counter
+        }
 
     # generate combos
     def generate_combinations(seed, method):
@@ -220,7 +215,7 @@ def generate_context(cdigits):
         else:
             survivors.append(combo)
 
-    # sidebar summary
+    # summary
     st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
 
     # combo checker
@@ -231,9 +226,9 @@ def generate_context(cdigits):
         elif norm in survivors:
             st.sidebar.success(f"Combo {check_combo} survived all filters")
         else:
-            st.sidebar.warning(f"Combo {check_combo} not found")
+            st.sidebar.warning("Combo not found")
 
-    # active filters UI
+    # filter UI
     st.header("🔧 Active Filters")
     for flt in filters:
         count = sum(
@@ -246,8 +241,8 @@ def generate_context(cdigits):
                     key=f"filter_{flt['id']}",
                     value=st.session_state.get(f"filter_{flt['id']}", select_all and flt['enabled_default']))
 
-    # show survivors
-    with st.expander("Show remaining combinations"):
+    # survivors
+    with st.expander("Show remaining combos"):
         for c in survivors:
             st.write(c)
 
