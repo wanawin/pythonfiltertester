@@ -199,11 +199,11 @@ def main():
                     combos.add(''.join(sorted(pair + ''.join(p))))
         return sorted(combos)
 
-    combos     = generate_combinations(seed, method)
+        combos     = generate_combinations(seed, method)
     eliminated = {}
     survivors  = []
 
-        # Apply filters
+    # Apply filters
     for combo in combos:
         cdigits = [int(c) for c in combo]
         ctx     = generate_context(cdigits)
@@ -212,12 +212,13 @@ def main():
             active = st.session_state.get(key, select_all and flt['enabled_default'])
             if not active:
                 continue
-            # Safely evaluate applicable and expression
+            # Safely evaluate applicability
             try:
                 if not eval(flt['applicable_code'], ctx, ctx):
                     continue
             except Exception:
                 continue
+            # Safely evaluate expression
             try:
                 if eval(flt['expr_code'], ctx, ctx):
                     eliminated[combo] = flt['name']
