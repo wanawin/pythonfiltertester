@@ -186,7 +186,7 @@ def main():
     # Generate combos
     def generate_combinations(seed, method):
         all_d = '0123456789'
-        combos = set()
+    combos     = generate_combinations(seed, method) set()
         s_sort = ''.join(sorted(seed))
         if method == '1-digit':
             for d in s_sort:
