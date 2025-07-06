@@ -10,6 +10,14 @@ V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
 MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
 MIRROR = MIRROR_PAIRS
 
+def sum_category(s: int) -> str:
+    """Categorize a sum into Very Low, Low, Mid, or High."""
+    if   0  <= s <= 15: return 'Very Low'
+    elif 16 <= s <= 24: return 'Low'
+    elif 25 <= s <= 33: return 'Mid'
+    else:               return 'High'
+
+
 def load_filters(path='lottery_filters_batch10.csv'):
     if not os.path.exists(path):
         st.error(f"Filter file not found: {path}")
@@ -64,9 +72,21 @@ def load_filters(path='lottery_filters_batch10.csv'):
                     lo, hi = m.groups()
                     row['expression'] = f"not ({lo} <= combo_sum <= {hi})"
 
+            # Sum-Category-Transition Filters
+            elif 'previous sum category is' in name_l:
+                m = re.search(
+                    r'previous sum category is (\w+).*eliminate\s+(.+)',
+                    name_l
+                )
+                if m:
+                    prev_cat, bad = m.groups()
+                    bad_list = [b.strip().capitalize() for b in bad.split('or')]
+                    row['applicable_if'] = f"prev_sum_cat == '{prev_cat.capitalize()}'"
+                    row['expression']    = f"combo_sum_cat in {bad_list}"
+
             try:
                 row['applicable_code'] = compile(row.get('applicable_if', 'True'), '<applicable>', 'eval')
-                row['expr_code'] = compile(row.get('expression', 'False'), '<expr>', 'eval')
+                row['expr_code']       = compile(row.get('expression',    'False'), '<expr>',      'eval')
             except SyntaxError as e:
                 st.error(f"Syntax error in filter {row['id']}: {e}")
                 continue
@@ -74,7 +94,7 @@ def load_filters(path='lottery_filters_batch10.csv'):
             flts.append(row)
     return flts
 
-# Load filters
+
 def main():
     filters = load_filters()
 
@@ -105,7 +125,35 @@ def main():
     seed_counts = Counter(seed_digits)
     seed_vtracs = set(V_TRAC_GROUPS[d] for d in seed_digits)
 
-    # Generate combos\    
+    # Compute sums and categories
+    seed_sum = sum(seed_digits)
+    prev_sum_cat  = sum_category(seed_sum)
+
+    def generate_context(cdigits):
+        combo_sum = sum(cdigits)
+        return {
+            'seed_digits': seed_digits,
+            'prev_seed_digits': prev_seed_digits,
+            'prev_prev_seed_digits': prev_prev_seed_digits,
+            'new_seed_digits': new_seed_digits,
+            'hot_digits': hot_digits,
+            'cold_digits': cold_digits,
+            'due_digits': due_digits,
+            'seed_counts': seed_counts,
+            'seed_sum': seed_sum,
+            'prev_sum_cat': prev_sum_cat,
+            'combo_digits': cdigits,
+            'combo_sum': combo_sum,
+            'combo_sum_cat': sum_category(combo_sum),
+            'seed_vtracs': seed_vtracs,
+            'combo_vtracs': set(V_TRAC_GROUPS[d] for d in cdigits),
+            'mirror': MIRROR,
+            'common_to_both': set(prev_seed_digits)&set(prev_prev_seed_digits),
+            'last2': set(prev_seed_digits)|set(prev_prev_seed_digits),
+            'Counter': Counter
+        }
+
+    # Generate combos
     def generate_combinations(seed, method):
         all_digits = '0123456789'
         combos = set()
@@ -125,30 +173,13 @@ def main():
     eliminated = {}
     survivors = []
 
-    # Apply filters to each combo
+    # Apply filters
     for combo in combos:
         cdigits = [int(c) for c in combo]
-        ctx = {
-            'seed_digits': seed_digits,
-            'prev_seed_digits': prev_seed_digits,
-            'prev_prev_seed_digits': prev_prev_seed_digits,
-            'new_seed_digits': new_seed_digits,
-            'hot_digits': hot_digits,
-            'cold_digits': cold_digits,
-            'due_digits': due_digits,
-            'seed_counts': seed_counts,
-            'seed_sum': sum(seed_digits),
-            'combo_digits': cdigits,
-            'combo_sum': sum(cdigits),
-            'seed_vtracs': seed_vtracs,
-            'combo_vtracs': set(V_TRAC_GROUPS[d] for d in cdigits),
-            'mirror': MIRROR,
-            'common_to_both': set(prev_seed_digits)&set(prev_prev_seed_digits),
-            'last2': set(prev_seed_digits)|set(prev_prev_seed_digits),
-            'Counter': Counter
-        }
+        ctx = generate_context(cdigits)
         for flt in filters:
-            active = st.session_state.get(f"filter_{flt['id']}", select_all and flt['enabled_default'])
+            key = f"filter_{flt['id']}"
+            active = st.session_state.get(key, select_all and flt['enabled_default'])
             if not active or not eval(flt['applicable_code'], ctx, ctx):
                 continue
             if eval(flt['expr_code'], ctx, ctx):
@@ -173,29 +204,11 @@ def main():
         count = 0
         for combo in combos:
             cdigits = [int(c) for c in combo]
-            ctx_combo = {
-                'seed_digits': seed_digits,
-                'prev_seed_digits': prev_seed_digits,
-                'prev_prev_seed_digits': prev_prev_seed_digits,
-                'new_seed_digits': new_seed_digits,
-                'hot_digits': hot_digits,
-                'cold_digits': cold_digits,
-                'due_digits': due_digits,
-                'seed_counts': seed_counts,
-                'seed_sum': sum(seed_digits),
-                'combo_digits': cdigits,
-                'combo_sum': sum(cdigits),
-                'seed_vtracs': seed_vtracs,
-                'combo_vtracs': set(V_TRAC_GROUPS[d] for d in cdigits),
-                'mirror': MIRROR,
-                'common_to_both': set(prev_seed_digits)&set(prev_prev_seed_digits),
-                'last2': set(prev_seed_digits)|set(prev_prev_seed_digits),
-                'Counter': Counter
-            }
-            if eval(flt['applicable_code'], ctx_combo, ctx_combo) and eval(flt['expr_code'], ctx_combo, ctx_combo):
+            ctx = generate_context(cdigits)
+            if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
                 count += 1
         label = f"{flt['id']}: {flt['name']} — eliminated {count}"
-        st.checkbox(label, key=f"filter_{flt['id']}", value=select_all and flt['enabled_default'])
+        st.checkbox(label, key=f"filter_{flt['id']}", value=st.session_state.get(f"filter_{flt['id']}", select_all and flt['enabled_default']))
 
     # Show survivors
     with st.expander("Show remaining combinations"):
