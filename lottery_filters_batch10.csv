@@ -476,8 +476,9 @@ F474,"If last three seeds are ('Very Low', 'Odd', 'Mid', 'Odd', 'Mid', 'Even') e
 F475,"If last three seeds are ('Very Low', 'Odd', 'Very Low', 'Even', 'High', 'Even') eliminate combos outside Mid (100% over 1 cases)",TRUE,,,,,,,,,,,,
 F476,"If last three seeds are ('Very Low', 'Odd', 'Very Low', 'Even', 'Low', 'Even') eliminate combos outside Mid (100% over 1 cases)",TRUE,,,,,,,,,,,,
 F477,"If last three seeds are ('Very Low', 'Odd', 'Very Low', 'Odd', 'Low', 'Even') eliminate combos outside Low (100% over 1 cases)",TRUE,,,,,,,,,,,,
-F478,"Eliminate all odd‐sum combos",TRUE,"True","combo_sum % 2 != 0"
-F479,"Eliminate all even‐sum combos",TRUE,"True","combo_sum % 2 == 0"
+F478,"Eliminate all odd-sum combos",TRUE,"True","combo_sum % 2 != 0",,,,,,,,,,
+F479,"Eliminate all even-sum combos",TRUE,"True","combo_sum % 2 == 0",,,,,,,,,,
+
 
 
 
