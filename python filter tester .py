@@ -174,9 +174,13 @@ def main():
 
     # Active Filters UI
     st.header("🔧 Active Filters")
-    for flt in filters:
+    # Compute elimination counts
+    flt_counts = {flt['id']: sum(1 for c,name in eliminated.items() if name == flt['name']) for flt in filters}
+    # Sort filters by descending count (non-zero first)
+    sorted_filters = sorted(filters, key=lambda flt: flt_counts[flt['id']], reverse=True)
+    for flt in sorted_filters:
         key = f"filter_{flt['id']}"
-        count = sum(1 for c, name in eliminated.items() if name == flt['name'])
+        count = flt_counts[flt['id']]
         label = f"{flt['id']}: {flt['name']} — eliminated {count}"
         st.checkbox(label,
                     key=key,
