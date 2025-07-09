@@ -136,15 +136,15 @@ def main():
         }
 
     # Generate and filter combos
-    combos = generate_combinations(seed, method)
+    combos    = generate_combinations(seed, method)
     eliminated = {}
     survivors  = []
 
     for combo in combos:
         cdigits = [int(c) for c in combo]
-        ctx = generate_context(cdigits)
+        ctx     = generate_context(cdigits)
         for flt in filters:
-            key = f"filter_{flt['id']}"
+            key    = f"filter_{flt['id']}"
             active = st.session_state.get(key, select_all and flt['enabled_default'])
             if not active:
                 continue
@@ -159,7 +159,7 @@ def main():
         else:
             survivors.append(combo)
 
-    # Summary
+    # Sidebar summary
     st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
 
     # Specific combo check
@@ -174,12 +174,24 @@ def main():
 
     # Active Filters UI
     st.header("🔧 Active Filters")
-    # Compute elimination counts
-    flt_counts = {flt['id']: sum(1 for c,name in eliminated.items() if name == flt['name']) for flt in filters}
-    # Sort filters by descending count (non-zero first)
-    sorted_filters = sorted(filters, key=lambda flt: flt_counts[flt['id']], reverse=True)
+    # Compute elimination counts by re-evaluating all combos
+    flt_counts = {}
+    for flt in filters:
+        cnt = 0
+        for combo in combos:
+            cdigits = [int(c) for c in combo]
+            ctx     = generate_context(cdigits)
+            try:
+                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
+                    cnt += 1
+            except Exception:
+                pass
+        flt_counts[flt['id']] = cnt
+    # Sort filters: those that eliminate >0 first, then zeros
+    sorted_filters = sorted(filters, key=lambda flt: (flt_counts[flt['id']] == 0, -flt_counts[flt['id']]))
+
     for flt in sorted_filters:
-        key = f"filter_{flt['id']}"
+        key   = f"filter_{flt['id']}"
         count = flt_counts[flt['id']]
         label = f"{flt['id']}: {flt['name']} — eliminated {count}"
         st.checkbox(label,
