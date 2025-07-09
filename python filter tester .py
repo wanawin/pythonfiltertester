@@ -72,20 +72,24 @@ def generate_combinations(seed: str, method: str) -> list:
 
 def main():
     filters = load_filters()
-    st.sidebar.header("🔢 DC-5 Filter Tracker Full")
-    select_all    = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
-    seed          = st.sidebar.text_input("Current 5-digit seed (required):").strip()
-    prev_seed     = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
-    prev_prev     = st.sidebar.text_input("Previous previous 5-digit seed (optional):").strip()
-    method        = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
-    hot_input     = st.sidebar.text_input("Hot digits (comma-separated):").strip()
-    cold_input    = st.sidebar.text_input("Cold digits (comma-separated):").strip()
-    check_combo   = st.sidebar.text_input("Check specific combo:").strip()
 
+    # Sidebar inputs
+    st.sidebar.header("🔢 DC-5 Filter Tracker Full")
+    select_all  = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
+    seed        = st.sidebar.text_input("Current 5-digit seed (required):").strip()
+    prev_seed   = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
+    prev_prev   = st.sidebar.text_input("Previous previous 5-digit seed (optional):").strip()
+    method      = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
+    hot_input   = st.sidebar.text_input("Hot digits (comma-separated):").strip()
+    cold_input  = st.sidebar.text_input("Cold digits (comma-separated):").strip()
+    check_combo = st.sidebar.text_input("Check specific combo:").strip()
+
+    # Validate seed
     if len(seed) != 5 or not seed.isdigit():
         st.sidebar.error("Seed must be exactly 5 digits")
         return
 
+    # Build context data
     seed_digits      = [int(d) for d in seed]
     prev_digits      = [int(d) for d in prev_seed if d.isdigit()]
     prev_prev_digits = [int(d) for d in prev_prev if d.isdigit()]
@@ -98,6 +102,7 @@ def main():
     seed_sum         = sum(seed_digits)
     prev_sum_cat     = sum_category(seed_sum)
 
+    # Build previous pattern as tuple for comparisons
     prev_pattern = []
     for digs in (prev_prev_digits, prev_digits, seed_digits):
         cat = sum_category(sum(digs))
@@ -108,28 +113,29 @@ def main():
     def generate_context(cdigits):
         csum = sum(cdigits)
         return {
-            'seed_digits': seed_digits,
-            'prev_seed_digits': prev_digits,
+            'seed_digits':           seed_digits,
+            'prev_seed_digits':      prev_digits,
             'prev_prev_seed_digits': prev_prev_digits,
-            'new_seed_digits': new_digits,
-            'prev_pattern': prev_pattern,
-            'hot_digits': hot_digits,
-            'cold_digits': cold_digits,
-            'due_digits': due_digits,
-            'seed_counts': seed_counts,
-            'seed_sum': seed_sum,
-            'prev_sum_cat': prev_sum_cat,
-            'combo_digits': cdigits,
-            'combo_sum': csum,
-            'combo_sum_cat': sum_category(csum),
-            'seed_vtracs': seed_vtracs,
-            'combo_vtracs': set(V_TRAC_GROUPS[d] for d in cdigits),
-            'mirror': MIRROR,
-            'common_to_both': set(prev_digits) & set(prev_prev_digits),
-            'last2': set(prev_digits) | set(prev_prev_digits),
-            'Counter': Counter
+            'new_seed_digits':       new_digits,
+            'prev_pattern':          prev_pattern,
+            'hot_digits':            hot_digits,
+            'cold_digits':           cold_digits,
+            'due_digits':            due_digits,
+            'seed_counts':           seed_counts,
+            'seed_sum':              seed_sum,
+            'prev_sum_cat':          prev_sum_cat,
+            'combo_digits':          cdigits,
+            'combo_sum':             csum,
+            'combo_sum_cat':         sum_category(csum),
+            'seed_vtracs':           seed_vtracs,
+            'combo_vtracs':          set(V_TRAC_GROUPS[d] for d in cdigits),
+            'mirror':                MIRROR,
+            'common_to_both':        set(prev_digits) & set(prev_prev_digits),
+            'last2':                 set(prev_digits) | set(prev_prev_digits),
+            'Counter':               Counter
         }
 
+    # Generate and filter combos
     combos = generate_combinations(seed, method)
     eliminated = {}
     survivors  = []
@@ -153,5 +159,33 @@ def main():
         else:
             survivors.append(combo)
 
-    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}
+    # Summary
+    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
 
+    # Specific combo check
+    if check_combo:
+        norm = ''.join(sorted(check_combo))
+        if norm in eliminated:
+            st.sidebar.info(f"Combo {check_combo} eliminated by {eliminated[norm]}")
+        elif norm in survivors:
+            st.sidebar.success(f"Combo {check_combo} survived all filters")
+        else:
+            st.sidebar.warning("Combo not found in generated list")
+
+    # Active Filters UI
+    st.header("🔧 Active Filters")
+    for flt in filters:
+        key = f"filter_{flt['id']}"
+        count = sum(1 for c, name in eliminated.items() if name == flt['name'])
+        label = f"{flt['id']}: {flt['name']} — eliminated {count}"
+        st.checkbox(label,
+                    key=key,
+                    value=st.session_state.get(key, select_all and flt['enabled_default']))
+
+    # Show survivors
+    with st.expander("Show remaining combinations"):
+        for combo in survivors:
+            st.write(combo)
+
+if __name__ == '__main__':
+    main()
