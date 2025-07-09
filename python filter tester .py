@@ -112,6 +112,8 @@ def main():
         cat = sum_category(sum(digs))
         parity = 'Even' if sum(digs) % 2 == 0 else 'Odd'
         prev_pattern.extend([cat, parity])
+    # convert to tuple so tuple comparisons match CSV definitions
+    prev_pattern = tuple(prev_pattern)
 
     def generate_context(cdigits):
         csum = sum(cdigits)
