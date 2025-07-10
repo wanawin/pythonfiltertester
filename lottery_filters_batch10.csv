@@ -193,7 +193,7 @@ F191,Eliminate if seed has 0 and 7 and combo sum <8 or >28,TRUE,"""set(seed_digi
 F192,Eliminate if seed has 0 and 6 and combo sum <8 or >29,TRUE,"""set(seed_digits).issuperset({0,6})""","""combo_sum <8 or combo_sum >29""",,,,,,,,,,
 F193,Eliminate if seed has 0 and 5 and combo sum <10 or >30,TRUE,"""set(seed_digits).issuperset({0,5})""","""combo_sum <10 or combo_sum >30""",,,,,,,,,,
 F194,Eliminate if seed has '00' and combo sum <11 or >33,TRUE,"""seed_counts.get(0,0)>=2""","""combo_sum <11 or combo_sum >33""",,,,,,,,,,
-F195,Eliminate if seed has 1 and combo has neither 2 nor 4,TRUE,"""1 in seed_digits""","""2 not in combo_digits and 4 not in combo_digits""",,,,,,,,,,
+F195,XXXEliminate if seed has 1 and combo has neither 2 nor 4,TRUE,"""1 in seed_digits""","""2 not in combo_digits and 4 not in combo_digits""",,,,,,,,,,
 F196,"XXXEliminate if seed has 5 and combo has neither 2,3,1",TRUE,"""5 in seed_digits""","""not any(d in combo_digits for d in [1,2,3])""",,,,,,,,,,
 F197,XXXEliminate if seed has 6 and combo has neither 3 nor 4,TRUE,"""6 in seed_digits""","""3 not in combo_digits and 4 not in combo_digits""",,,,,,,,,,
 F198,XXXEliminate if no combo digit is cold digit,TRUE,"""True""","""not any(d in cold_digits for d in combo_digits)""",,,,,,,,,,
