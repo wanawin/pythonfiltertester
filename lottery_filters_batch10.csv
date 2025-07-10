@@ -256,7 +256,7 @@ F254,If seed sum=22-23 keep combo sum 16-25,TRUE,"""22<=seed_sum<=23""","""not (
 F255,If seed sum=19-21 keep combo sum 14-24,TRUE,"""19<=seed_sum<=21""","""not (14<=combo_sum<=24)""",,,,,,,,,,
 F256,If seed sum=13-15 keep combo sum 14-22,TRUE,"""13<=seed_sum<=15""","""not (14<=combo_sum<=22)""",,,,,,,,,,
 F257,XXXIf seed sum=12 keep combo sum 12-25,TRUE,"""seed_sum==12""","""not (12<=combo_sum<=25)""",,,,,,,,,,
-F258,If seed sum=16 keep combo sum 12-20,TRUE,"""seed_sum==16""","""not (12<=combo_sum<=20)""",,,,,,,,,,
+F258,XXXIf seed sum=16 keep combo sum 12-20,TRUE,"""seed_sum==16""","""not (12<=combo_sum<=20)""",,,,,,,,,,
 F259,If seed sum=17-18 keep combo sum 11-26,TRUE,"""17<=seed_sum<=18""","""not (11<=combo_sum<=26)""",,,,,,,,,,
 F260,If seed sum=24-25 and combo <19 or >25,TRUE,"""24<=seed_sum<=25""","""combo_sum<19 or combo_sum>25""",,,,,,,,,,
 F261,If seed sum=22-23 and combo <16 or >25,TRUE,"""22<=seed_sum<=23""","""combo_sum<16 or combo_sum>25""",,,,,,,,,,
@@ -476,8 +476,8 @@ F474,"If last three seeds are ('Very Low', 'Odd', 'Mid', 'Odd', 'Mid', 'Even') e
 F475,"If last three seeds are ('Very Low', 'Odd', 'Very Low', 'Even', 'High', 'Even') eliminate combos outside Mid (100% over 1 cases)",TRUE,,,,,,,,,,,,
 F476,"If last three seeds are ('Very Low', 'Odd', 'Very Low', 'Even', 'Low', 'Even') eliminate combos outside Mid (100% over 1 cases)",TRUE,,,,,,,,,,,,
 F477,"If last three seeds are ('Very Low', 'Odd', 'Very Low', 'Odd', 'Low', 'Even') eliminate combos outside Low (100% over 1 cases)",TRUE,,,,,,,,,,,,
-F478,"Eliminate all odd-sum combos",TRUE,"True","combo_sum % 2 != 0",,,,,,,,,,
-F479,"Eliminate all even-sum combos",TRUE,"True","combo_sum % 2 == 0",,,,,,,,,,
+F478,"XXXEliminate all odd-sum combos",TRUE,"True","combo_sum % 2 != 0",,,,,,,,,,
+F479,"XXXEliminate all even-sum combos",TRUE,"True","combo_sum % 2 == 0",,,,,,,,,,
 
 
 
