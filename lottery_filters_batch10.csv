@@ -55,7 +55,7 @@ F053,XXXEliminate combo missing new digits from seed vs prev_seed,TRUE,"""new_se
 F054,XXXEliminate combo with >=2 digits from both prev draws,TRUE,"""sum(d in common_to_both for d in combo_digits) >= 2""","""True""",,,,,,,,,,
 F055,XXEliminate combo missing at least 2 digits from last 2 draws,TRUE,"""len(last2.intersection(combo_digits)) < 2""","""True""",,,,,,,,,,
 F056,XXXEliminate combo with at least 2 distinct digits from last 2 draws,TRUE,"""sum(1 for d in set(combo_digits) if d in last2) >= 2""","""True""",,,,,,,,,,
-F057,Eliminate combo missing any new digit vs last 2 draws,TRUE,"""not any(d not in last2 for d in combo_digits)""","""True""",,,,,,,,,,
+F057,XXEliminate combo missing any new digit vs last 2 draws,TRUE,"""not any(d not in last2 for d in combo_digits)""","""True""",,,,,,,,,,
 F058,If seed_sum ends in 7 and combo_sum ends in 8 eliminate,TRUE,"""seed_sum % 10 == 7""","""combo_sum % 10 == 8""",,,,,,,,,,
 F059,If seed_sum ends in 4 and combo_sum ends in 8 eliminate,TRUE,"""seed_sum % 10 == 4""","""combo_sum % 10 == 8""",,,,,,,,,,
 F060,If seed_sum ends in 1 and combo_sum ends in 7 eliminate,TRUE,"""seed_sum % 10 == 1""","""combo_sum % 10 == 7""",,,,,,,,,,
