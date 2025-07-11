@@ -492,6 +492,9 @@ F490,"If seed includes 2,5,8,9 eliminate odd-sum combos",TRUE,"""set(seed_digits
 F491,"If seed includes 3,4,5,8 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({3,4,5,8})""","""combo_sum % 2 != 0""",,,,,,,,,,
 F492,"If seed includes 2,3,6,9 eliminate even-sum combos",TRUE,"""set(seed_digits).issuperset({2,3,6,9})""","""combo_sum % 2 == 0""",,,,,,,,,,
 F493,"If seed includes 1,3,6,8 eliminate even-sum combos",TRUE,"""set(seed_digits).issuperset({1,3,6,8})""","""combo_sum % 2 == 0""",,,,,,,,,,
+F494,"xIf seed includes 1,3,4,9 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({1,3,4,9})""","""combo_sum % 2 != 0""",,,,,,,,,,
+F495,"xIf seed includes 0,5,7,9 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({0,5,7,9})""","""combo_sum % 2 != 0""",,,,,,,,,,
+F483,"xIf seed includes 8,8 eliminate even-sum combos",TRUE,"""set(seed_digits).issuperset({8,8})""","""combo_sum % 2 == 0""",,,,,,,,,,
 
 
 
