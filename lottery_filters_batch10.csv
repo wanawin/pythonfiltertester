@@ -262,7 +262,7 @@ F260,XXIf seed sum=24-25 and combo <19 or >25,TRUE,"""24<=seed_sum<=25""","""com
 F261,XXXIf seed sum=22-23 and combo <16 or >25,TRUE,"""22<=seed_sum<=23""","""combo_sum<16 or combo_sum>25""",,,,,,,,,,
 F262,If seed sum=19-21 and combo <14 or >24,TRUE,"""19<=seed_sum<=21""","""combo_sum<14 or combo_sum>24""",,,,,,,,,,
 F263,If seed sum=13-15 and combo <14 or >22,TRUE,"""13<=seed_sum<=15""","""combo_sum<14 or combo_sum>22""",,,,,,,,,,
-F264,If seed sum<=12 and combo <12 or >25,TRUE,"""seed_sum<=12""","""combo_sum<12 or combo_sum>25""",,,,,,,,,,
+F264,XXIf seed sum<=12 and combo <12 or >25,TRUE,"""seed_sum<=12""","""combo_sum<12 or combo_sum>25""",,,,,,,,,,
 F265,If seed sum=17-18 and combo <11 or >26,TRUE,"""17<=seed_sum<=18""","""combo_sum<11 or combo_sum>26""",,,,,,,,,,
 F266,If seed sum ends in 2 and combo sum ends in 0,TRUE,"""seed_sum%10==2""","""combo_sum%10==0""",,,,,,,,,,
 F267,If seed sum=13-15 and combo <14 or >22,TRUE,"""13<=seed_sum<=15""","""combo_sum<14 or combo_sum>22""",,,,,,,,,,
