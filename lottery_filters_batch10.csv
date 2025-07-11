@@ -252,7 +252,7 @@ F250,"XXXIf seed has 1 and combo lacks 2,3,4",TRUE,"""1 in seed_digits""","""2 n
 F251,"XXXIf seed has 2 and combo lacks 5,4",TRUE,"""2 in seed_digits""","""5 not in combo_digits and 4 not in combo_digits""",,,,,,,,,,
 F252,If seed sum>=26 keep combo sum 20-28,TRUE,"""seed_sum>=26""","""not (20<=combo_sum<=28)""",,,,,,,,,,
 F253,If seed sum=17 keep combo sum 19-25,TRUE,"""seed_sum==17""","""not (19<=combo_sum<=25)""",,,,,,,,,,
-F254,If seed sum=22-23 keep combo sum 16-25,TRUE,"""22<=seed_sum<=23""","""not (16<=combo_sum<=25)""",,,,,,,,,,
+F254,XXIf seed sum=22-23 keep combo sum 16-25,TRUE,"""22<=seed_sum<=23""","""not (16<=combo_sum<=25)""",,,,,,,,,,
 F255,XXXIf seed sum=19-21 keep combo sum 14-24,TRUE,"""19<=seed_sum<=21""","""not (14<=combo_sum<=24)""",,,,,,,,,,
 F256,If seed sum=13-15 keep combo sum 14-22,TRUE,"""13<=seed_sum<=15""","""not (14<=combo_sum<=22)""",,,,,,,,,,
 F257,XXXIf seed sum=12 keep combo sum 12-25,TRUE,"""seed_sum==12""","""not (12<=combo_sum<=25)""",,,,,,,,,,
