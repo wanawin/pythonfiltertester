@@ -66,7 +66,7 @@ F064,If seed_sum ends in 8 and combo_sum ends in 5 eliminate,TRUE,"""seed_sum % 
 F065,If seed_sum ends in 0 and combo_sum ends in 4 eliminate,TRUE,"""seed_sum % 10 == 0""","""combo_sum % 10 == 4""",,,,,,,,,,
 F066,"If seed includes 0,2,8,9 eliminate all odd-sum combos",TRUE,"""set(seed_digits).issuperset({0,2,8,9})""","""combo_sum % 2 != 0""",,,,,,,,,,
 F067,"If seed includes 0,1,4,8 eliminate all even-sum combos",TRUE,"""set(seed_digits).issuperset({0,1,4,8})""","""combo_sum % 2 == 0""",,,,,,,,,,
-F068,"If seed includes 0,3,5,7 eliminate all odd-sum combos",TRUE,"""set(seed_digits).issuperset({0,3,5,7})""","""combo_sum % 2 != 0""",,,,,,,,,,
+F068,"If seed includes 0,3,5,7 eliminate all even-sum combos",TRUE,"""set(seed_digits).issuperset({0,3,5,7})""","""combo_sum % 2 == 0""",,,,,,,,,,
 F069,"If seed includes 0,3,7,8 eliminate all odd-sum combos",TRUE,"""set(seed_digits).issuperset({0,3,7,8})""","""combo_sum % 2 != 0""",,,,,,,,,,
 F070,"If seed includes 4,6,7,9 eliminate all odd-sum combos",TRUE,"""set(seed_digits).issuperset({4,6,7,9})""","""combo_sum % 2 != 0""",,,,,,,,,,
 F071,"If seed includes 4,5,6,9 eliminate all odd-sum combos",TRUE,"""set(seed_digits).issuperset({4,5,6,9})""","""combo_sum % 2 != 0""",,,,,,,,,,
