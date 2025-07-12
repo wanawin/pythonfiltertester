@@ -28,14 +28,22 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
         st.stop()
 
     filters = []
+    # Robust CSV loading: pad rows to header width, then zip into dicts
     with open(path, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for raw in reader:
-            # Normalize keys and handle missing fields
+        reader = csv.reader(f)
+        headers = next(reader)
+        width = len(headers)
+        for raw_row in reader:
+            # Pad short rows
+            if len(raw_row) < width:
+                raw_row += [''] * (width - len(raw_row))
+            # Create dict from header to value
+            raw = dict(zip(headers, raw_row))
+            # Normalize keys
             row = {k.lower(): (v or '').strip() for k, v in raw.items()}
-            row['id'] = row.get('id', row.get('fid', '')).strip()
+            row['id'] = row.get('id', row.get('fid', ''))
 
-            # Strip any surrounding quotes from key fields
+            # Strip surrounding quotes from key fields if present
             for key in ('name', 'applicable_if', 'expression'):
                 if key in row:
                     row[key] = row[key].strip('"').strip("'")
