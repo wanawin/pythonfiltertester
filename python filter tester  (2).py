@@ -29,7 +29,8 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
 
     filters = []
     with open(path, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\')  # allow quotes in fields without CSV parsing errors  # allow quotes in fields without CSV parsing errors
+        # allow quotes in fields without CSV parsing errors
+        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')
         for raw in reader:
             row = {k.lower(): v for k, v in raw.items()}
             row['id'] = row.get('id', row.get('fid', '')).strip()
@@ -37,14 +38,11 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
                 if key in row and isinstance(row[key], str):
                     row[key] = row[key].strip().strip('"').strip("'")
 
-            # Prepare snippets for compilation
             applicable = row.get('applicable_if') or 'True'
             expr = row.get('expression') or 'False'
 
-            # DEBUG: print each filter's expression repr
             st.write(f"DEBUG {row['id']} expression repr: {repr(expr)}")
 
-            # Compile into code objects
             try:
                 row['applicable_code'] = compile(applicable, '<applicable>', 'eval')
                 row['expr_code'] = compile(expr, '<expr>', 'eval')
@@ -58,14 +56,8 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
 
 # -- Streamlit UI --
 st.title("DC-5 Filter Tracker Full")
-
-# Load and debug-print filters
 filters = load_filters()
 st.write(f"Loaded {len(filters)} filters")
-
-# Existing UI code would go here (checkboxes, seed input, etc.)
-# For debugging, show first 5 filters:
 for f in filters[:5]:
     st.write(f"{f['id']}: {f['name']} -> expr={f['expression']}")
-
-# Rest of your Streamlit app remains unchanged.
+# ... rest of the app remains unchanged ...
