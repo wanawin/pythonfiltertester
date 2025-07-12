@@ -28,31 +28,39 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
         st.stop()
 
     filters = []
+    # Open CSV with lenient parsing to allow unescaped quotes
     with open(path, newline='', encoding='utf-8') as f:
-        # use default CSV quoting; ensure correct double-quote escaping in CSV file
-        reader = csv.DictReader(f)
+        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')
         for raw in reader:
             row = {k.lower(): v for k, v in raw.items()}
             row['id'] = row.get('id', row.get('fid', '')).strip()
             for key in ('name', 'applicable_if', 'expression'):
                 if key in row and isinstance(row[key], str):
+                    # strip surrounding whitespace and quotes
                     row[key] = row[key].strip().strip('"').strip("'")
 
             applicable = row.get('applicable_if') or 'True'
-            expr = row.get('expression') or 'False'
+            expr = row.get('expression') or ''
+
+            # skip filters without a valid expression
+            if not expr:
+                st.warning(f"Skipping filter {row['id']}: no expression provided")
+                continue
 
             st.write(f"DEBUG {row['id']} expression repr: {repr(expr)}")
 
             try:
+                # compile applicability and expression code
                 row['applicable_code'] = compile(applicable, '<applicable>', 'eval')
                 row['expr_code'] = compile(expr, '<expr>', 'eval')
-            except SyntaxError as e:
-                st.error(f"Syntax error in filter {row['id']}: {e}")
+            except SyntaxError:
+                st.warning(f"Skipping filter {row['id']}: invalid expression syntax")
                 continue
 
             row['enabled_default'] = row.get('enabled', '').lower() == 'true'
             filters.append(row)
     return filters
+
 
 # -- Streamlit UI --
 st.title("DC-5 Filter Tracker Full")
