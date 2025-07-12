@@ -516,3 +516,4 @@ F514,"xIf seed includes 2,7,9 eliminate odd-sum combos",TRUE,"""set(seed_digits)
 F515,"xIf seed includes 1,5,6 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({1,5,6})""","""combo_sum % 2 != 0""",,,,,,,,,,
 F516,"If (seed_sum+11) mod 12 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 11) % 12 == 0 and combo_sum % 2 != 0",,,,,,,,,,,
 
+
