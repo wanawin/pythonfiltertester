@@ -30,6 +30,7 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
     filters = []
     # Open CSV with lenient parsing to allow unescaped quotes
     with open(path, newline='', encoding='utf-8') as f:
+        # Use QUOTE_NONE with a double-escaped backslash to handle unescaped quotes
         reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')
         for raw in reader:
             row = {k.lower(): v for k, v in raw.items()}
