@@ -23,37 +23,35 @@ def sum_category(total: int) -> str:
 
 
 def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
-    """Load filter rows by slicing columns to ignore trailing commas/miscounts."""
+    """Load filter definitions, strip extra columns, compile expressions."""
     if not os.path.exists(path):
         st.error(f"Filter file not found: {path}")
         st.stop()
 
     filters = []
     with open(path, newline='', encoding='utf-8') as f:
-        rdr = csv.reader(f)
-        # skip header
-        header = next(rdr, None)
-        for row in rdr:
-            if not row or len(row) < 5:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        for row in reader:
+            # require at least id,name,enabled,applicable_if,expression
+            if len(row) < 5:
                 continue
-            fid, name, enabled_flag, applic, expr = [col.strip() for col in row[:5]]
-            # strip optional outer quotes
-            name  = name.strip('"').strip("'")
-            applic = applic.strip('"').strip("'") or 'True'
-            expr   = expr.strip('"').strip("'").replace('!==', '!=') or 'False'
-            # compile expressions
+            fid, name, enabled_f, applic, expr = [c.strip() for c in row[:5]]
+            name     = name.strip('"').strip("'")
+            applic   = (applic.strip('"').strip("'") or 'True').replace('!==', '!=')
+            expr     = (expr.strip('"').strip("'") or 'False').replace('!==', '!=')
             try:
-                applicable_code = compile(applic, '<applicable>', 'eval')
-                expr_code       = compile(expr,   '<expr>',       'eval')
+                code_app = compile(applic, '<applicable>', 'eval')
+                code_expr= compile(expr,   '<expr>',       'eval')
             except SyntaxError as e:
                 st.error(f"Syntax error in filter {fid}: {e}")
                 continue
             filters.append({
                 'id':               fid,
                 'name':             name,
-                'enabled_default':  enabled_flag.lower() == 'true',
-                'applicable_code':  applicable_code,
-                'expr_code':        expr_code,
+                'enabled_default':  enabled_f.lower() == 'true',
+                'applicable_code':  code_app,
+                'expr_code':        code_expr,
             })
     return filters
 
@@ -61,14 +59,14 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
 def generate_combinations(seed: str, method: str) -> list:
     all_digits = '0123456789'
     combos = set()
-    seed_sorted = ''.join(sorted(seed))
+    sorted_seed = ''.join(sorted(seed))
     if method == '1-digit':
-        for d in seed_sorted:
+        for d in sorted_seed:
             for p in product(all_digits, repeat=4):
                 combos.add(''.join(sorted(d + ''.join(p))))
     else:
-        pairs = {''.join(sorted((seed_sorted[i], seed_sorted[j])))
-                 for i in range(len(seed_sorted)) for j in range(i+1, len(seed_sorted))}
+        pairs = { ''.join(sorted((sorted_seed[i], sorted_seed[j])))
+                  for i in range(len(sorted_seed)) for j in range(i+1, len(sorted_seed)) }
         for pair in pairs:
             for p in product(all_digits, repeat=3):
                 combos.add(''.join(sorted(pair + ''.join(p))))
@@ -76,13 +74,12 @@ def generate_combinations(seed: str, method: str) -> list:
 
 
 def main():
-    # Load filters
     filters = load_filters()
 
-    # ------ Sidebar setup ------
+    # Sidebar
     st.sidebar.header("🔢 DC-5 Filter Tracker Full")
-    # Master toggle
     select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True, key='select_all')
+    # Sync individual toggles when master toggles
     if 'select_all_prev' not in st.session_state:
         st.session_state['select_all_prev'] = None
     if st.session_state['select_all_prev'] != select_all:
@@ -98,15 +95,14 @@ def main():
     cold_input  = st.sidebar.text_input("Cold digits (comma-separated):").strip()
     check_combo = st.sidebar.text_input("Check specific combo:").strip()
 
-    # Validate seed
     if len(seed) != 5 or not seed.isdigit():
         st.sidebar.error("Seed must be exactly 5 digits")
         return
 
-    # Build common context
-    sd  = [int(d) for d in seed]
-    p1  = [int(d) for d in prev1 if d.isdigit()]
-    p2  = [int(d) for d in prev2 if d.isdigit()]
+    # Build context
+    sd = [int(d) for d in seed]
+    p1 = [int(d) for d in prev1 if d.isdigit()]
+    p2 = [int(d) for d in prev2 if d.isdigit()]
     ctx_common = {
         'seed_digits':           sd,
         'prev_seed_digits':      p1,
@@ -122,15 +118,13 @@ def main():
         'mirror':                MIRROR,
         'Counter':               Counter,
     }
-    # Prev pattern
     tmp = []
     for digs in (p2, p1, sd):
         s = sum(digs)
         tmp.append(sum_category(s)); tmp.append('Even' if s % 2 == 0 else 'Odd')
     ctx_common['prev_pattern'] = tuple(tmp)
 
-    # Generate and filter combos
-    combos = generate_combinations(seed, method)
+    combos    = generate_combinations(seed, method)
     eliminated = {}
     survivors  = []
     for combo in combos:
@@ -157,7 +151,7 @@ def main():
         else:
             survivors.append(combo)
 
-    st.sidebar.markdown(f"**Total**: {len(combos)}  **Elim**: {len(eliminated)}  **Remain**: {len(survivors)}")
+    st.sidebar.markdown(f"**Total:** {len(combos)}  **Elim:** {len(eliminated)}  **Remain:** {len(survivors)}")
 
     if check_combo:
         norm = ''.join(sorted(check_combo))
@@ -168,8 +162,8 @@ def main():
         else:
             st.sidebar.warning("Combo not found")
 
-    # Active Filters UI
     st.header("🔧 Active Filters")
+    # count eliminations per filter
     flt_counts = {flt['id']: 0 for flt in filters}
     for combo in combos:
         cd = [int(c) for c in combo]
@@ -182,16 +176,17 @@ def main():
         })
         for flt in filters:
             key = f"filter_{flt['id']}"
-            if st.session_state.get(key, flt['enabled_default']) and eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
+            if st.session_state.get(key, flt['enabled_default']) and \
+               eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
                 flt_counts[flt['id']] += 1
                 break
+
     sorted_filters = sorted(filters, key=lambda f: flt_counts[f['id']], reverse=True)
     for flt in sorted_filters:
         k   = f"filter_{flt['id']}"
         lbl = f"{flt['id']}: {flt['name']} — eliminated {flt_counts[flt['id']]}"
         st.checkbox(lbl, key=k, value=st.session_state.get(k, flt['enabled_default']))
 
-    # Show survivors
     with st.expander("Show remaining combinations"):
         for c in survivors:
             st.write(c)
