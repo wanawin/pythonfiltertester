@@ -185,7 +185,7 @@ def main():
             if st.session_state.get(key, flt['enabled_default']) and eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
                 flt_counts[flt['id']] += 1
                 break
-    sorted_filters = sorted(filters, key=lambda f: (flt_counts[f['id']] == 0, -flt_counts[f['id']]))
+    sorted_filters = sorted(filters, key=lambda f: flt_counts[f['id']], reverse=True)
     for flt in sorted_filters:
         k   = f"filter_{flt['id']}"
         lbl = f"{flt['id']}: {flt['name']} — eliminated {flt_counts[flt['id']]}"
