@@ -2,7 +2,6 @@ import streamlit as st
 from itertools import product
 import csv
 import os
-import re
 from collections import Counter
 
 # V-Trac and mirror mappings
@@ -40,19 +39,16 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
 
             # Prepare snippets for compilation
             applicable = row.get('applicable_if') or 'True'
-            expr       = row.get('expression')    or 'False'
-            # DEBUG: print raw expression repr for new filters
-            if row['id'] in ("F532","F533","F534","F535","F536","F537","F538"):  # adjust IDs as needed
-                st.write(f"DEBUG {row['id']} expression repr: {repr(expr)}")
+            expr = row.get('expression') or 'False'
 
-            # DEBUG: Print out the raw expression repr for new filters
-            if row['id'] in ("F532","F533","F534","F535","F536","F537","F538"):  # adjust IDs as needed
+            # DEBUG: Show the raw repr of each new filter expression
+            if row['id'].startswith('F53'):
                 st.write(f"DEBUG {row['id']} expression repr: {repr(expr)}")
 
             # Compile into code objects
             try:
                 row['applicable_code'] = compile(applicable, '<applicable>', 'eval')
-                row['expr_code']       = compile(expr,       '<expr>',       'eval')
+                row['expr_code'] = compile(expr, '<expr>', 'eval')
             except SyntaxError as e:
                 st.error(f"Syntax error in filter {row['id']}: {e}")
                 continue
