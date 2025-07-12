@@ -1,6 +1,4 @@
 id,name,enabled,applicable_if,expression,,,,,,,,,,
-id,name,enabled,applicable_if,expression,col6,col7,col8,col9,col10,col11,col12,col13,col14,col15
-F081,"Eliminate if seed is Mid and next sum is High","TRUE","True","seed_cat == \"Mid\" and next_cat == \"High\"","","","","","","","","","",""
 F001,Eliminate combos where combo sum equals 1,TRUE,"""True""","""combo_sum == 1""",,,,,,,,,,
 F002,"XXXIf seed includes 4,5,6,8 eliminate all even-sum combos",TRUE,"""set(seed_digits).issuperset({4,5,6,8})""","""combo_sum % 2 == 0""",,,,,,,,,,
 F003,"If seed includes 1,2,4,7 eliminate all even-sum combos",TRUE,"""set(seed_digits).issuperset({1,2,4,7})""","""combo_sum % 2 == 0""",,,,,,,,,,
