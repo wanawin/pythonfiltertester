@@ -29,7 +29,7 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
 
     filters = []
     with open(path, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
+        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\')  # allow quotes in fields without CSV parsing errors
         for raw in reader:
             row = {k.lower(): v for k, v in raw.items()}
             row['id'] = row.get('id', row.get('fid', '')).strip()
