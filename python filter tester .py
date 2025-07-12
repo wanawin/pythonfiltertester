@@ -28,29 +28,20 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
         st.stop()
 
     filters = []
-    # Robust CSV loading: pad rows to header width, then zip into dicts
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.reader(f)
         headers = next(reader)
         width = len(headers)
         for raw_row in reader:
-            # Pad short rows
             if len(raw_row) < width:
                 raw_row += [''] * (width - len(raw_row))
-            # Create dict from header to value
             raw = dict(zip(headers, raw_row))
-            # Normalize keys
             row = {k.lower(): (v or '').strip() for k, v in raw.items()}
             row['id'] = row.get('id', row.get('fid', ''))
-
-            # Strip surrounding quotes from key fields if present
             for key in ('name', 'applicable_if', 'expression'):
                 if key in row:
                     row[key] = row[key].strip('"').strip("'")
-
-            # Replace JS-style !== with Python !=
             row['expression'] = row.get('expression', '').replace('!==', '!=')
-
             applicable = row.get('applicable_if') or 'True'
             expr       = row.get('expression')    or 'False'
             try:
@@ -59,10 +50,8 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
             except SyntaxError as e:
                 st.error(f"Syntax error in filter {row['id']}: {e}")
                 continue
-
             row['enabled_default'] = row.get('enabled', '').lower() == 'true'
             filters.append(row)
-
     return filters
 
 
@@ -90,23 +79,23 @@ def main():
 
     # Sidebar inputs
     st.sidebar.header("🔢 DC-5 Filter Tracker Full")
-    # "Select/Deselect All Filters" control with on_change to update individual states
-select_all = st.sidebar.checkbox(
-    "Select/Deselect All Filters", value=True, key="select_all"
-)
-# When select_all changes, propagate to each filter's session state
-if st.session_state.get('select_all_prev') != st.session_state['select_all']:
-    for flt in filters:
-        key = f"filter_{flt['id']}"
-        st.session_state[key] = st.session_state['select_all'] and flt['enabled_default']
-    st.session_state['select_all_prev'] = st.session_state['select_all']
-
-# Sidebar inputs
-# Note: removed hot_input assignment here to place above correctly
-
-hot_input   = st.sidebar.text_input("Hot digits (comma-separated):").strip()   = st.sidebar.text_input("Hot digits (comma-separated):").strip()
+    seed        = st.sidebar.text_input("Current 5-digit seed (required):").strip()
+    prev_seed   = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
+    prev_prev   = st.sidebar.text_input("Previous previous 5-digit seed (optional):").strip()
+    method      = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
+    hot_input   = st.sidebar.text_input("Hot digits (comma-separated):").strip()
     cold_input  = st.sidebar.text_input("Cold digits (comma-separated):").strip()
     check_combo = st.sidebar.text_input("Check specific combo:").strip()
+
+    # Master toggle
+    select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True, key='select_all')
+    # Propagate master toggle changes
+    if 'select_all_prev' not in st.session_state:
+        st.session_state['select_all_prev'] = None
+    if st.session_state['select_all_prev'] != st.session_state['select_all']:
+        for flt in filters:
+            st.session_state[f"filter_{flt['id']}"] = st.session_state['select_all'] and flt['enabled_default']
+        st.session_state['select_all_prev'] = st.session_state['select_all']
 
     # Validate seed
     if len(seed) != 5 or not seed.isdigit():
@@ -126,7 +115,7 @@ hot_input   = st.sidebar.text_input("Hot digits (comma-separated):").strip()   =
     seed_sum         = sum(seed_digits)
     prev_sum_cat     = sum_category(seed_sum)
 
-    # Build previous pattern as tuple for comparisons
+    # Build prev_pattern
     prev_pattern = []
     for digs in (prev_prev_digits, prev_digits, seed_digits):
         cat = sum_category(sum(digs))
@@ -134,41 +123,42 @@ hot_input   = st.sidebar.text_input("Hot digits (comma-separated):").strip()   =
         prev_pattern.extend([cat, parity])
     prev_pattern = tuple(prev_pattern)
 
+    # Context factory
     def generate_context(cdigits):
         csum = sum(cdigits)
         return {
-            'seed_digits':           seed_digits,
-            'prev_seed_digits':      prev_digits,
+            'seed_digits': seed_digits,
+            'prev_seed_digits': prev_digits,
             'prev_prev_seed_digits': prev_prev_digits,
-            'new_seed_digits':       new_digits,
-            'prev_pattern':          prev_pattern,
-            'hot_digits':            hot_digits,
-            'cold_digits':           cold_digits,
-            'due_digits':            due_digits,
-            'seed_counts':           seed_counts,
-            'seed_sum':              seed_sum,
-            'prev_sum_cat':          prev_sum_cat,
-            'combo_digits':          cdigits,
-            'combo_sum':             csum,
-            'combo_sum_cat':         sum_category(csum),
-            'seed_vtracs':           seed_vtracs,
-            'combo_vtracs':          set(V_TRAC_GROUPS[d] for d in cdigits),
-            'mirror':                MIRROR,
-            'common_to_both':        set(prev_digits) & set(prev_prev_digits),
-            'last2':                 set(prev_digits) | set(prev_prev_digits),
-            'Counter':               Counter
+            'new_seed_digits': new_digits,
+            'prev_pattern': prev_pattern,
+            'hot_digits': hot_digits,
+            'cold_digits': cold_digits,
+            'due_digits': due_digits,
+            'seed_counts': seed_counts,
+            'seed_sum': seed_sum,
+            'prev_sum_cat': prev_sum_cat,
+            'combo_digits': cdigits,
+            'combo_sum': csum,
+            'combo_sum_cat': sum_category(csum),
+            'seed_vtracs': seed_vtracs,
+            'combo_vtracs': set(V_TRAC_GROUPS[d] for d in cdigits),
+            'mirror': MIRROR,
+            'common_to_both': set(prev_digits) & set(prev_prev_digits),
+            'last2': set(prev_digits) | set(prev_prev_digits),
+            'Counter': Counter
         }
 
-    combos    = generate_combinations(seed, method)
+    # Generate and filter
+    combos     = generate_combinations(seed, method)
     eliminated = {}
     survivors  = []
-
     for combo in combos:
         cdigits = [int(c) for c in combo]
         ctx     = generate_context(cdigits)
         for flt in filters:
             key    = f"filter_{flt['id']}"
-            active = st.session_state.get(key, select_all and flt['enabled_default'])
+            active = st.session_state.get(key, flt['enabled_default'])
             if not active:
                 continue
             try:
@@ -178,7 +168,7 @@ hot_input   = st.sidebar.text_input("Hot digits (comma-separated):").strip()   =
                     eliminated[combo] = flt['name']
                     break
             except Exception:
-                continue
+                pass
         else:
             survivors.append(combo)
 
@@ -197,7 +187,7 @@ hot_input   = st.sidebar.text_input("Hot digits (comma-separated):").strip()   =
 
     # Active Filters UI
     st.header("🔧 Active Filters")
-    flt_counts = {}  # Compute elimination counts
+    flt_counts = {}
     for flt in filters:
         cnt = 0
         for combo in combos:
@@ -209,14 +199,14 @@ hot_input   = st.sidebar.text_input("Hot digits (comma-separated):").strip()   =
             except Exception:
                 pass
         flt_counts[flt['id']] = cnt
-
     sorted_filters = sorted(filters, key=lambda flt: (flt_counts[flt['id']] == 0, -flt_counts[flt['id']]))
     for flt in sorted_filters:
         key   = f"filter_{flt['id']}"
         count = flt_counts[flt['id']]
         label = f"{flt['id']}: {flt['name']} — eliminated {count}"
-        st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
+        st.checkbox(label, key=key, value=st.session_state.get(key, flt['enabled_default']))
 
+    # Survivors expander
     with st.expander("Show remaining combinations"):
         for combo in survivors:
             st.write(combo)
