@@ -515,5 +515,10 @@ F513,"If seed includes 3,6,8 eliminate even-sum combos",TRUE,"""set(seed_digits)
 F514,"xIf seed includes 2,7,9 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({2,7,9})""","""combo_sum % 2 != 0""",,,,,,,,,,
 F515,"xIf seed includes 1,5,6 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({1,5,6})""","""combo_sum % 2 != 0""",,,,,,,,,,
 F516,"If (seed_sum+11) mod 12 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 11) % 12 == 0 and combo_sum % 2 != 0",,,,,,,,,,
+F517,"If (seed_sum+11) mod 12 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 11) % 12 == 0 and combo_sum % 2 != 0",,,,,,,,,,,
+F518,"If (seed_sum+5) mod 9 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 5) % 9 == 0 and combo_sum % 2 != 0",,,,,,,,,,,
+F519,"If (seed_sum+6) mod 19 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 6) % 19 == 0 and combo_sum % 2 != 0",,,,,,,,,,,
+F520,"If (seed_sum+1) mod 13 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 1) % 13 == 0 and combo_sum % 2 != 0",,,,,,,,,,,
+F521,"If (seed_sum+5) mod 12 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 5) % 12 == 0 and combo_sum % 2 != 0",,,,,,,,,,,
 
 
