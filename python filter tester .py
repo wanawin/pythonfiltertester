@@ -117,6 +117,9 @@ def main():
         'seed_vtracs':           {V_TRAC_GROUPS[d] for d in sd},
         'mirror':                MIRROR,
         'Counter':               Counter,
+        # new round: alias for seed and next categories
+        'seed_cat':              sum_category(sum(sd)),
+        'next_cat':              sum_category(sum(p1)),
     }
     tmp = []
     for digs in (p2, p1, sd):
