@@ -538,6 +538,3 @@ F085,"Eliminate if seed is Low and next sum is Very Low","TRUE","True","seed_cat
 F086,"Eliminate if seed is Mid and next sum is Very Low","TRUE","True","seed_cat == 'Mid' and next_cat == 'Very Low'",,,,,,,,,,
 F087,"Eliminate if seed is High and next sum is Very Low","TRUE","True","seed_cat == 'High' and next_cat == 'Very Low'",,,,,,,,,,
 F088,"Eliminate if seed is Very Low and next sum is Very Low","TRUE","True","seed_cat == 'Very Low' and next_cat == 'Very Low'",,,,,,,,,,
-
-
-
