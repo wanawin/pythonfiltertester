@@ -90,12 +90,21 @@ def main():
 
     # Sidebar inputs
     st.sidebar.header("🔢 DC-5 Filter Tracker Full")
-    select_all  = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
-    seed        = st.sidebar.text_input("Current 5-digit seed (required):").strip()
-    prev_seed   = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
-    prev_prev   = st.sidebar.text_input("Previous previous 5-digit seed (optional):").strip()
-    method      = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
-    hot_input   = st.sidebar.text_input("Hot digits (comma-separated):").strip()
+    # "Select/Deselect All Filters" control with on_change to update individual states
+select_all = st.sidebar.checkbox(
+    "Select/Deselect All Filters", value=True, key="select_all"
+)
+# When select_all changes, propagate to each filter's session state
+if st.session_state.get('select_all_prev') != st.session_state['select_all']:
+    for flt in filters:
+        key = f"filter_{flt['id']}"
+        st.session_state[key] = st.session_state['select_all'] and flt['enabled_default']
+    st.session_state['select_all_prev'] = st.session_state['select_all']
+
+# Sidebar inputs
+# Note: removed hot_input assignment here to place above correctly
+
+hot_input   = st.sidebar.text_input("Hot digits (comma-separated):").strip()   = st.sidebar.text_input("Hot digits (comma-separated):").strip()
     cold_input  = st.sidebar.text_input("Cold digits (comma-separated):").strip()
     check_combo = st.sidebar.text_input("Check specific combo:").strip()
 
