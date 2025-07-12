@@ -27,9 +27,9 @@ def load_filters(csv_path: str = 'lottery_filters_batch10.csv') -> list:
     """Loads filter definitions from a CSV file."""
     filters = []
     with open(csv_path, newline='') as f:
-        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')  # allow unescaped quotes
+        # Use QUOTE_NONE and properly escaped backslash so unescaped quotes are tolerated
+        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')
         for raw in reader:
-            # Normalize keys to lowercase and strip whitespace
             row = {k.lower(): v for k, v in raw.items()}
             if not row.get('enabled', '').lower() in ('true', '1'):
                 continue
@@ -42,7 +42,7 @@ def load_filters(csv_path: str = 'lottery_filters_batch10.csv') -> list:
                     'func': compiled,
                     'enabled_default': row.get('enabled_default', 'true').lower() == 'true'
                 })
-            except Exception as e:
+            except Exception:
                 st.warning(f"Skipping filter {row['id']}: invalid expression syntax")
     return filters
 
@@ -84,7 +84,6 @@ def main():
     seed_digits = list(map(int, seed_input))
     seed_sum = sum(seed_digits)
     
-    # Load filters
     filters = load_filters()
     st.write(f"Loaded {len(filters)} filters")
 
@@ -94,8 +93,7 @@ def main():
     st.header("Filters")
     for flt in filters:
         key = f"filter_{flt['id']}"
-        label = f"{flt['id']}: {flt['name']}" \
-                f" — eliminated {flt_counts.get(flt['id'], 0)}"
+        label = f"{flt['id']}: {flt['name']} — eliminated {flt_counts.get(flt['id'], 0)}"
         st.checkbox(label, key=key, value=select_all and flt['enabled_default'])
 
     with st.expander("Show remaining combinations"):
