@@ -530,14 +530,14 @@ F528,"If (seed_sum+19) mod 26 = 0 eliminate even-sum combos",TRUE,"True","(seed_
 F529,"If (seed_sum+8) mod 24 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 8) % 24 == 0 and combo_sum % 2 != 0",,,,,,,,,,
 F530,"If (seed_sum+11) mod 22 = 0 eliminate even-sum combos",TRUE,"True","(seed_sum + 11) % 22 == 0 and combo_sum % 2 == 0",,,,,,,,,,
 F531,"If (seed_sum+13) mod 29 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 13) % 29 == 0 and combo_sum % 2 != 0",,,,,,,,,,
-F081,"Eliminate if seed is Mid and next sum is High","TRUE","True","seed_cat == \"Mid\" and next_cat == \"High\"",,,,,,,,,,
-F082,"Eliminate if seed is Low and next sum is High","TRUE","True","seed_cat == \"Low\" and next_cat == \"High\"",,,,,,,,,,
-F083,"Eliminate if seed is High and next sum is High","TRUE","True","seed_cat == \"High\" and next_cat == \"High\"",,,,,,,,,,
-F084,"Eliminate if seed is Very Low and next sum is High","TRUE","True","seed_cat == \"Very Low\" and next_cat == \"High\"",,,,,,,,,,
-F085,"Eliminate if seed is Low and next sum is Very Low","TRUE","True","seed_cat == \"Low\" and next_cat == \"Very Low\"",,,,,,,,,,
-F086,"Eliminate if seed is Mid and next sum is Very Low","TRUE","True","seed_cat == \"Mid\" and next_cat == \"Very Low\"",,,,,,,,,,
-F087,"Eliminate if seed is High and next sum is Very Low","TRUE","True","seed_cat == \"High\" and next_cat == \"Very Low\"",,,,,,,,,,
-F088,"Eliminate if seed is Very Low and next sum is Very Low","TRUE","True","seed_cat == \"Very Low\" and next_cat == \"Very Low\"",,,,,,,,,,
+F081,"Eliminate if seed is Mid and next sum is High","TRUE","True","seed_cat == ""Mid"" and next_cat == ""High""",,,,,,,,,,
+F082,"Eliminate if seed is Low and next sum is High","TRUE","True","seed_cat == ""Low"" and next_cat == ""High""",,,,,,,,,,
+F083,"Eliminate if seed is High and next sum is High","TRUE","True","seed_cat == ""High"" and next_cat == ""High""",,,,,,,,,,
+F084,"Eliminate if seed is Very Low and next sum is High","TRUE","True","seed_cat == ""Very Low"" and next_cat == ""High""",,,,,,,,,,
+F085,"Eliminate if seed is Low and next sum is Very Low","TRUE","True","seed_cat == ""Low"" and next_cat == ""Very Low""",,,,,,,,,,
+F086,"Eliminate if seed is Mid and next sum is Very Low","TRUE","True","seed_cat == ""Mid"" and next_cat == ""Very Low""",,,,,,,,,,
+F087,"Eliminate if seed is High and next sum is Very Low","TRUE","True","seed_cat == ""High"" and next_cat == ""Very Low""",,,,,,,,,,
+F088,"Eliminate if seed is Very Low and next sum is Very Low","TRUE","True","seed_cat == ""Very Low"" and next_cat == ""Very Low""",,,,,,,,,,
 
 
 
