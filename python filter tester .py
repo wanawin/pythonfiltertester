@@ -79,24 +79,6 @@ def main():
 
     # Sidebar inputs
     st.sidebar.header("🔢 DC-5 Filter Tracker Full")
-    seed        = st.sidebar.text_input("Current 5-digit seed (required):").strip()
-    prev_seed   = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
-    prev_prev   = st.sidebar.text_input("Previous previous 5-digit seed (optional):").strip()
-    method      = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
-    hot_input   = st.sidebar.text_input("Hot digits (comma-separated):").strip()
-    cold_input  = st.sidebar.text_input("Cold digits (comma-separated):").strip()
-    check_combo = st.sidebar.text_input("Check specific combo:").strip()
-
-    # Master toggle
-    select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True, key='select_all')
-    # Propagate master toggle changes
-    if 'select_all_prev' not in st.session_state:
-        st.session_state['select_all_prev'] = None
-    if st.session_state['select_all_prev'] != st.session_state['select_all']:
-        for flt in filters:
-            st.session_state[f"filter_{flt['id']}"] = st.session_state['select_all'] and flt['enabled_default']
-        st.session_state['select_all_prev'] = st.session_state['select_all']
-
     # Validate seed
     if len(seed) != 5 or not seed.isdigit():
         st.sidebar.error("Seed must be exactly 5 digits")
