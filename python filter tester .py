@@ -28,40 +28,32 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
         st.stop()
 
     filters = []
-    # Read via csv.reader to capture header width and pad rows
     with open(path, newline='', encoding='utf-8') as f:
-        reader = csv.reader(f)
-        headers = next(reader)
-        width = len(headers)
-        # Iterate rows, pad to width, then map to dict
-        for row in reader:
-            if len(row) < width:
-                row += [''] * (width - len(row))
-            raw = dict(zip(headers, row))
+        reader = csv.DictReader(f)
+        for raw in reader:
+            # Normalize keys and handle missing fields
+            row = {k.lower(): (v or '').strip() for k, v in raw.items()}
+            row['id'] = row.get('id', row.get('fid', '')).strip()
 
-            # Lowercase keys for consistency
-            record = {k.lower(): v for k, v in raw.items()}
-            record['id'] = record.get('id', record.get('fid', '')).strip()
-
-            # Strip only whitespace from name, applicable_if, expression
+            # Strip any surrounding quotes from key fields
             for key in ('name', 'applicable_if', 'expression'):
-                if key in record and isinstance(record[key], str):
-                    record[key] = record[key].strip()
+                if key in row:
+                    row[key] = row[key].strip('"').strip("'")
 
             # Replace JS-style !== with Python !=
-            record['expression'] = record.get('expression', '').replace('!==', '!=')
+            row['expression'] = row.get('expression', '').replace('!==', '!=')
 
-            applicable = record.get('applicable_if') or 'True'
-            expr = record.get('expression') or 'False'
+            applicable = row.get('applicable_if') or 'True'
+            expr       = row.get('expression')    or 'False'
             try:
-                record['applicable_code'] = compile(applicable, '<applicable>', 'eval')
-                record['expr_code'] = compile(expr,       '<expr>',       'eval')
+                row['applicable_code'] = compile(applicable, '<applicable>', 'eval')
+                row['expr_code']       = compile(expr,       '<expr>',       'eval')
             except SyntaxError as e:
-                st.error(f"Syntax error in filter {record['id']}: {e}")
+                st.error(f"Syntax error in filter {row['id']}: {e}")
                 continue
 
-            record['enabled_default'] = record.get('enabled', '').lower() == 'true'
-            filters.append(record)
+            row['enabled_default'] = row.get('enabled', '').lower() == 'true'
+            filters.append(row)
 
     return filters
 
@@ -188,8 +180,7 @@ def main():
 
     # Active Filters UI
     st.header("🔧 Active Filters")
-    # Compute elimination counts by re-evaluating all combos
-    flt_counts = {}
+    flt_counts = {}  # Compute elimination counts
     for flt in filters:
         cnt = 0
         for combo in combos:
@@ -201,18 +192,14 @@ def main():
             except Exception:
                 pass
         flt_counts[flt['id']] = cnt
-    # Sort filters: those that eliminate >0 first, then zeros
-    sorted_filters = sorted(filters, key=lambda flt: (flt_counts[flt['id']] == 0, -flt_counts[flt['id']]))
 
+    sorted_filters = sorted(filters, key=lambda flt: (flt_counts[flt['id']] == 0, -flt_counts[flt['id']]))
     for flt in sorted_filters:
         key   = f"filter_{flt['id']}"
         count = flt_counts[flt['id']]
         label = f"{flt['id']}: {flt['name']} — eliminated {count}"
-        st.checkbox(label,
-                    key=key,
-                    value=st.session_state.get(key, select_all and flt['enabled_default']))
+        st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
 
-    # Show survivors
     with st.expander("Show remaining combinations"):
         for combo in survivors:
             st.write(combo)
