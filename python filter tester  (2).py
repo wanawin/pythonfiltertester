@@ -28,10 +28,9 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
         st.stop()
 
     filters = []
-    # Open CSV with lenient parsing to allow unescaped quotes
+    # Open CSV with default quoting (requires properly escaped fields)
     with open(path, newline='', encoding='utf-8') as f:
-        # Use QUOTE_NONE with a double-escaped backslash to handle unescaped quotes
-        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')
+        reader = csv.DictReader(f)  # reverted to default quoting; ensure CSV fields use proper escape sequences
         for raw in reader:
             row = {k.lower(): v for k, v in raw.items()}
             row['id'] = row.get('id', row.get('fid', '')).strip()
@@ -61,7 +60,6 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
             row['enabled_default'] = row.get('enabled', '').lower() == 'true'
             filters.append(row)
     return filters
-
 
 # -- Streamlit UI --
 st.title("DC-5 Filter Tracker Full")
