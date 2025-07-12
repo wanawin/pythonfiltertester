@@ -60,7 +60,7 @@ F058,If seed_sum ends in 7 and combo_sum ends in 8 eliminate,TRUE,"""seed_sum % 
 F059,If seed_sum ends in 4 and combo_sum ends in 8 eliminate,TRUE,"""seed_sum % 10 == 4""","""combo_sum % 10 == 8""",,,,,,,,,,
 F060,If seed_sum ends in 1 and combo_sum ends in 7 eliminate,TRUE,"""seed_sum % 10 == 1""","""combo_sum % 10 == 7""",,,,,,,,,,
 F061,If seed_sum ends in 4 and combo_sum ends in 7 eliminate,TRUE,"""seed_sum % 10 == 4""","""combo_sum % 10 == 7""",,,,,,,,,,
-F062,If seed_sum ends in 4 and combo_sum ends in 6 eliminate,TRUE,"""seed_sum % 10 == 4""","""combo_sum % 10 == 6""",,,,,,,,,,
+F062,XXIf seed_sum ends in 4 and combo_sum ends in 6 eliminate,TRUE,"""seed_sum % 10 == 4""","""combo_sum % 10 == 6""",,,,,,,,,,
 F063,If seed_sum ends in 5 and combo_sum ends in 6 eliminate,TRUE,"""seed_sum % 10 == 5""","""combo_sum % 10 == 6""",,,,,,,,,,
 F064,If seed_sum ends in 8 and combo_sum ends in 5 eliminate,TRUE,"""seed_sum % 10 == 8""","""combo_sum % 10 == 5""",,,,,,,,,,
 F065,If seed_sum ends in 0 and combo_sum ends in 4 eliminate,TRUE,"""seed_sum % 10 == 0""","""combo_sum % 10 == 4""",,,,,,,,,,
