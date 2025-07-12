@@ -514,7 +514,6 @@ F512,"If seed includes 6,8 eliminate even-sum combos",TRUE,"""set(seed_digits).i
 F543,"If seed includes 3,6,8 eliminate even-sum combos",TRUE,"""set(seed_digits).issuperset({3,6,8})""","""combo_sum % 2 == 0""",,,,,,,,,,
 F544,"xIf seed includes 2,7,9 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({2,7,9})""","""combo_sum % 2 != 0""",,,,,,,,,,
 F545,"xIf seed includes 1,5,6 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({1,5,6})""","""combo_sum % 2 != 0""",,,,,,,,,,
-id,name,enabled,applicable_if,expression,eliminate
 F001,"Eliminate if seed contains digits [4,5,6,8]",TRUE,True,"set(seed_digits).issuperset({4,5,6,8})",even
 F002,"Eliminate if seed contains digits [0,1,4,8]",TRUE,True,"set(seed_digits).issuperset({0,1,4,8})",even
 F003,"Eliminate if seed contains digits [1,2,3,5]",TRUE,True,"set(seed_digits).issuperset({1,2,3,5})",even
