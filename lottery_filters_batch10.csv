@@ -511,32 +511,7 @@ F509,"xIf seed includes 1,6,7 eliminate even-sum combos",TRUE,"""set(seed_digits
 F510,"xIf seed includes 3,6,7 eliminate even-sum combos",TRUE,"""set(seed_digits).issuperset({3,6,7})""","""combo_sum % 2 == 0""",,,,,,,,,,
 F511,"xIf seed includes 0,3,4 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({0,3,4})""","""combo_sum % 2 != 0""",,,,,,,,,,
 F512,"If seed includes 6,8 eliminate even-sum combos",TRUE,"""set(seed_digits).issuperset({6,8})""","""combo_sum % 2 == 0""",,,,,,,,,,
-F543,"If seed includes 3,6,8 eliminate even-sum combos",TRUE,"""set(seed_digits).issuperset({3,6,8})""","""combo_sum % 2 == 0""",,,,,,,,,,
-F544,"xIf seed includes 2,7,9 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({2,7,9})""","""combo_sum % 2 != 0""",,,,,,,,,,
-F545,"xIf seed includes 1,5,6 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({1,5,6})""","""combo_sum % 2 != 0""",,,,,,,,,,
-F001,"Eliminate combos when seed contains digits [4,5,6,8]",TRUE,True,"set(seed_digits).issuperset({4,5,6,8})"
-F002,"Eliminate combos when seed contains digits [0,1,4,8]",TRUE,True,"set(seed_digits).issuperset({0,1,4,8})"
-F003,"Eliminate combos when seed contains digits [1,2,3,5]",TRUE,True,"set(seed_digits).issuperset({1,2,3,5})"
-F004,"Eliminate combos when seed contains digits [0,2,5,6]",TRUE,True,"set(seed_digits).issuperset({0,2,5,6})"
-F005,"Eliminate combos when seed contains digits [0,6,7,9]",TRUE,True,"set(seed_digits).issuperset({0,6,7,9})"
-F006,"Eliminate combos when seed contains digits [6,7,8,9]",TRUE,True,"set(seed_digits).issuperset({6,7,8,9})"
-F007,"Eliminate combos when seed contains digits [2,3,6,9]",TRUE,True,"set(seed_digits).issuperset({2,3,6,9})"
-F008,"Eliminate combos when seed contains digits [0,2,8,9]",TRUE,True,"set(seed_digits).issuperset({0,2,8,9})"
-F009,"Eliminate combos when seed contains digits [0,2,6,7]",TRUE,True,"set(seed_digits).issuperset({0,2,6,7})"
-F010,"Eliminate combos when seed contains digits [0,4,8,9]",TRUE,True,"set(seed_digits).issuperset({0,4,8,9})"
-F011,"Eliminate combos when seed contains digits [0,7,8]",TRUE,True,"set(seed_digits).issuperset({0,7,8})"
-F012,"Eliminate combos when seed contains digits [6,8]",TRUE,True,"set(seed_digits).issuperset({6,8})"
-F013,"Eliminate combos when positions [0,2,4] are all odd",TRUE,True,"all(seed_digits[p] % 2 != 0 for p in [0,2,4])"
-F014,"Eliminate combos when positions [0,1,2,4] are all odd",TRUE,True,"all(seed_digits[p] % 2 != 0 for p in [0,1,2,4])"
-F015,"Eliminate combos when seed sum mod 3 == 0",TRUE,True,"seed_sum % 3 == 0"
-F016,"Eliminate combos when seed sum mod 3 == 1",TRUE,True,"seed_sum % 3 == 1"
-F017,"Eliminate combos when seed sum mod 5 == 0",TRUE,True,"seed_sum % 5 == 0"
-F018,"Eliminate combos when seed sum mod 5 == 1",TRUE,True,"seed_sum % 5 == 1"
-F019,"Eliminate combos when floor(seed_sum/pi) == 3",TRUE,True,"int(seed_sum/3.141592653589793) == 3"
-F020,"Eliminate combos when floor(seed_sum/pi) == 8",TRUE,True,"int(seed_sum/3.141592653589793) == 8"
-F021,"Eliminate combos when floor(seed_sum/pi) == 6",TRUE,True,"int(seed_sum/3.141592653589793) == 6"
-F022,"Eliminate combos when floor(seed_sum/pi) == 2",TRUE,True,"int(seed_sum/3.141592653589793) == 2"
-F023,"Eliminate combos when seed sum ≤14 and exactly 2 or 4 odd digits",TRUE,True,"seed_sum <= 14 and sum(d % 2 != 0 for d in seed_digits) in (2,4)"
-F024,"Eliminate combos when seed sum ≥17 and exactly 3 odd digits",TRUE,True,"seed_sum >= 17 and sum(d % 2 != 0 for d in seed_digits) == 3"
-F025,"Eliminate combos when seed_sum%3==2 and seed_sum%6==2 and 2 or 4 odd digits",TRUE,True,"seed_sum % 3 == 2 and seed_sum % 6 == 2 and sum(d % 2 != 0 for d in seed_digits) in (2,4)"
-F026,"Eliminate combos when seed_sum%6==5 and exactly 1 odd digit",TRUE,True,"seed_sum % 6 == 5 and sum(d % 2 != 0 for d in seed_digits) == 1"
+F513,"If seed includes 3,6,8 eliminate even-sum combos",TRUE,"""set(seed_digits).issuperset({3,6,8})""","""combo_sum % 2 == 0""",,,,,,,,,,
+F514,"xIf seed includes 2,7,9 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({2,7,9})""","""combo_sum % 2 != 0""",,,,,,,,,,
+F515,"xIf seed includes 1,5,6 eliminate odd-sum combos",TRUE,"""set(seed_digits).issuperset({1,5,6})""","""combo_sum % 2 != 0""",,,,,,,,,,
+
