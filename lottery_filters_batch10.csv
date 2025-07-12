@@ -540,3 +540,4 @@ F087,"Eliminate if seed is High and next sum is Very Low","TRUE","True","seed_ca
 F088,"Eliminate if seed is Very Low and next sum is Very Low","TRUE","True","seed_cat == 'Very Low' and next_cat == 'Very Low'",,,,,,,,,,
 
 
+
