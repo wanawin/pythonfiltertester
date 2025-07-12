@@ -41,7 +41,7 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
             applicable = row.get('applicable_if') or 'True'
             expr = row.get('expression') or 'False'
 
-            # DEBUG: Unconditional print of each filter's expression repr
+            # DEBUG: print each filter's expression repr
             st.write(f"DEBUG {row['id']} expression repr: {repr(expr)}")
 
             # Compile into code objects
@@ -56,4 +56,16 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
             filters.append(row)
     return filters
 
-# ... rest of your existing code unchanged ...
+# -- Streamlit UI --
+st.title("DC-5 Filter Tracker Full")
+
+# Load and debug-print filters
+filters = load_filters()
+st.write(f"Loaded {len(filters)} filters")
+
+# Existing UI code would go here (checkboxes, seed input, etc.)
+# For debugging, show first 5 filters:
+for f in filters[:5]:
+    st.write(f"{f['id']}: {f['name']} -> expr={f['expression']}")
+
+# Rest of your Streamlit app remains unchanged.
