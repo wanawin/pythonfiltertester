@@ -525,5 +525,10 @@ F523,"If (seed_sum+4) mod 14 = 0 eliminate odd-sum combos",TRUE,"True","(seed_su
 F524,"If (seed_sum+12) mod 14 = 0 eliminate even-sum combos",TRUE,"True","(seed_sum + 12) % 14 == 0 and combo_sum % 2 == 0",,,,,,,,,,
 F525,"If (seed_sum+4) mod 17 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 4) % 17 == 0 and combo_sum % 2 != 0",,,,,,,,,,
 F526,"If (seed_sum+2) mod 18 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 2) % 18 == 0 and combo_sum % 2 != 0",,,,,,,,,,
+F527,"If (seed_sum+13) mod 23 = 0 eliminate even-sum combos",TRUE,"True","(seed_sum + 13) % 23 == 0 and combo_sum % 2 == 0",,,,,,,,,,
+F528,"If (seed_sum+19) mod 26 = 0 eliminate even-sum combos",TRUE,"True","(seed_sum + 19) % 26 == 0 and combo_sum % 2 == 0",,,,,,,,,,
+F529,"If (seed_sum+8) mod 24 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 8) % 24 == 0 and combo_sum % 2 != 0",,,,,,,,,,
+F530,"If (seed_sum+11) mod 22 = 0 eliminate even-sum combos",TRUE,"True","(seed_sum + 11) % 22 == 0 and combo_sum % 2 == 0",,,,,,,,,,
+F531,"If (seed_sum+13) mod 29 = 0 eliminate odd-sum combos",TRUE,"True","(seed_sum + 13) % 29 == 0 and combo_sum % 2 != 0",,,,,,,,,,
 
 
