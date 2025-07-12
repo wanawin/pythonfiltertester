@@ -2,6 +2,7 @@ import streamlit as st
 from itertools import product
 import csv
 import os
+import re
 from collections import Counter
 
 # V-Trac and mirror mappings
@@ -13,58 +14,93 @@ def sum_category(total: int) -> str:
     """Maps a sum to a category bucket."""
     if 0 <= total <= 15:
         return 'Very Low'
-    elif 16 <= total <= 24:
+    elif 16 <= total <= 20:
         return 'Low'
-    elif 25 <= total <= 33:
+    elif 21 <= total <= 25:
         return 'Mid'
-    else:
+    elif 26 <= total <= 30:
         return 'High'
+    else:
+        return 'Very High'
 
-
-def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
-    """Loads filter definitions, compiles code objects for applicability and expression."""
-    if not os.path.exists(path):
-        st.error(f"Filter file not found: {path}")
-        st.stop()
-
+def load_filters(csv_path: str = 'lottery_filters_batch10.csv') -> list:
+    """Loads filter definitions from a CSV file."""
     filters = []
-    # Open CSV with default quoting (requires properly escaped fields)
-    with open(path, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)  # reverted to default quoting; ensure CSV fields use proper escape sequences
+    with open(csv_path, newline='') as f:
+        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')  # allow unescaped quotes
         for raw in reader:
+            # Normalize keys to lowercase and strip whitespace
             row = {k.lower(): v for k, v in raw.items()}
-            row['id'] = row.get('id', row.get('fid', '')).strip()
-            for key in ('name', 'applicable_if', 'expression'):
-                if key in row and isinstance(row[key], str):
-                    # strip surrounding whitespace and quotes
-                    row[key] = row[key].strip().strip('"').strip("'")
-
-            applicable = row.get('applicable_if') or 'True'
-            expr = row.get('expression') or ''
-
-            # skip filters without a valid expression
-            if not expr:
-                st.warning(f"Skipping filter {row['id']}: no expression provided")
+            if not row.get('enabled', '').lower() in ('true', '1'):
                 continue
-
-            st.write(f"DEBUG {row['id']} expression repr: {repr(expr)}")
-
             try:
-                # compile applicability and expression code
-                row['applicable_code'] = compile(applicable, '<applicable>', 'eval')
-                row['expr_code'] = compile(expr, '<expr>', 'eval')
-            except SyntaxError:
+                code = row.get('expression', '')
+                compiled = compile(code, '<string>', 'eval')
+                filters.append({
+                    'id': row['id'],
+                    'name': row['name'],
+                    'func': compiled,
+                    'enabled_default': row.get('enabled_default', 'true').lower() == 'true'
+                })
+            except Exception as e:
                 st.warning(f"Skipping filter {row['id']}: invalid expression syntax")
-                continue
-
-            row['enabled_default'] = row.get('enabled', '').lower() == 'true'
-            filters.append(row)
     return filters
 
-# -- Streamlit UI --
-st.title("DC-5 Filter Tracker Full")
-filters = load_filters()
-st.write(f"Loaded {len(filters)} filters")
-for f in filters[:5]:
-    st.write(f"{f['id']}: {f['name']} -> expr={f['expression']}")
-# ... rest of the app remains unchanged ...
+def apply_filters(filters: list, combos: list, seed_sum: int, **kwargs) -> tuple:
+    """Applies filters to the list of combos and returns survivors and counts."""
+    survivors = []
+    flt_counts = {f['id']: 0 for f in filters}
+    for combo in combos:
+        combo_sum = sum(combo)
+        context = {**kwargs, 'combo_sum': combo_sum, 'seed_sum': seed_sum}
+        passed = True
+        for flt in filters:
+            if eval(flt['func'], {}, context):
+                flt_counts[flt['id']] += 1
+                passed = False
+                break
+        if passed:
+            survivors.append(combo)
+    return survivors, flt_counts
+
+def generate_combinations(method: str) -> list:
+    """Generates digit combinations based on the selected method."""
+    digits = range(10)
+    if method == '1-digit':
+        return [(d,) for d in digits]
+    elif method == '2-digit':
+        return list(product(digits, repeat=2))
+    # Add more generation methods as needed
+    return []
+
+def main():
+    st.title("DC-5 Filter Tracker Full")
+
+    select_all = st.checkbox("Select/Deselect All Filters", value=True)
+    seed_input = st.text_input("Current 5-digit seed (required):")
+    if not seed_input or not seed_input.isdigit():
+        st.error("Please enter a valid 5-digit seed.")
+        return
+    seed_digits = list(map(int, seed_input))
+    seed_sum = sum(seed_digits)
+    
+    # Load filters
+    filters = load_filters()
+    st.write(f"Loaded {len(filters)} filters")
+
+    combos = generate_combinations(st.selectbox("Generation Method:", ['1-digit', '2-digit']))
+    survivors, flt_counts = apply_filters(filters, combos, seed_sum, seed_digits=seed_digits)
+
+    st.header("Filters")
+    for flt in filters:
+        key = f"filter_{flt['id']}"
+        label = f"{flt['id']}: {flt['name']}" \
+                f" — eliminated {flt_counts.get(flt['id'], 0)}"
+        st.checkbox(label, key=key, value=select_all and flt['enabled_default'])
+
+    with st.expander("Show remaining combinations"):
+        for combo in survivors:
+            st.write(combo)
+
+if __name__ == '__main__':
+    main()
