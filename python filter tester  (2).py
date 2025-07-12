@@ -41,9 +41,8 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
             applicable = row.get('applicable_if') or 'True'
             expr = row.get('expression') or 'False'
 
-            # DEBUG: Show the raw repr of each new filter expression
-            if row['id'].startswith('F53'):
-                st.write(f"DEBUG {row['id']} expression repr: {repr(expr)}")
+            # DEBUG: Unconditional print of each filter's expression repr
+            st.write(f"DEBUG {row['id']} expression repr: {repr(expr)}")
 
             # Compile into code objects
             try:
