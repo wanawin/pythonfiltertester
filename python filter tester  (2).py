@@ -57,19 +57,22 @@ def main():
     prev_seed = st.sidebar.text_input('Previous 5-digit seed (optional):')
     prev_prev_seed = st.sidebar.text_input('Prev Prev 5-digit seed (optional):')
     gen_method = st.sidebar.selectbox('Generation Method:', ['1-digit', '2-digit'])
-    hot = st.sidebar.text_input('Hot digits (comma-separated):')
-    cold = st.sidebar.text_input('Cold digits (comma-separated):')
-    track_combo = st.sidebar.text_input('Track specific combo (optional):')
+    hot = st.sidebar.text_input('Hot digits (comma-separated):')  # restore hot digits
+    cold = st.sidebar.text_input('Cold digits (comma-separated):')  # restore cold digits
+    track_combo = st.sidebar.text_input('Track specific combo (optional):')  # restore combo tracking
 
     # Validate seeds
-    # ... validation code ...
+    for seed in (current_seed,):
+        if seed and (not seed.isdigit() or len(seed) != 5):
+            st.sidebar.error('Seed must be exactly 5 digits')
+            return
 
     filters = load_filters()
     results = []
 
     # Generate combinations based on method
     for combo in product(range(10), repeat=1 if gen_method=='1-digit' else 2):
-        seed_digits = [int(d) for d in current_seed]
+        seed_digits = [int(d) for d in current_seed] if current_seed else []
         prev_digits = [int(d) for d in prev_seed] if prev_seed else []
         prev_prev_digits = [int(d) for d in prev_prev_seed] if prev_prev_seed else []
 
@@ -84,7 +87,8 @@ def main():
             last_three += (sum_category(prev_prev_seed_sum), parity(prev_prev_seed_sum))
         if prev_seed_sum is not None:
             last_three += (sum_category(prev_seed_sum), parity(prev_seed_sum))
-        last_three += (sum_category(seed_sum), parity(seed_sum))
+        if current_seed:
+            last_three += (sum_category(seed_sum), parity(seed_sum))
 
         # Prepare evaluation context
         context = {
@@ -94,7 +98,10 @@ def main():
             'prev_seed_sum': prev_seed_sum,
             'prev_prev_seed_sum': prev_prev_seed_sum,
             'combo_sum': combo_sum,
-            'last_three': last_three
+            'last_three': last_three,
+            'hot': [int(x) for x in hot.split(',') if x.strip().isdigit()],
+            'cold': [int(x) for x in cold.split(',') if x.strip().isdigit()],
+            'track_combo': tuple(int(x) for x in track_combo.split(',') if x.strip().isdigit()) if track_combo else None
         }
 
         # Check filters
@@ -104,7 +111,9 @@ def main():
                     results.append((f['id'], f['name'], combo))
 
     # Display results
-    # ... unchanged UI code to list eliminated combos ...
+    st.title('Eliminated Combos')
+    for fid, name, combo in results:
+        st.write(f"{fid}: {name} — eliminated {combo}")
 
 if __name__ == '__main__':
     main()
