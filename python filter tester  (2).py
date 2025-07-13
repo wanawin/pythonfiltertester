@@ -24,8 +24,11 @@ def load_filters(csv_path='lottery_filters_batch10.csv'):
         st.stop()
     with open(csv_path, newline='', encoding='utf-8') as f:
         # Use QUOTE_NONE and escapechar to tolerate unescaped quotes
-        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')
+        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\')
         for raw in reader:
+            # Skip empty or malformed rows
+            if not raw or raw.get('id') is None:
+                continue
             # Normalize keys and ensure no None values
             row = {k.lower(): (v or '').strip() for k, v in raw.items()}
             # Skip disabled filters
@@ -47,7 +50,7 @@ def load_filters(csv_path='lottery_filters_batch10.csv'):
                 st.warning(f"Skipping filter {row.get('id')}: {e}")
     return filters
 
-# Generate all 5-digit combos based on method
+# Generate all 5-digit combos based on method based on method
 def generate_combinations(seed, method):
     all_digits = '0123456789'
     combos = set()
