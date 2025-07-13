@@ -176,10 +176,11 @@ def main():
         else:
             st.sidebar.warning("Combo not found in generated list")
 
-    # Active Filters UI
+    # Active Filters UI: sort by elimination count descending
     st.header("🔧 Active Filters")
+    # compute counts
+    filter_counts = {}
     for flt in filters:
-        key = f"filter_{flt['id']}"
         count = 0
         for combo in combos:
             cdigits = [int(c) for c in combo]
@@ -189,6 +190,13 @@ def main():
                     count += 1
             except Exception:
                 pass
+        filter_counts[flt['id']] = count
+    # sort filters by count descending
+    sorted_filters = sorted(filters, key=lambda f: filter_counts.get(f['id'], 0), reverse=True)
+    # display sorted
+    for flt in sorted_filters:
+        key = f"filter_{flt['id']}"
+        count = filter_counts.get(flt['id'], 0)
         label = f"{flt['id']}: {flt['name']} — eliminated {count}"
         st.checkbox(label,
                     key=key,
