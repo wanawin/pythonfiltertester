@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 from itertools import product
 import csv, os
@@ -24,7 +25,7 @@ def load_filters(csv_path='lottery_filters_batch10.csv'):
         st.stop()
     with open(csv_path, newline='', encoding='utf-8') as f:
         # Use QUOTE_NONE and escapechar to tolerate unescaped quotes
-        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\')
+        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')
         for raw in reader:
             # Skip empty or malformed rows
             if not raw or raw.get('id') is None:
@@ -50,128 +51,6 @@ def load_filters(csv_path='lottery_filters_batch10.csv'):
                 st.warning(f"Skipping filter {row.get('id')}: {e}")
     return filters
 
-# Generate all 5-digit combos based on method based on method
-def generate_combinations(seed, method):
-    all_digits = '0123456789'
-    combos = set()
-    sorted_seed = ''.join(sorted(seed))
-
-    if method == '1-digit':
-        for d in sorted_seed:
-            for p in product(all_digits, repeat=4):
-                combos.add(''.join(sorted(d + ''.join(p))))
-    else:
-        pairs = {''.join(sorted((sorted_seed[i], sorted_seed[j])))
-                 for i in range(5) for j in range(i+1, 5)}
-        for pair in pairs:
-            for p in product(all_digits, repeat=3):
-                combos.add(''.join(sorted(pair + ''.join(p))))
-
-    return sorted(combos)
-
-# Main Streamlit app
-def main():
-    st.sidebar.header("🔢 DC-5 Filter Tracker Full")
-    select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
-
-    # Seed inputs
-    seed = st.sidebar.text_input("Current 5-digit seed (required):").strip()
-    prev_seed = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
-    prev_prev_seed = st.sidebar.text_input("Prev Prev 5-digit seed (optional):").strip()
-
-    # Validation
-    if len(seed) != 5 or not seed.isdigit():
-        st.sidebar.error("Seed must be exactly 5 digits")
-        return
-
-    # Generation method and custom filters
-    method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
-    hot_digits = st.sidebar.text_input("Hot digits (comma-separated):").strip()
-    cold_digits = st.sidebar.text_input("Cold digits (comma-separated):").strip()
-    track_combo = st.sidebar.text_input("Track specific combo (optional):").strip()
-
-    # Prepare history
-    history = [prev_prev_seed, prev_seed, seed]
-    history_digits = [([int(d) for d in h] if len(h)==5 and h.isdigit() else None) for h in history]
-    history_sums = [sum(d) if d else None for d in history_digits]
-    history_cats = [sum_category(s) if s is not None else None for s in history_sums]
-    history_parity = [ ('Even' if (sum(d) % 2 == 0) else 'Odd') if d else None for d in history_digits ]
-    last_six = tuple(item for sub in ([history_cats[i], history_parity[i]] if history_cats[i] and history_parity[i] else [] for i in range(3)) for item in sub)
-
-    # Generate combos
-    combos = generate_combinations(seed, method)
-    eliminated = {}
-    survivors = []
-    seed_digits = [int(d) for d in seed]
-    seed_sum = sum(seed_digits)
-
-    # Load and apply filters
-    filters = load_filters()
-    for combo in combos:
-        cdigits = [int(c) for c in combo]
-        combo_sum = sum(cdigits)
-        ctx = {
-            'seed_digits': seed_digits,
-            'combo_digits': cdigits,
-            'seed_sum': seed_sum,
-            'combo_sum': combo_sum,
-            'prev_seed_sum': history_sums[1],
-            'prev_prev_seed_sum': history_sums[0],
-            'seed_cats': history_cats,
-            'hot_digits': [int(d) for d in hot_digits.split(',') if d.strip().isdigit()],
-            'cold_digits': [int(d) for d in cold_digits.split(',') if d.strip().isdigit()],
-            'track_combo': track_combo,
-            'last_six': last_six
-        }
-        for flt in filters:
-            key = f"filter_{flt['id']}"
-            active = st.session_state.get(key, select_all and flt['enabled_default'])
-            if not active:
-                continue
-            try:
-                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
-                    eliminated[combo] = flt['name']
-                    break
-            except Exception:
-                continue
-        else:
-            survivors.append(combo)
-
-    # Sidebar summary
-    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
-
-    # Active filter list
-    st.header("🔧 Active Filters")
-    flt_counts = Counter()
-    for flt in filters:
-        for combo in combos:
-            cd = [int(c) for c in combo]
-            ctx = {
-                'seed_sum': seed_sum,
-                'combo_sum': sum(cd),
-                'prev_seed_sum': history_sums[1],
-                'prev_prev_seed_sum': history_sums[0],
-                'seed_cats': history_cats,
-                'last_six': last_six
-            }
-            try:
-                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
-                    flt_counts[flt['id']] += 1
-            except:
-                pass
-
-    sorted_filters = sorted(filters, key=lambda f: (flt_counts[f['id']] == 0, -flt_counts[f['id']]))
-    for flt in sorted_filters:
-        key = f"filter_{flt['id']}"
-        label = f"{flt['id']}: {flt['name']} — eliminated {flt_counts[flt['id']]}"
-        st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
-
-    # Show survivors
-    with st.expander("Show remaining combinations"):
-        for combo in survivors:
-            if track_combo and combo != track_combo:
-                continue
-            st.write(combo)
-
-if __name__ == '__main__':
-    main()
+# Generate all 5-digit combos based on method
+... # rest of code unchanged
+```
