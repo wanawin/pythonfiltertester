@@ -1,4 +1,3 @@
-```python
 import streamlit as st
 from itertools import product
 import csv, os
@@ -51,6 +50,5 @@ def load_filters(csv_path='lottery_filters_batch10.csv'):
                 st.warning(f"Skipping filter {row.get('id')}: {e}")
     return filters
 
-# Generate all 5-digit combos based on method
-... # rest of code unchanged
-```
+# (Rest of your app code unchanged—UI elements for seeds, hot/cold digits, track combo,
+#  filter loop, and results display remain exactly as before.)
