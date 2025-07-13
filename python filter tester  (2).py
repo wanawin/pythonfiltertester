@@ -88,6 +88,10 @@ def main():
     history_digits = [([int(d) for d in h] if len(h)==5 and h.isdigit() else None) for h in history]
     history_sums = [sum(d) if d else None for d in history_digits]
     history_cats = [sum_category(s) if s is not None else None for s in history_sums]
+    # Compute parity for each historical seed and build last_six tuple (category, parity)
+    history_parity = [ ('Even' if (sum(d) % 2 == 0) else 'Odd') if d else None for d in history_digits ]
+    # Only include entries where both category and parity exist
+    last_six = tuple(sum([ ( [history_cats[i], history_parity[i]] if history_cats[i] and history_parity[i] else [] ) for i in range(3)], [] ))
 
     # Generate combos
     combos = generate_combinations(seed, method)
