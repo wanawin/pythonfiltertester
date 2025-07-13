@@ -17,10 +17,8 @@ def sum_category(total: int) -> str:
     else:
         return 'Very High'
 
-
 def parity(n: int) -> str:
     return 'Even' if n % 2 == 0 else 'Odd'
-
 
 def load_filters(csv_path='lottery_filters_batch10.csv'):
     filters = []
@@ -33,12 +31,15 @@ def load_filters(csv_path='lottery_filters_batch10.csv'):
         for raw in reader:
             if not raw or not raw.get('id'):
                 continue
-            # Normalize and strip values, guard against None keys/values
             row = {}
             for k, v in raw.items():
                 key = (k or '').lower().strip()
-                val = (v or '').strip()
-                row[key] = val
+                if isinstance(v, list):
+                    val = ','.join(str(x) for x in v)
+                else:
+                    val = str(v or '')
+                row[key] = val.strip()
+
             if row.get('enabled', '').lower() not in ('true', '1'):
                 continue
 
@@ -56,7 +57,6 @@ def load_filters(csv_path='lottery_filters_batch10.csv'):
                 st.warning(f"Skipping filter {row.get('id')}: {e}")
     return filters
 
-
 def main():
     st.sidebar.title('DC-5 Filter Tracker')
     current_seed = st.sidebar.text_input('Current 5-digit seed (required):')
@@ -67,7 +67,6 @@ def main():
     cold = st.sidebar.text_input('Cold digits (comma-separated):')
     track_combo = st.sidebar.text_input('Track specific combo (optional):')
 
-    # Validate seeds
     if current_seed and (not current_seed.isdigit() or len(current_seed) != 5):
         st.sidebar.error('Seed must be exactly 5 digits')
         return
@@ -85,7 +84,6 @@ def main():
         prev_prev_seed_sum = sum(prev_prev_digits) if prev_prev_digits else None
         combo_sum = sum(combo)
 
-        # Build last_three tuple for conditions
         last_three = ()
         if prev_prev_seed_sum is not None:
             last_three += (sum_category(prev_prev_seed_sum), parity(prev_prev_seed_sum))
@@ -94,7 +92,6 @@ def main():
         if current_seed:
             last_three += (sum_category(seed_sum), parity(seed_sum))
 
-        # Evaluation context
         context = {
             'sum_category': sum_category,
             'parity': parity,
