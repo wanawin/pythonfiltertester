@@ -24,7 +24,7 @@ def sum_category(total: int) -> str:
         return 'Very High'
 
 def load_filters(csv_path: str = 'lottery_filters_batch10.csv') -> list:
-    """Loads filter definitions from a CSV file."""
+    """Loads filter definitions from a CSV file, tolerating unescaped quotes."""
     filters = []
     with open(csv_path, newline='') as f:
         # Use QUOTE_NONE with a single backslash escape to tolerate unescaped quotes
@@ -34,8 +34,8 @@ def load_filters(csv_path: str = 'lottery_filters_batch10.csv') -> list:
             if not row.get('enabled', '').lower() in ('true', '1'):
                 continue
             try:
-                code = row.get('expression', '')
-                compiled = compile(code, '<string>', 'eval')
+                expr = row.get('expression', '').strip()
+                compiled = compile(expr, '<string>', 'eval')
                 filters.append({
                     'id': row['id'],
                     'name': row['name'],
@@ -48,7 +48,7 @@ def load_filters(csv_path: str = 'lottery_filters_batch10.csv') -> list:
 
 
 def apply_filters(filters: list, combos: list, seed_sum: int, **kwargs) -> tuple:
-    """Applies filters to the list of combos and returns survivors and counts."""
+    """Applies filters to combos and returns survivors plus elimination counts."""
     survivors = []
     flt_counts = {f['id']: 0 for f in filters}
     for combo in combos:
@@ -72,7 +72,7 @@ def generate_combinations(method: str) -> list:
         return [(d,) for d in digits]
     elif method == '2-digit':
         return list(product(digits, repeat=2))
-    # Add more generation methods as needed
+    # Add more methods as needed
     return []
 
 
@@ -81,23 +81,24 @@ def main():
 
     select_all = st.checkbox("Select/Deselect All Filters", value=True)
     seed_input = st.text_input("Current 5-digit seed (required):")
-    if not seed_input or not seed_input.isdigit():
+    if not seed_input or not seed_input.isdigit() or len(seed_input) != 5:
         st.error("Please enter a valid 5-digit seed.")
         return
-    seed_digits = list(map(int, seed_input))
+    seed_digits = [int(d) for d in seed_input]
     seed_sum = sum(seed_digits)
     
     filters = load_filters()
     st.write(f"Loaded {len(filters)} filters")
 
-    combos = generate_combinations(st.selectbox("Generation Method:", ['1-digit', '2-digit']))
+    method = st.selectbox("Generation Method:", ['1-digit', '2-digit'])
+    combos = generate_combinations(method)
     survivors, flt_counts = apply_filters(filters, combos, seed_sum, seed_digits=seed_digits)
 
     st.header("Filters")
     for flt in filters:
         key = f"filter_{flt['id']}"
         label = f"{flt['id']}: {flt['name']} — eliminated {flt_counts.get(flt['id'], 0)}"
-        st.checkbox(label, key=key, value=select_all and flt['enabled_default'])
+        st.checkbox(label, key=key, value=(select_all and flt['enabled_default']))
 
     with st.expander("Show remaining combinations"):
         for combo in survivors:
