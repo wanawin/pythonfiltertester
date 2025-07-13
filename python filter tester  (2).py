@@ -27,8 +27,8 @@ def load_filters(csv_path: str = 'lottery_filters_batch10.csv') -> list:
     """Loads filter definitions from a CSV file."""
     filters = []
     with open(csv_path, newline='') as f:
-        # Use QUOTE_NONE and properly escaped backslash so unescaped quotes are tolerated
-        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\\\')
+        # Use QUOTE_NONE with a single backslash escape to tolerate unescaped quotes
+        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')
         for raw in reader:
             row = {k.lower(): v for k, v in raw.items()}
             if not row.get('enabled', '').lower() in ('true', '1'):
@@ -45,6 +45,7 @@ def load_filters(csv_path: str = 'lottery_filters_batch10.csv') -> list:
             except Exception:
                 st.warning(f"Skipping filter {row['id']}: invalid expression syntax")
     return filters
+
 
 def apply_filters(filters: list, combos: list, seed_sum: int, **kwargs) -> tuple:
     """Applies filters to the list of combos and returns survivors and counts."""
@@ -63,6 +64,7 @@ def apply_filters(filters: list, combos: list, seed_sum: int, **kwargs) -> tuple
             survivors.append(combo)
     return survivors, flt_counts
 
+
 def generate_combinations(method: str) -> list:
     """Generates digit combinations based on the selected method."""
     digits = range(10)
@@ -72,6 +74,7 @@ def generate_combinations(method: str) -> list:
         return list(product(digits, repeat=2))
     # Add more generation methods as needed
     return []
+
 
 def main():
     st.title("DC-5 Filter Tracker Full")
