@@ -64,31 +64,26 @@ def generate_combinations(seed, method):
 
 # Main Streamlit app
 def main():
-    # Load and build
     st.sidebar.header("🔢 DC-5 Filter Tracker Full")
     select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
     seed = st.sidebar.text_input("Current 5-digit seed (required):").strip()
     prev_seed = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
     prev_prev_seed = st.sidebar.text_input("Prev Prev 5-digit seed (optional):").strip()
 
-    # Validate current seed
     if len(seed) != 5 or not seed.isdigit():
         st.sidebar.error("Seed must be exactly 5 digits")
         return
-    method = st.sidebar.selectbox("Generation Method:", ["1-digit","2-digit pair"])
-        # Additional inputs for hot/cold digits and specific combo to track
+
+    method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
     hot_digits = st.sidebar.text_input("Hot digits (comma-separated):").strip()
     cold_digits = st.sidebar.text_input("Cold digits (comma-separated):").strip()
     track_combo = st.sidebar.text_input("Track specific combo (optional):").strip()
 
-    # Build history digits, sums, and categories
     history = [prev_prev_seed, prev_seed, seed]
-    history_digits = [([int(d) for d in h] if len(h)==5 and h.isdigit() else None)
-                      for h in history]
+    history_digits = [([int(d) for d in h] if len(h)==5 and h.isdigit() else None) for h in history]
     history_sums = [sum(d) if d else None for d in history_digits]
     history_cats = [sum_category(s) if s is not None else None for s in history_sums]
 
-    # Generate combos and prepare counts
     combos = generate_combinations(seed, method)
     eliminated = {}
     survivors = []
@@ -96,7 +91,6 @@ def main():
     seed_sum = sum(seed_digits)
 
     filters = load_filters()
-    # Apply filters to each combo
     for combo in combos:
         cdigits = [int(c) for c in combo]
         combo_sum = sum(cdigits)
@@ -107,7 +101,10 @@ def main():
             'combo_sum': combo_sum,
             'prev_seed_sum': history_sums[1],
             'prev_prev_seed_sum': history_sums[0],
-            'seed_cats': history_cats
+            'seed_cats': history_cats,
+            'hot_digits': [int(d) for d in hot_digits.split(',') if d.strip().isdigit()],
+            'cold_digits': [int(d) for d in cold_digits.split(',') if d.strip().isdigit()],
+            'track_combo': track_combo
         }
         for flt in filters:
             key = f"filter_{flt['id']}"
@@ -123,38 +120,30 @@ def main():
         else:
             survivors.append(combo)
 
-    # Summary
-    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
+    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
 
-    # Active filters UI
     st.header("🔧 Active Filters")
     flt_counts = Counter()
     for flt in filters:
         for combo in combos:
             cd = [int(c) for c in combo]
-            ctx = {
-                'seed_sum': seed_sum,
-                'combo_sum': sum(cd),
-                'prev_seed_sum': history_sums[1],
-                'prev_prev_seed_sum': history_sums[0],
-                'seed_cats': history_cats
-            }
+            ctx = {'seed_sum': seed_sum, 'combo_sum': sum(cd), 'prev_seed_sum': history_sums[1], 'prev_prev_seed_sum': history_sums[0], 'seed_cats': history_cats}
             try:
                 if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
                     flt_counts[flt['id']] += 1
             except:
                 pass
 
-    # Sort and render filter checkboxes
     sorted_filters = sorted(filters, key=lambda f: (flt_counts[f['id']] == 0, -flt_counts[f['id']]))
     for flt in sorted_filters:
         key = f"filter_{flt['id']}"
         label = f"{flt['id']}: {flt['name']} — eliminated {flt_counts[flt['id']]}"
         st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
 
-    # Show survivors
     with st.expander("Show remaining combinations"):
         for combo in survivors:
+            if track_combo and combo != track_combo:
+                continue
             st.write(combo)
 
 if __name__ == '__main__':
