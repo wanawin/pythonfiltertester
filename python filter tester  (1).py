@@ -102,7 +102,6 @@ def main():
     cold_digits       = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
     due_digits        = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]
     seed_counts       = Counter(seed_digits)
-    seed_vtracs       = set(V_TRAC_GROUPS[d] for d in seed_digits)
     seed_sum          = sum(seed_digits)
     prev_sum_cat      = sum_category(seed_sum)
 
@@ -130,11 +129,9 @@ def main():
             'combo_digits':          cdigits,
             'combo_sum':             csum,
             'combo_sum_cat':         sum_category(csum),
-            'seed_vtracs':           seed_vtracs,
+            'seed_vtracs':           set(V_TRAC_GROUPS[d] for d in seed_digits),
             'combo_vtracs':          set(V_TRAC_GROUPS[d] for d in cdigits),
             'mirror':                MIRROR,
-            'common_to_both':        set(prev_digits) & set(prev_prev_digits),
-            'last2':                 set(prev_digits) | set(prev_prev_digits),
             'Counter':               Counter
         }
 
@@ -176,26 +173,36 @@ def main():
         else:
             st.sidebar.warning("Combo not found in generated list")
 
-    # Active Filters UI
+    # Active Filters UI with original and remaining elimination counts
     st.header("🔧 Active Filters")
-    # Compute elimination counts for each filter
     counts = []
     for flt in filters:
-        count = 0
+        orig = 0
+        rem  = 0
+        # original elimination count
         for combo in combos:
             cdigits = [int(c) for c in combo]
             ctx = generate_context(cdigits)
             try:
                 if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
-                    count += 1
+                    orig += 1
             except Exception:
                 pass
-        counts.append((flt, count))
-    # Sort filters by highest elimination count
+        # remaining elimination count on survivors
+        for combo in survivors:
+            cdigits = [int(c) for c in combo]
+            ctx = generate_context(cdigits)
+            try:
+                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
+                    rem += 1
+            except Exception:
+                pass
+        counts.append((flt, orig, rem))
+    # Sort filters by original elimination descending
     sorted_filters = sorted(counts, key=lambda x: x[1], reverse=True)
-    for flt, count in sorted_filters:
+    for flt, orig, rem in sorted_filters:
         key = f"filter_{flt['id']}"
-        label = f"{flt['id']}: {flt['name']} — eliminated {count}"
+        label = f"{flt['id']}: {flt['name']} — originally eliminates {orig}, now eliminates {rem}"
         st.checkbox(label,
                     key=key,
                     value=st.session_state.get(key, select_all and flt['enabled_default']))
