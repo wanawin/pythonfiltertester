@@ -24,7 +24,7 @@ def load_filters(csv_path='lottery_filters_batch10.csv'):
         st.stop()
     with open(csv_path, newline='', encoding='utf-8') as f:
         # Use QUOTE_NONE and escapechar to tolerate unescaped quotes
-        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\')
+        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')
         for raw in reader:
             # Normalize keys and ensure no None values
             row = {k.lower(): (v or '').strip() for k, v in raw.items()}
@@ -93,10 +93,7 @@ def main():
     history_sums = [sum(d) if d else None for d in history_digits]
     history_cats = [sum_category(s) if s is not None else None for s in history_sums]
     history_parity = [ ('Even' if (sum(d) % 2 == 0) else 'Odd') if d else None for d in history_digits ]
-    # Build last_six tuple for filters referencing exact history patterns
-    last_six = tuple(sum(([history_cats[i], history_parity[i]] if history_cats[i] and history_parity[i] else []), []) for i in range(3))
-    # Flatten to a single tuple length‐6
-    last_six = tuple(item for sub in last_six for item in sub)
+    last_six = tuple(item for sub in ([history_cats[i], history_parity[i]] if history_cats[i] and history_parity[i] else [] for i in range(3)) for item in sub)
 
     # Generate combos
     combos = generate_combinations(seed, method)
