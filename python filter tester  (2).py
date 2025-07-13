@@ -1,4 +1,3 @@
-```python
 import streamlit as st
 from itertools import product
 import csv
