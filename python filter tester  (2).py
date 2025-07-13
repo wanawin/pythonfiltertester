@@ -105,10 +105,14 @@ def main():
         }
 
         # Check filters
-        for f in filters:
-            if eval(f['applicable_code'], {}, context):
-                if eval(f['expr_code'], {}, context):
-                    results.append((f['id'], f['name'], combo))
+    for f in filters:
+        try:
+            if eval(f['applicable_code'], {}, context) and eval(f['expr_code'], {}, context):
+                results.append((f['id'], f['name'], combo))
+        except Exception:
+            # Skip filters that error (e.g., missing seed for prev conditions)
+            continue
+(f['id'], f['name'], combo))
 
     # Display results
     st.title('Eliminated Combos')
