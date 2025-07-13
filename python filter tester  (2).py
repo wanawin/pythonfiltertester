@@ -28,7 +28,7 @@ def load_filters(csv_path: str = 'lottery_filters_batch10.csv') -> list:
     filters = []
     with open(csv_path, newline='') as f:
         # Use QUOTE_NONE and properly escaped backslash so unescaped quotes are tolerated
-        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')
+        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\\\')
         for raw in reader:
             row = {k.lower(): v for k, v in raw.items()}
             if not row.get('enabled', '').lower() in ('true', '1'):
