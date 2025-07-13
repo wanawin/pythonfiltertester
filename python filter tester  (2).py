@@ -21,7 +21,6 @@ def parity(n: int) -> str:
     return 'Even' if n % 2 == 0 else 'Odd'
 
 # Load filters from CSV, tolerating unescaped quotes by disabling quoting and using escapechar
-
 def load_filters(csv_path='lottery_filters_batch10.csv'):
     filters = []
     if not os.path.exists(csv_path):
@@ -49,13 +48,11 @@ def load_filters(csv_path='lottery_filters_batch10.csv'):
                 })
             except SyntaxError as e:
                 st.warning(f"Skipping filter {row.get('id')}: {e}")
-
     return filters
 
 # -- UI and evaluation context --
 def main():
     st.sidebar.title('DC-5 Filter Tracker')
-    # ... existing sidebar inputs untouched ...
     current_seed = st.sidebar.text_input('Current 5-digit seed (required):')
     prev_seed = st.sidebar.text_input('Previous 5-digit seed (optional):')
     prev_prev_seed = st.sidebar.text_input('Prev Prev 5-digit seed (optional):')
@@ -72,7 +69,6 @@ def main():
 
     # Generate combinations based on method
     for combo in product(range(10), repeat=1 if gen_method=='1-digit' else 2):
-        # Build numeric lists for current and previous seeds
         seed_digits = [int(d) for d in current_seed]
         prev_digits = [int(d) for d in prev_seed] if prev_seed else []
         prev_prev_digits = [int(d) for d in prev_prev_seed] if prev_prev_seed else []
@@ -82,7 +78,7 @@ def main():
         prev_prev_seed_sum = sum(prev_prev_digits) if prev_prev_digits else None
         combo_sum = sum(combo)
 
-        # Build last_three tuple: (cat, parity) pairs for prev_prev, prev, current
+        # Build last_three tuple: (category, parity) pairs for prev_prev, prev, current
         last_three = ()
         if prev_prev_seed_sum is not None:
             last_three += (sum_category(prev_prev_seed_sum), parity(prev_prev_seed_sum))
@@ -90,7 +86,8 @@ def main():
             last_three += (sum_category(prev_seed_sum), parity(prev_seed_sum))
         last_three += (sum_category(seed_sum), parity(seed_sum))
 
-        # Prepare evaluation context\        context = {
+        # Prepare evaluation context
+        context = {
             'sum_category': sum_category,
             'parity': parity,
             'seed_sum': seed_sum,
