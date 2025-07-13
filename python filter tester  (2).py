@@ -76,10 +76,10 @@ def main():
         st.sidebar.error("Seed must be exactly 5 digits")
         return
     method = st.sidebar.selectbox("Generation Method:", ["1-digit","2-digit pair"])
-    # Additional inputs for hot/cold digits and specific combo to track
+        # Additional inputs for hot/cold digits and specific combo to track
     hot_digits = st.sidebar.text_input("Hot digits (comma-separated):").strip()
     cold_digits = st.sidebar.text_input("Cold digits (comma-separated):").strip()
-    track_combo = st.sidebar.text_input("Track specific combo (optional):").strip()("Generation Method:", ["1-digit","2-digit pair"])
+    track_combo = st.sidebar.text_input("Track specific combo (optional):").strip()
 
     # Build history digits, sums, and categories
     history = [prev_prev_seed, prev_seed, seed]
