@@ -23,21 +23,25 @@ def load_filters(csv_path='lottery_filters_batch10.csv'):
         st.error(f"Filter file not found: {csv_path}")
         st.stop()
     with open(csv_path, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\\')
+        # Use QUOTE_NONE and escapechar to tolerate unescaped quotes
+        reader = csv.DictReader(f, quoting=csv.QUOTE_NONE, escapechar='\')
         for raw in reader:
-            row = {k.lower(): v for k, v in raw.items()}
-            if row.get('enabled','').strip().lower() not in ('true','1'):
+            # Normalize keys and ensure no None values
+            row = {k.lower(): (v or '').strip() for k, v in raw.items()}
+            # Skip disabled filters
+            if row.get('enabled', '').lower() not in ('true', '1'):
                 continue
-            applicable = row.get('applicable_if','').strip() or 'True'
-            expr = row.get('expression','').strip() or 'False'
-            expr = expr.replace('!==','!=')
+            # Provide default expressions
+            applicable = row.get('applicable_if') or 'True'
+            expr = row.get('expression') or 'False'
+            expr = expr.replace('!==', '!=')
             try:
                 filters.append({
-                    'id': row['id'].strip(),
-                    'name': row['name'].strip(),
+                    'id': row['id'],
+                    'name': row['name'],
                     'applicable_code': compile(applicable, '<applicable>', 'eval'),
                     'expr_code': compile(expr, '<expr>', 'eval'),
-                    'enabled_default': row.get('enabled').lower() == 'true'
+                    'enabled_default': row.get('enabled', '').lower() == 'true'
                 })
             except SyntaxError as e:
                 st.warning(f"Skipping filter {row.get('id')}: {e}")
@@ -88,10 +92,11 @@ def main():
     history_digits = [([int(d) for d in h] if len(h)==5 and h.isdigit() else None) for h in history]
     history_sums = [sum(d) if d else None for d in history_digits]
     history_cats = [sum_category(s) if s is not None else None for s in history_sums]
-    # Compute parity for each historical seed and build last_six tuple (category, parity)
     history_parity = [ ('Even' if (sum(d) % 2 == 0) else 'Odd') if d else None for d in history_digits ]
-    # Only include entries where both category and parity exist
-    last_six = tuple(sum([ ( [history_cats[i], history_parity[i]] if history_cats[i] and history_parity[i] else [] ) for i in range(3)], [] ))
+    # Build last_six tuple for filters referencing exact history patterns
+    last_six = tuple(sum(([history_cats[i], history_parity[i]] if history_cats[i] and history_parity[i] else []), []) for i in range(3))
+    # Flatten to a single tuple length‐6
+    last_six = tuple(item for sub in last_six for item in sub)
 
     # Generate combos
     combos = generate_combinations(seed, method)
@@ -115,7 +120,8 @@ def main():
             'seed_cats': history_cats,
             'hot_digits': [int(d) for d in hot_digits.split(',') if d.strip().isdigit()],
             'cold_digits': [int(d) for d in cold_digits.split(',') if d.strip().isdigit()],
-            'track_combo': track_combo
+            'track_combo': track_combo,
+            'last_six': last_six
         }
         for flt in filters:
             key = f"filter_{flt['id']}"
@@ -145,7 +151,8 @@ def main():
                 'combo_sum': sum(cd),
                 'prev_seed_sum': history_sums[1],
                 'prev_prev_seed_sum': history_sums[0],
-                'seed_cats': history_cats
+                'seed_cats': history_cats,
+                'last_six': last_six
             }
             try:
                 if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
