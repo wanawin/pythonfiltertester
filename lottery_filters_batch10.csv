@@ -529,13 +529,14 @@ F528,"If (seed_sum + 19) mod 26 equals 0, eliminate even-sum combos",TRUE,"True"
 F529,"If (seed_sum + 8) mod 24 equals 0, eliminate odd-sum combos",TRUE,"True","(seed_sum + 8) % 24 == 0 and combo_sum % 2 != 0",,,,,,,,,,
 F530,"If (seed_sum + 11) mod 22 equals 0, eliminate even-sum combos",TRUE,"True","(seed_sum + 11) % 22 == 0 and combo_sum % 2 == 0",,,,,,,,,,
 F531,"If (seed_sum + 13) mod 29 equals 0, eliminate odd-sum combos",TRUE,"True","(seed_sum + 13) % 29 == 0 and combo_sum % 2 != 0",,,,,,,,,,
-F532,"Eliminate if seed sum is Low and combo sum is High",TRUE,"True","sum_category(seed_sum) == 'Low' and sum_category(combo_sum) == 'High'",,,,,,,,,,
-F533,"Eliminate if seed sum is High and combo sum is High",TRUE,"True","sum_category(seed_sum) == 'High' and sum_category(combo_sum) == 'High'",,,,,,,,,,
-F534,"Eliminate if seed sum is Very Low and combo sum is High",TRUE,"True","sum_category(seed_sum) == 'Very Low' and sum_category(combo_sum) == 'High'",,,,,,,,,,
-F535,"Eliminate if seed sum is Low and combo sum is Very Low",TRUE,"True","sum_category(seed_sum) == 'Low' and sum_category(combo_sum) == 'Very Low'",,,,,,,,,,
-F536,"Eliminate if seed sum is Mid and combo sum is Very Low",TRUE,"True","sum_category(seed_sum) == 'Mid' and sum_category(combo_sum) == 'Very Low'",,,,,,,,,,
-F537,"Eliminate if seed sum is High and combo sum is Very Low",TRUE,"True","sum_category(seed_sum) == 'High' and sum_category(combo_sum) == 'Very Low'",,,,,,,,,,
-F538,"Eliminate if seed sum is Very Low and combo sum is Very Low",TRUE,"True","sum_category(seed_sum) == 'Very Low' and sum_category(combo_sum) == 'Very Low'",,,,,,,,,,
+F532,"Eliminate if seed sum is Low and combo sum is High",TRUE,"True","""sum_category(seed_sum) == 'Low' and sum_category(combo_sum) == 'High'""",,,,,,,,,,
+F533,"Eliminate if seed sum is High and combo sum is High",TRUE,"True","""sum_category(seed_sum) == 'High' and sum_category(combo_sum) == 'High'""",,,,,,,,,,
+F534,"Eliminate if seed sum is Very Low and combo sum is High",TRUE,"True","""sum_category(seed_sum) == 'Very Low' and sum_category(combo_sum) == 'High'""",,,,,,,,,,
+F535,"Eliminate if seed sum is Low and combo sum is Very Low",TRUE,"True","""sum_category(seed_sum) == 'Low' and sum_category(combo_sum) == 'Very Low'""",,,,,,,,,,
+F536,"Eliminate if seed sum is Mid and combo sum is Very Low",TRUE,"True","""sum_category(seed_sum) == 'Mid' and sum_category(combo_sum) == 'Very Low'""",,,,,,,,,,
+F537,"Eliminate if seed sum is High and combo sum is Very Low",TRUE,"True","""sum_category(seed_sum) == 'High' and sum_category(combo_sum) == 'Very Low'""",,,,,,,,,,
+F538,"Eliminate if seed sum is Very Low and combo sum is Very Low",TRUE,"True","""sum_category(seed_sum) == 'Very Low' and sum_category(combo_sum) == 'Very Low'""",,,,,,,,,,
+
 
 
 
