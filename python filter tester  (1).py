@@ -78,7 +78,7 @@ def main():
     filters = load_filters()
 
     # Sidebar inputs
-    st.sidebar.header("🔢 DC-5 Filter Tracker Full")
+    st.sidebar.header("🔢 DC-5 Filter Tracker Sorted")
     select_all    = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
     seed          = st.sidebar.text_input("Current 5-digit seed (required):").strip()
     prev_seed     = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
@@ -97,20 +97,10 @@ def main():
     seed_digits       = [int(d) for d in seed]
     prev_digits       = [int(d) for d in prev_seed if d.isdigit()]
     prev_prev_digits  = [int(d) for d in prev_prev if d.isdigit()]
-    new_digits        = set(seed_digits) - set(prev_digits)
     hot_digits        = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
     cold_digits       = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
-    due_digits        = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]
     seed_counts       = Counter(seed_digits)
     seed_sum          = sum(seed_digits)
-    prev_sum_cat      = sum_category(seed_sum)
-
-    # Build previous pattern
-    prev_pattern = []
-    for digs in (prev_prev_digits, prev_digits, seed_digits):
-        cat = sum_category(sum(digs))
-        parity = 'Even' if sum(digs) % 2 == 0 else 'Odd'
-        prev_pattern.extend([cat, parity])
 
     def generate_context(cdigits):
         csum = sum(cdigits)
@@ -118,19 +108,13 @@ def main():
             'seed_digits':           seed_digits,
             'prev_seed_digits':      prev_digits,
             'prev_prev_seed_digits': prev_prev_digits,
-            'new_seed_digits':       new_digits,
-            'prev_pattern':          prev_pattern,
             'hot_digits':            hot_digits,
             'cold_digits':           cold_digits,
-            'due_digits':            due_digits,
             'seed_counts':           seed_counts,
             'seed_sum':              seed_sum,
-            'prev_sum_cat':          prev_sum_cat,
             'combo_digits':          cdigits,
             'combo_sum':             csum,
             'combo_sum_cat':         sum_category(csum),
-            'seed_vtracs':           set(V_TRAC_GROUPS[d] for d in seed_digits),
-            'combo_vtracs':          set(V_TRAC_GROUPS[d] for d in cdigits),
             'mirror':                MIRROR,
             'Counter':               Counter
         }
@@ -150,9 +134,7 @@ def main():
             if not active:
                 continue
             try:
-                if not eval(flt['applicable_code'], ctx, ctx):
-                    continue
-                if eval(flt['expr_code'],      ctx, ctx):
+                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
                     eliminated[combo] = flt['name']
                     break
             except Exception:
@@ -175,11 +157,10 @@ def main():
 
     # Active Filters UI with original and remaining elimination counts
     st.header("🔧 Active Filters")
-    counts = []
+    # Compute original elimination counts
+    orig_counts = []
     for flt in filters:
         orig = 0
-        rem  = 0
-        # original elimination count
         for combo in combos:
             cdigits = [int(c) for c in combo]
             ctx = generate_context(cdigits)
@@ -188,19 +169,34 @@ def main():
                     orig += 1
             except Exception:
                 pass
-        # remaining elimination count on survivors
-        for combo in survivors:
+        orig_counts.append((flt, orig))
+
+    # Sort filters by original elimination descending
+    sorted_filters = [flt for flt, _ in sorted(orig_counts, key=lambda x: x[1], reverse=True)]
+
+    # Sequentially apply filters and count remaining elimination
+    remaining = list(combos)
+    remaining_counts = []
+    for flt in sorted_filters:
+        rem = 0
+        next_remaining = []
+        for combo in remaining:
             cdigits = [int(c) for c in combo]
             ctx = generate_context(cdigits)
             try:
                 if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
                     rem += 1
+                else:
+                    next_remaining.append(combo)
             except Exception:
-                pass
-        counts.append((flt, orig, rem))
-    # Sort filters by original elimination descending
-    sorted_filters = sorted(counts, key=lambda x: x[1], reverse=True)
-    for flt, orig, rem in sorted_filters:
+                next_remaining.append(combo)
+        remaining_counts.append((flt, rem))
+        remaining = next_remaining
+
+    # Display filters in sorted order with counts
+    for flt in sorted_filters:
+        orig = next(o for f, o in orig_counts if f['id'] == flt['id'])
+        rem  = next(r for f, r in remaining_counts if f['id'] == flt['id'])
         key = f"filter_{flt['id']}"
         label = f"{flt['id']}: {flt['name']} — originally eliminates {orig}, now eliminates {rem}"
         st.checkbox(label,
