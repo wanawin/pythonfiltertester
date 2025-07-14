@@ -10,7 +10,6 @@ MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
 MIRROR = MIRROR_PAIRS
 
 def sum_category(total: int) -> str:
-    """Maps a sum to a category bucket."""
     if 0 <= total <= 15:
         return 'Very Low'
     elif 16 <= total <= 24:
@@ -22,11 +21,9 @@ def sum_category(total: int) -> str:
 
 
 def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
-    """Loads filter definitions, compiles code objects for applicability and expression."""
     if not os.path.exists(path):
         st.error(f"Filter file not found: {path}")
         st.stop()
-
     filters = []
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
@@ -51,7 +48,6 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
 
 
 def generate_combinations(seed: str, method: str) -> list:
-    """Generates sorted 5-digit combos by method."""
     all_digits = '0123456789'
     combos_set = set()
     sorted_seed = ''.join(sorted(seed))
@@ -144,7 +140,6 @@ def main():
         else:
             st.sidebar.warning("Combo not found in generated list")
 
-    # Active Filters with original and sequential elimination counts
     st.header("🔧 Active Filters")
 
     # original elimination counts
@@ -164,15 +159,10 @@ def main():
     # sort by original count descending
     sorted_by_orig = sorted(filters, key=lambda f: orig_counts[f['id']], reverse=True)
 
-    # push simple parity filters to end so sequential counts reflect unique elimination
-    parity_filters = [f for f in sorted_by_orig if '% 2' in (f.get('expression','') or '')]
-    other_filters  = [f for f in sorted_by_orig if f not in parity_filters]
-    sorted_filters = other_filters + parity_filters
-
-    # sequential elimination counts (unique elimination after previous filters)
+    # sequential elimination counts
     remaining = list(combos)
     rem_counts = {}
-    for flt in sorted_filters:
+    for flt in sorted_by_orig:
         cnt = 0
         next_rem = []
         for combo in remaining:
@@ -188,12 +178,27 @@ def main():
         rem_counts[flt['id']] = cnt
         remaining = next_rem
 
+    # standalone elimination on survivors
+    surv_counts = {f['id']: 0 for f in filters}
+    for flt in sorted_by_orig:
+        cnt = 0
+        for combo in survivors:
+            cd = [int(c) for c in combo]
+            ctx = gen_ctx(cd)
+            try:
+                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
+                    cnt += 1
+            except:
+                pass
+        surv_counts[flt['id']] = cnt
+
     # display sorted filters
-    for flt in sorted_filters:
+    for flt in sorted_by_orig:
         key   = f"filter_{flt['id']}"
         orig  = orig_counts.get(flt['id'], 0)
         now   = rem_counts.get(flt['id'], 0)
-        label = f"{flt['id']}: {flt['name']} — originally eliminates {orig}, now eliminates {now}"
+        sv    = surv_counts.get(flt['id'], 0)
+        label = f"{flt['id']}: {flt['name']} — originally eliminates {orig}, now eliminates {now}, survivors-target {sv}"
         st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
 
     with st.expander("Show remaining combinations"):
