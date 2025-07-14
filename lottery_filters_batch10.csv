@@ -543,3 +543,4 @@ F541,Eliminate if hot digits present and structure is 5 unique,True,any(d in hot
 F542,Eliminate if hot digits present and structure is 3 unique,True,any(d in hot_digits for d in combo_digits),winner_structure == 3,,,,,,,,,,
 F543,Eliminate if hot digits present and structure is 2 unique,True,any(d in hot_digits for d in combo_digits),winner_structure == 2,,,,,,,,,,
 F546,"If seed contains only 1 hot digit, eliminate all odd combinations",True,sum(d in hot_digits for d in seed_digits) == 1,combo_sum % 2 != 0,,,,,,,,,,
+F547,"xIf seed contains no hot digit, eliminate all even combinations",True,sum(d in hot_digits for d in seed_digits) == 0,combo_sum % 2 == 0,,,,,,,,,,
