@@ -542,4 +542,3 @@ F540,XXEliminate if fewer than 2 hot digits in combo,True,True,sum(d in hot_digi
 F541,Eliminate if hot digits present and structure is 5 unique,True,any(d in hot_digits for d in combo_digits),winner_structure == 5,,,,,,,,,,
 F542,Eliminate if hot digits present and structure is 3 unique,True,any(d in hot_digits for d in combo_digits),winner_structure == 3,,,,,,,,,,
 F543,Eliminate if hot digits present and structure is 2 unique,True,any(d in hot_digits for d in combo_digits),winner_structure == 2,,,,,,,,,,
-F540,XXEliminate if fewer than 1 hot digits in combo,True,True,sum(d in hot_digits for d in combo_digits) < 1,,,,,,,,,,
