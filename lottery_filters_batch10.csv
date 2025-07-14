@@ -532,7 +532,7 @@ F532,Eliminate if seed sum is 16–24 and combo sum is 34–45,True,True,(16 <= 
 F533,Eliminate if seed sum is 34–45 and combo sum is 34–45,True,True,(34 <= seed_sum <= 45) and (34 <= combo_sum <= 45),,,,,,,,,,
 F534,Eliminate if seed sum is 0–15 and combo sum is 34–45,True,True,(0 <= seed_sum <= 15) and (34 <= combo_sum <= 45),,,,,,,,,,
 F535,Eliminate if seed sum is 16–24 and combo sum is 0–15,True,True,(16 <= seed_sum <= 24) and (0 <= combo_sum <= 15),,,,,,,,,,
-F536,Eliminate if seed sum is 25–33 and combo sum is 0–15,True,True,(25 <= seed_sum <= 33) and (0 <= combo_sum <= 15),,,,,,,,,,
+F536,XXEliminate if seed sum is 25–33 and combo sum is 0–15,True,True,(25 <= seed_sum <= 33) and (0 <= combo_sum <= 15),,,,,,,,,,
 F537,Eliminate if seed sum is 34–45 and combo sum is 0–15,True,True,(34 <= seed_sum <= 45) and (0 <= combo_sum <= 15),,,,,,,,,,
 F538,Eliminate if seed sum is 0–15 and combo sum is 0–15,True,True,(0 <= seed_sum <= 15) and (0 <= combo_sum <= 15),,,,,,,,,,
 F539,Eliminate if no combo digit is hot digit,True,True,not any(d in hot_digits for d in combo_digits),,,,,,,,,,
