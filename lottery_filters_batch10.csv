@@ -538,7 +538,7 @@ F536,Eliminate if seed sum is 25–33 and combo sum is 0–15,True,True,(25 <= s
 F537,Eliminate if seed sum is 34–45 and combo sum is 0–15,True,True,(34 <= seed_sum <= 45) and (0 <= combo_sum <= 15),,,,,,,,,,
 F538,Eliminate if seed sum is 0–15 and combo sum is 0–15,True,True,(0 <= seed_sum <= 15) and (0 <= combo_sum <= 15),,,,,,,,,,
 F539,Eliminate if no combo digit is hot digit,True,True,not any(d in hot_digits for d in combo_digits),,,,,,,,,,
-F540,Eliminate if fewer than 2 hot digits in combo,True,True,sum(d in hot_digits for d in combo_digits) < 2,,,,,,,,,,
+F540,XXEliminate if fewer than 2 hot digits in combo,True,True,sum(d in hot_digits for d in combo_digits) < 2,,,,,,,,,,
 F541,Eliminate if hot digits present and structure is 5 unique,True,any(d in hot_digits for d in combo_digits),winner_structure == 5,,,,,,,,,,
 F542,Eliminate if hot digits present and structure is 3 unique,True,any(d in hot_digits for d in combo_digits),winner_structure == 3,,,,,,,,,,
 F543,Eliminate if hot digits present and structure is 2 unique,True,any(d in hot_digits for d in combo_digits),winner_structure == 2,,,,,,,,,,
