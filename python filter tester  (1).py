@@ -115,6 +115,7 @@ def main():
     eliminated = {}
     survivors  = []
 
+    # initial elimination pass
     for combo in combos:
         cdigits = [int(c) for c in combo]
         ctx = gen_ctx(cdigits)
@@ -145,7 +146,8 @@ def main():
 
     # Active Filters with original and sequential elimination counts
     st.header("🔧 Active Filters")
-    # calculate original elimination counts
+
+    # original elimination counts
     orig_counts = {f['id']: 0 for f in filters}
     for flt in filters:
         cnt = 0
@@ -159,11 +161,16 @@ def main():
                 pass
         orig_counts[flt['id']] = cnt
 
-    # sort filters by original count desc
-    sorted_filters = sorted(filters, key=lambda f: orig_counts[f['id']], reverse=True)
+    # sort by original count descending
+    sorted_by_orig = sorted(filters, key=lambda f: orig_counts[f['id']], reverse=True)
 
-    # sequential elimination counts
-    remaining = combos.copy()
+    # push simple parity filters to end so sequential counts reflect unique elimination
+    parity_filters = [f for f in sorted_by_orig if '% 2' in (f.get('expression','') or '')]
+    other_filters  = [f for f in sorted_by_orig if f not in parity_filters]
+    sorted_filters = other_filters + parity_filters
+
+    # sequential elimination counts (unique elimination after previous filters)
+    remaining = list(combos)
     rem_counts = {}
     for flt in sorted_filters:
         cnt = 0
