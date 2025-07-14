@@ -2,7 +2,6 @@ import streamlit as st
 from itertools import product
 import csv
 import os
-import re
 from collections import Counter
 
 # V-Trac and mirror mappings
@@ -34,13 +33,10 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
         for raw in reader:
             row = {k.lower(): v for k, v in raw.items()}
             row['id'] = row.get('id', row.get('fid', '')).strip()
-            # clean & parse
             for key in ('name', 'applicable_if', 'expression'):
                 if key in row and isinstance(row[key], str):
                     row[key] = row[key].strip().strip('"').strip("'")
-            # fix operators
             row['expression'] = row.get('expression', '').replace('!==', '!=')
-            # compile code
             applicable = row.get('applicable_if') or 'True'
             expr       = row.get('expression')    or 'False'
             try:
@@ -74,10 +70,8 @@ def generate_combinations(seed: str, method: str) -> list:
 
 
 def main():
-    # Load filters
     filters = load_filters()
 
-    # Sidebar inputs
     st.sidebar.header("🔢 DC-5 Filter Tracker Sorted")
     select_all    = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
     seed          = st.sidebar.text_input("Current 5-digit seed (required):").strip()
@@ -88,12 +82,10 @@ def main():
     cold_input    = st.sidebar.text_input("Cold digits (comma-separated):").strip()
     check_combo   = st.sidebar.text_input("Check specific combo:").strip()
 
-    # Validate seed
     if len(seed) != 5 or not seed.isdigit():
         st.sidebar.error("Seed must be exactly 5 digits")
         return
 
-    # Build context data
     seed_digits       = [int(d) for d in seed]
     prev_digits       = [int(d) for d in prev_seed if d.isdigit()]
     prev_prev_digits  = [int(d) for d in prev_prev if d.isdigit()]
@@ -102,7 +94,7 @@ def main():
     seed_counts       = Counter(seed_digits)
     seed_sum          = sum(seed_digits)
 
-    def generate_context(cdigits):
+    def gen_ctx(cdigits):
         csum = sum(cdigits)
         return {
             'seed_digits':           seed_digits,
@@ -114,20 +106,18 @@ def main():
             'seed_sum':              seed_sum,
             'combo_digits':          cdigits,
             'combo_sum':             csum,
-            'combo_sum_cat':         sum_category(csum),
             'mirror':                MIRROR,
-            'Counter':               Counter
+            'Counter':               Counter,
+            'sum_category':          sum_category
         }
 
-    # Generate combos
-    combos = generate_combinations(seed, method)
+    combos     = generate_combinations(seed, method)
     eliminated = {}
     survivors  = []
 
-    # Apply filters to combos
     for combo in combos:
         cdigits = [int(c) for c in combo]
-        ctx = generate_context(cdigits)
+        ctx = gen_ctx(cdigits)
         for flt in filters:
             key = f"filter_{flt['id']}"
             active = st.session_state.get(key, select_all and flt['enabled_default'])
@@ -142,10 +132,8 @@ def main():
         else:
             survivors.append(combo)
 
-    # Sidebar summary
     st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
 
-    # Check specific combo
     if check_combo:
         norm = ''.join(sorted(check_combo))
         if norm in eliminated:
@@ -155,55 +143,52 @@ def main():
         else:
             st.sidebar.warning("Combo not found in generated list")
 
-    # Active Filters UI with original and remaining elimination counts
+    # Active Filters with original and sequential elimination counts
     st.header("🔧 Active Filters")
-    # Compute original elimination counts
-    orig_counts = []
+    # calculate original elimination counts
+    orig_counts = {f['id']: 0 for f in filters}
     for flt in filters:
-        orig = 0
+        cnt = 0
         for combo in combos:
-            cdigits = [int(c) for c in combo]
-            ctx = generate_context(cdigits)
+            cd = [int(c) for c in combo]
+            ctx = gen_ctx(cd)
             try:
                 if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
-                    orig += 1
-            except Exception:
+                    cnt += 1
+            except:
                 pass
-        orig_counts.append((flt, orig))
+        orig_counts[flt['id']] = cnt
 
-    # Sort filters by original elimination descending
-    sorted_filters = [flt for flt, _ in sorted(orig_counts, key=lambda x: x[1], reverse=True)]
+    # sort filters by original count desc
+    sorted_filters = sorted(filters, key=lambda f: orig_counts[f['id']], reverse=True)
 
-    # Sequentially apply filters and count remaining elimination
-    remaining = list(combos)
-    remaining_counts = []
+    # sequential elimination counts
+    remaining = combos.copy()
+    rem_counts = {}
     for flt in sorted_filters:
-        rem = 0
-        next_remaining = []
+        cnt = 0
+        next_rem = []
         for combo in remaining:
-            cdigits = [int(c) for c in combo]
-            ctx = generate_context(cdigits)
+            cd = [int(c) for c in combo]
+            ctx = gen_ctx(cd)
             try:
                 if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
-                    rem += 1
+                    cnt += 1
                 else:
-                    next_remaining.append(combo)
-            except Exception:
-                next_remaining.append(combo)
-        remaining_counts.append((flt, rem))
-        remaining = next_remaining
+                    next_rem.append(combo)
+            except:
+                next_rem.append(combo)
+        rem_counts[flt['id']] = cnt
+        remaining = next_rem
 
-    # Display filters in sorted order with counts
+    # display sorted filters
     for flt in sorted_filters:
-        orig = next(o for f, o in orig_counts if f['id'] == flt['id'])
-        rem  = next(r for f, r in remaining_counts if f['id'] == flt['id'])
-        key = f"filter_{flt['id']}"
-        label = f"{flt['id']}: {flt['name']} — originally eliminates {orig}, now eliminates {rem}"
-        st.checkbox(label,
-                    key=key,
-                    value=st.session_state.get(key, select_all and flt['enabled_default']))
+        key   = f"filter_{flt['id']}"
+        orig  = orig_counts.get(flt['id'], 0)
+        now   = rem_counts.get(flt['id'], 0)
+        label = f"{flt['id']}: {flt['name']} — originally eliminates {orig}, now eliminates {now}"
+        st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
 
-    # Show survivors
     with st.expander("Show remaining combinations"):
         for c in survivors:
             st.write(c)
