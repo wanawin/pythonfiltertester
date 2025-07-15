@@ -320,7 +320,7 @@ F320,If combo has 5 unique digits and sum>25 must match 3 seed digits,True,"""le
 F321,XXXIf combo >3 unique digits must have cold digit,True,"""len(set(combo_digits))>3""","""not any(d in cold_digits for d in combo_digits)""",,,,,,,,,,
 F322,"XXIf spread diff >3 from seed, eliminate combo",True,"""True""","""abs((max(combo_digits)-min(combo_digits)) - (max(seed_digits)-min(seed_digits)))>3""",,,,,,,,,,
 F323,"If all combo digits >=5, eliminate combo",True,"""True""","""all(d>=5 for d in combo_digits)""",,,,,,,,,,
-F324,"XXXIf all combo digits <=4, eliminate combo",True,"""True""","""all(d<=4 for d in combo_digits)""",,,,,,,,,,
+F324,"XXXIf all combo digits <=4, eliminate combo",True,"""True""","""all(d<=4 for d in combo_digits)and combo_structure == 5""",,,,,,,,,,
 F325,"XXXIf all combo digits odd, eliminate combo",True,"""True""","""all(d%2 for d in combo_digits)""",,,,,,,,,,
 F326,"XXIf all combo digits even, eliminate combo",True,"""True""","""all(d%2==0 for d in combo_digits)""",,,,,,,,,,
 F327,XXIf seed sum=24-25 and combo <19 or >25,True,"""24<=seed_sum<=25""","""combo_sum<19 or combo_sum>25""",,,,,,,,,,
