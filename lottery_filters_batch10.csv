@@ -176,7 +176,7 @@ F176,"xIf seed includes 1,2,9 eliminate odd-sum combos",True,"""set(seed_digits)
 F177,"xIf seed includes 4,5,6 eliminate odd-sum combos",True,"""set(seed_digits).issuperset({4,5,6})""","""combo_sum % 2 != 0""",,,,,,,,,,
 F178,"xIf seed includes 1,2,5,9 eliminate odd-sum combos",True,"""set(seed_digits).issuperset({1,2,5,9})""","""combo_sum % 2 != 0""",,,,,,,,,,
 F179,If seed_sum ends in 3 and combo_sum ends in 1 eliminate,True,"""seed_sum % 10 == 3""","""combo_sum % 10 == 1""",,,,,,,,,,
-F180,XXXEliminate combo with ≥5 shared digits with seed and sum <22,True,"""True""","""sum(1 for d in combo_digits if d in seed_digits) >=5 and combo_sum <22""",,,,,,,,,,
+F180,XXXEliminate combo with ≥5 shared digits with seed and sum <22,True,"""True""","""sum(1 for d in combo_digits if d in seed_digits) >=5 and combo_sum <22 and combo_structure == 5 and combo_structure == 5""",,,,,,,,,,
 F181,XXXEliminate if seed sum 16-24 and combo sum 25-33,True,"""16 <= seed_sum <= 24""","""25 <= combo_sum <= 33""",,,,,,,,,,
 F182,XXXEliminate if seed sum 25-33 and combo sum 0-15,True,"""25 <= seed_sum <= 33""","""combo_sum <= 15""",,,,,,,,,,
 F183,"Eliminate if ≥4 prime digits (2,3,5,7) and combo is single (5 unique digits)",True,True,"sum(1 for d in combo_digits if d in {2,3,5,7}) >= 4 and winner_structure == 5",,,,,,,,,,
