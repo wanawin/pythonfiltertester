@@ -180,7 +180,7 @@ F180,XXXEliminate combo with ≥5 shared digits with seed and sum <22,True,"""Tr
 F181,XXXEliminate if seed sum 16-24 and combo sum 25-33,True,"""16 <= seed_sum <= 24""","""25 <= combo_sum <= 33""",,,,,,,,,,
 F182,XXXEliminate if seed sum 25-33 and combo sum 0-15,True,"""25 <= seed_sum <= 33""","""combo_sum <= 15""",,,,,,,,,,
 F183,"Eliminate if ≥4 prime digits (2,3,5,7) and combo is single (5 unique digits)",True,True,"sum(1 for d in combo_digits if d in {2,3,5,7}) >= 4 and winner_structure == 5",,,,,,,,,,
-F184,XXXEliminate if combo contains a digit and its mirror,True,"""True""","""any(mirror.get(d,None) in combo_digits for d in combo_digits)""",,,,,,,,,,
+F184,noooooEliminate if combo contains a digit and its mirror,True,"""True""","""any(mirror.get(d,None) in combo_digits for d in combo_digits)""",,,,,,,,,,
 F185,DUBDUBEliminate combos with exactly 3 unique digits where two appear twice,True,"""True""","""len(set(combo_digits)) == 3 and sorted(Counter(combo_digits).values())==[1,2,2]""",,,,,,,,,,
 F186,TRIPEliminate combos with three identical digits,True,"""True""","""any(v >=3 for v in Counter(combo_digits).values())""",,,,,,,,,,
 F187,Eliminate combos with four identical digits,True,"""True""","""any(v >=4 for v in Counter(combo_digits).values())""",,,,,,,,,,
