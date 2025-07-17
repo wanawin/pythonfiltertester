@@ -1,4 +1,0 @@
-id,name,enabled,applicable_if,expression
-F553,Eliminate if combo contains mirror digits and spread > 4,TRUE,True,"any(mirror.get(d, -1) in combo_digits for d in combo_digits) and (max(combo_digits) - min(combo_digits)) > 4"
-F554,Eliminate if combo contains mirror digits and fewer than 4 digits ≤ 4,TRUE,True,"any(mirror.get(d, -1) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) < 4"
-F555,Eliminate if combo contains mirror digits and not all digits are odd,TRUE,True,"any(mirror.get(d, -1) in combo_digits for d in combo_digits) and not all(d % 2 == 1 for d in combo_digits)"
