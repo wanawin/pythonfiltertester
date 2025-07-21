@@ -718,3 +718,4 @@ F550S,XXXEliminate Singles with mirror digits and fewer than 4 digits ≤ 4,True
 F551S,Eliminate Singles without any mirror digits,True,True,"len(set(combo_digits)) == 5 and not any(mirror.get(d,None) in combo_digits for d in combo_digits)",,,,,,,,,,
 F550DD,Eliminate Double-Doubles that contain mirror digits,True,True,"any(mirror.get(d,None) in combo_digits for d in combo_digits) and sorted(Counter(combo_digits).values()) == [2, 2, 1]",,,,,,,,,,
 F551D,XXXEliminate Doubles without any mirror digits,True,True,"not any(mirror.get(d,None) in combo_digits for d in combo_digits)",,,,,,,,,,
+F719,Eliminate Singles with 5 consecutive digits,True,True,"len(set(combo_digits)) == 5 and all(b - a == 1 for a, b in zip(sorted(combo_digits), sorted(combo_digits)[1:]))",,,,,,,,,,
