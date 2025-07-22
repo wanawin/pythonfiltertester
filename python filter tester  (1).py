@@ -150,7 +150,7 @@ def main():
         # remove eliminated combos for next filter
         pool = [combo for combo in pool if not (eval(flt['applicable_code'], gen_ctx([int(c) for c in combo]), gen_ctx([int(c) for c in combo])) and eval(flt['expr_code'], gen_ctx([int(c) for c in combo]), gen_ctx([int(c) for c in combo])))]
 
-    st.header("🔧 Active Filters")("🔧 Active Filters")
+    st.header("🔧 Active Filters")
     for flt in display_filters:
         key=f"filter_{flt['id']}"
         ic=init_counts[flt['id']]; dc=dynamic_counts[flt['id']]
