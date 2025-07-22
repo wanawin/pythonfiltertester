@@ -132,23 +132,25 @@ def main():
     sorted_filters=sorted(filters,key=lambda flt:(init_counts[flt['id']]==0,-init_counts[flt['id']]))
     if hide_zero: display_filters=[f for f in sorted_filters if init_counts[f['id']]>0]
     else: display_filters=sorted_filters
-    # dynamic counts
-    pool=list(combos)
-    dynamic_counts={}
+        # dynamic counts (sequential elimination)
+    pool = list(combos)
+    dynamic_counts = {}
     for flt in display_filters:
-        dc=0
-        new_pool=[]
+        dc = 0
+        # count in current pool
         for combo in pool:
-            cdigits=[int(c) for c in combo];ctx=gen_ctx(cdigits)
+            cdigits = [int(c) for c in combo]
+            ctx = gen_ctx(cdigits)
             try:
-                if eval(flt['applicable_code'],ctx,ctx):
-                    if eval(flt['expr_code'],ctx,ctx): dc+=1
-                    else: new_pool.append(combo)
-                else: new_pool.append(combo)
-            except: new_pool.append(combo)
-        dynamic_counts[flt['id']]=dc
-        pool=new_pool
-    st.header("🔧 Active Filters")
+                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
+                    dc += 1
+            except Exception:
+                pass
+        dynamic_counts[flt['id']] = dc
+        # remove eliminated combos for next filter
+        pool = [combo for combo in pool if not (eval(flt['applicable_code'], gen_ctx([int(c) for c in combo]), gen_ctx([int(c) for c in combo])) and eval(flt['expr_code'], gen_ctx([int(c) for c in combo]), gen_ctx([int(c) for c in combo])))]
+
+    st.header("🔧 Active Filters")("🔧 Active Filters")
     for flt in display_filters:
         key=f"filter_{flt['id']}"
         ic=init_counts[flt['id']]; dc=dynamic_counts[flt['id']]
