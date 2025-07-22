@@ -168,8 +168,7 @@ def main():
         label=f"{flt['id']}: {flt['name']} — {dc}/{ic} eliminated"
         st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
     with st.expander("Show remaining combinations"):
-        for c in survivors:
-            st.write(c)("Show remaining combinations"):
-        for c in survivors: st.write(c)
+    for c in survivors:
+        st.write(c)
 
-if __name__=='__main__': main()
+if __name__=='__main__': main()=='__main__': main()
