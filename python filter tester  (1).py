@@ -160,18 +160,18 @@ def main():
         dynamic_counts[flt['id']]=dc
         pool=survivors_pool
 
-    st.header("🔧 Active Filters")
-for flt in display_filters:
-    key = f"filter_{flt['id']}"
-    ic = init_counts[flt['id']]
-    dc = dynamic_counts.get(flt['id'], 0)
-    label = f"{flt['id']}: {flt['name']} — {dc}/{ic} eliminated"
-    st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
+        st.header("🔧 Active Filters")
+    for flt in display_filters:
+        key = f"filter_{flt['id']}"
+        ic = init_counts[flt['id']]
+        dc = dynamic_counts.get(flt['id'], 0)
+        label = f"{flt['id']}: {flt['name']} — {dc}/{ic} eliminated"
+        st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
 
-# Show survivors under expander
-with st.expander("Show remaining combinations"):
-    for c in survivors:
-        st.write(c)
+    # Show survivors under expander
+    with st.expander("Show remaining combinations"):
+        for c in survivors:
+            st.write(c)
 
 if __name__ == '__main__':
     main()
