@@ -121,42 +121,55 @@ def main():
         if norm in eliminated: st.sidebar.info(f"Combo {check_combo} eliminated by {eliminated[norm]}")
         elif norm in survivors: st.sidebar.success(f"Combo {check_combo} survived all filters")
         else: st.sidebar.warning("Combo not found in generated list")
-    # initial counts
+        # initial counts
     init_counts={flt['id']:0 for flt in filters}
     for flt in filters:
         for combo in combos:
-            cdigits=[int(c) for c in combo];ctx=gen_ctx(cdigits)
+            cdigits=[int(c) for c in combo]
+            ctx=gen_ctx(cdigits)
             try:
-                if eval(flt['applicable_code'],ctx,ctx) and eval(flt['expr_code'],ctx,ctx): init_counts[flt['id']]+=1
-            except: pass
-    sorted_filters=sorted(filters,key=lambda flt:(init_counts[flt['id']]==0,-init_counts[flt['id']]))
-    if hide_zero: display_filters=[f for f in sorted_filters if init_counts[f['id']]>0]
-    else: display_filters=sorted_filters
-        # dynamic counts (sequential elimination)
-    pool = list(combos)
-    dynamic_counts = {}
-    for flt in display_filters:
-        dc = 0
-        # count in current pool
-        for combo in pool:
-            cdigits = [int(c) for c in combo]
-            ctx = gen_ctx(cdigits)
-            try:
-                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
-                    dc += 1
-            except Exception:
+                if eval(flt['applicable_code'],ctx,ctx) and eval(flt['expr_code'],ctx,ctx):
+                    init_counts[flt['id']]+=1
+            except:
                 pass
-        dynamic_counts[flt['id']] = dc
-        # remove eliminated combos for next filter
-        pool = [combo for combo in pool if not (eval(flt['applicable_code'], gen_ctx([int(c) for c in combo]), gen_ctx([int(c) for c in combo])) and eval(flt['expr_code'], gen_ctx([int(c) for c in combo]), gen_ctx([int(c) for c in combo])))]
+    # sort filters by initial elimination count
+    sorted_filters=sorted(filters, key=lambda flt: (init_counts[flt['id']]==0, -init_counts[flt['id']]))
+    # choose which to display based on hide_zero
+    if hide_zero:
+        display_filters=[flt for flt in sorted_filters if init_counts[flt['id']]>0]
+    else:
+        display_filters=sorted_filters
+
+    # dynamic counts (sequential elimination)
+    pool=list(combos)
+    dynamic_counts={}
+    for flt in display_filters:
+        # count how many this filter removes from the current pool
+        dc=0
+        survivors_pool=[]
+        for combo in pool:
+            cdigits=[int(c) for c in combo]
+            ctx=gen_ctx(cdigits)
+            try:
+                if eval(flt['applicable_code'],ctx,ctx) and eval(flt['expr_code'],ctx,ctx):
+                    dc+=1
+                else:
+                    survivors_pool.append(combo)
+            except:
+                survivors_pool.append(combo)
+        dynamic_counts[flt['id']]=dc
+        pool=survivors_pool
 
     st.header("🔧 Active Filters")
     for flt in display_filters:
         key=f"filter_{flt['id']}"
-        ic=init_counts[flt['id']]; dc=dynamic_counts[flt['id']]
+        ic=init_counts[flt['id']]
+        dc=dynamic_counts.get(flt['id'],0)
         label=f"{flt['id']}: {flt['name']} — {dc}/{ic} eliminated"
-        st.checkbox(label,key=key,value=st.session_state.get(key,select_all and flt['enabled_default']))
+        st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
     with st.expander("Show remaining combinations"):
+        for c in survivors:
+            st.write(c)("Show remaining combinations"):
         for c in survivors: st.write(c)
 
 if __name__=='__main__': main()
