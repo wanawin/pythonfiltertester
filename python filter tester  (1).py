@@ -27,7 +27,6 @@ def load_filters(path: str = 'lottery_filters_batch10.csv') -> list:
         st.error(f"Filter file not found: {path}")
         st.stop()
     filters = []
-    import csv
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for raw in reader:
@@ -54,7 +53,6 @@ def generate_combinations(seed: str, method: str) -> list:
     all_digits = '0123456789'
     combos_set = set()
     sorted_seed = ''.join(sorted(seed))
-    from itertools import product
     if method=='1-digit':
         for d in sorted_seed:
             for p in product(all_digits, repeat=4):
@@ -70,22 +68,21 @@ def generate_combinations(seed: str, method: str) -> list:
 
 def main():
     filters = load_filters()
-    # Sidebar inputs
     st.sidebar.header("🔢 DC-5 Filter Tracker Full")
-    select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
-    seed       = st.sidebar.text_input("Current 5-digit seed (required):").strip()
-    prev_seed  = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
-    prev_prev  = st.sidebar.text_input("Previous previous 5-digit seed (optional):").strip()
-    method     = st.sidebar.selectbox("Generation Method:", ["1-digit","2-digit pair"])
-    hot_input  = st.sidebar.text_input("Hot digits (comma-separated):").strip()
-    cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
-    check_combo= st.sidebar.text_input("Check specific combo:").strip()
-    hide_zero  = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True)
+    select_all  = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
+    seed        = st.sidebar.text_input("Current 5-digit seed (required):").strip()
+    prev_seed   = st.sidebar.text_input("Previous 5-digit seed (optional):").strip()
+    prev_prev   = st.sidebar.text_input("Previous previous 5-digit seed (optional):").strip()
+    method      = st.sidebar.selectbox("Generation Method:", ["1-digit","2-digit pair"])
+    hot_input   = st.sidebar.text_input("Hot digits (comma-separated):").strip()
+    cold_input  = st.sidebar.text_input("Cold digits (comma-separated):").strip()
+    check_combo = st.sidebar.text_input("Check specific combo:").strip()
+    hide_zero   = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True)
 
-    # Validate seed
     if len(seed)!=5 or not seed.isdigit():
         st.sidebar.error("Seed must be exactly 5 digits")
         return
+
     # Build context data
     seed_digits      = [int(d) for d in seed]
     prev_digits      = [int(d) for d in prev_seed if d.isdigit()]
@@ -98,15 +95,14 @@ def main():
     seed_vtracs      = set(V_TRAC_GROUPS[d] for d in seed_digits)
     seed_sum         = sum(seed_digits)
     prev_sum_cat     = sum_category(seed_sum)
-    # Previous pattern as tuple for comparisons
-    prev_pattern=[]
+    prev_pattern     = []
     for digs in (prev_prev_digits, prev_digits, seed_digits):
-        cat = sum_category(sum(digs))
-        parity = 'Even' if sum(digs)%2==0 else 'Odd'
+        cat   = sum_category(sum(digs))
+        parity= 'Even' if sum(digs)%2==0 else 'Odd'
         prev_pattern.extend([cat,parity])
     prev_pattern=tuple(prev_pattern)
     def gen_ctx(cdigits):
-        csum=sum(cdigits)
+        csum = sum(cdigits)
         return {'seed_digits':seed_digits,'prev_seed_digits':prev_digits,
                 'prev_prev_seed_digits':prev_prev_digits,'new_seed_digits':new_digits,
                 'prev_pattern':prev_pattern,'hot_digits':hot_digits,'cold_digits':cold_digits,
@@ -116,75 +112,50 @@ def main():
                 'combo_vtracs':set(V_TRAC_GROUPS[d] for d in cdigits),'mirror':MIRROR,
                 'common_to_both':set(prev_digits)&set(prev_prev_digits),'last2':set(prev_digits)|set(prev_prev_digits),
                 'Counter':Counter}
-    # Generate combos & apply filters
-    combos=generate_combinations(seed,method)
-    eliminated={}  
-    survivors=[]
+    combos = generate_combinations(seed,method)
+    eliminated = {}
+    survivors  = []
     for combo in combos:
-        cdigits=[int(c) for c in combo]
-        ctx=gen_ctx(cdigits)
+        cdigits=[int(c) for c in combo];ctx=gen_ctx(cdigits)
         for flt in filters:
-            key=f"filter_{flt['id']}"
-            active=st.session_state.get(key, select_all and flt['enabled_default'])
-            if not active: continue
+            key= f"filter_{flt['id']}"
+            if not st.session_state.get(key, select_all and flt['enabled_default']): continue
             try:
                 if not eval(flt['applicable_code'],ctx,ctx): continue
                 if eval(flt['expr_code'],ctx,ctx):
-                    eliminated[combo]=flt['name']
-                    break
+                    eliminated[combo]=flt['name'];break
             except: continue
-        else:
-            survivors.append(combo)
-    # Summary
+        else: survivors.append(combo)
     st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
-    # Check combo
     if check_combo:
         norm=''.join(sorted(check_combo))
-        if norm in eliminated:
-            st.sidebar.info(f"Combo {check_combo} eliminated by {eliminated[norm]}")
-        elif norm in survivors:
-            st.sidebar.success(f"Combo {check_combo} survived all filters")
-        else:
-            st.sidebar.warning("Combo not found in generated list")
-    # Compute initial counts
-    initial_counts={flt['id']:0 for flt in filters}
+        if norm in eliminated: st.sidebar.info(f"Combo {check_combo} eliminated by {eliminated[norm]}")
+        elif norm in survivors:st.sidebar.success(f"Combo {check_combo} survived all filters")
+        else: st.sidebar.warning("Combo not found in generated list")
+
+    # Initial elimination counts
+    init_counts={flt['id']:0 for flt in filters}
     for flt in filters:
         cnt=0
         for combo in combos:
-            cd=[int(c) for c in combo]
-            ctx=gen_ctx(cd)
+            cdigits=[int(c) for c in combo];ctx=gen_ctx(cdigits)
             try:
                 if eval(flt['applicable_code'],ctx,ctx) and eval(flt['expr_code'],ctx,ctx): cnt+=1
             except: pass
-        initial_counts[flt['id']]=cnt
-    # Sort and filter for display
-    sorted_filters=sorted(filters,key=lambda flt:(initial_counts[flt['id']]==0,-initial_counts[flt['id']]))
+        init_counts[flt['id']]=cnt
+    # Sort filters by initial count
+    sorted_filters= sorted(filters, key=lambda flt:(init_counts[flt['id']]==0,-init_counts[flt['id']]))
     if hide_zero:
-        display_filters=[flt for flt in sorted_filters if initial_counts[flt['id']]>0]
-    else:
-        display_filters=sorted_filters
-    # Sequential dynamic counts
-    temp=list(combos)
-    dynamic_counts={}
-    for flt in display_filters:
-        dc=0
-        rem=[]
-        for combo in temp:
-            cd=[int(c) for c in combo];ctx=gen_ctx(cd)
-            if eval(flt['applicable_code'],ctx,ctx) and eval(flt['expr_code'],ctx,ctx):
-                dc+=1
-            else:
-                rem.append(combo)
-        dynamic_counts[flt['id']]=dc
-        temp=rem
-    # Render checkboxes
+        display_filters=[flt for flt in sorted_filters if init_counts[flt['id']]>0]
+    else: display_filters=sorted_filters
+
     st.header("🔧 Active Filters")
+    # Render with initial counts
     for flt in display_filters:
-        key=f"filter_{flt['id']}"
-        count=dynamic_counts.get(flt['id'],0)
-        label=f"{flt['id']}: {flt['name']} — eliminated {count}"
-        st.checkbox(label,key=key,value=st.session_state.get(key,select_all and flt['enabled_default']))
-    # Show survivors
+        key = f"filter_{flt['id']}"
+        count = init_counts[flt['id']]
+        label = f"{flt['id']}: {flt['name']} — eliminated {count}"
+        st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
     with st.expander("Show remaining combinations"):
         for c in survivors: st.write(c)
 
