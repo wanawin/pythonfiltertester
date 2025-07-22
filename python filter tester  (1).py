@@ -140,22 +140,29 @@ def main():
     else:
         display_filters=sorted_filters
 
-        # dynamic counts (sequential elimination)
+            # dynamic counts (sequential elimination)
     pool = list(combos)
     dynamic_counts = {}
     for flt in display_filters:
+        key = f"filter_{flt['id']}"
+        # only apply filter if active
+        active = st.session_state.get(key, select_all and flt['enabled_default'])
         dc = 0
         survivors_pool = []
-        for combo in pool:
-            cdigits = [int(c) for c in combo]
-            ctx = gen_ctx(cdigits)
-            try:
-                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
-                    dc += 1
-                else:
+        if active:
+            for combo in pool:
+                cdigits = [int(c) for c in combo]
+                ctx = gen_ctx(cdigits)
+                try:
+                    if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
+                        dc += 1
+                    else:
+                        survivors_pool.append(combo)
+                except:
                     survivors_pool.append(combo)
-            except:
-                survivors_pool.append(combo)
+        else:
+            # if filter is inactive, it eliminates nothing from current pool
+            survivors_pool = pool.copy()
         dynamic_counts[flt['id']] = dc
         pool = survivors_pool
 
