@@ -169,8 +169,10 @@ def main():
         initial_counts[flt['id']] = cnt
     # Determine relevant filters (those eliminating at least one combo)
     relevant_filters = [flt for flt in filters if initial_counts[flt['id']] > 0]
-    # Sidebar summary showing count of relevant filters
-    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(relevant_filters)}")f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(filters)}")
+        # Sidebar summary showing count of relevant filters
+    st.sidebar.markdown(
+        f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(relevant_filters)}"
+    )}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(relevant_filters)}")f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(filters)}")
 
     # Active Filters UI -- exactly as original
     st.header("🔧 Active Filters")
