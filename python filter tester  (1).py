@@ -154,8 +154,23 @@ def main():
         else:
             survivors.append(combo)
 
-    # Sidebar summary with filter count
-    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(filters)}")
+        # Compute initial elimination counts for all filters
+    initial_counts = {}
+    for flt in filters:
+        cnt = 0
+        for combo in combos:
+            cdigits = [int(c) for c in combo]
+            ctx = gen_ctx(cdigits)
+            try:
+                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
+                    cnt += 1
+            except:
+                pass
+        initial_counts[flt['id']] = cnt
+    # Determine relevant filters (those eliminating at least one combo)
+    relevant_filters = [flt for flt in filters if initial_counts[flt['id']] > 0]
+    # Sidebar summary showing count of relevant filters
+    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(relevant_filters)}")f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(filters)}")
 
     # Active Filters UI -- exactly as original
     st.header("🔧 Active Filters")
