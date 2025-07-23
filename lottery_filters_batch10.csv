@@ -1,7 +1,7 @@
 id,name,enabled,applicable_if,expression,Unnamed: 5,Unnamed: 6,Unnamed: 7,Unnamed: 8,Unnamed: 9,Unnamed: 10,Unnamed: 11,Unnamed: 12,Unnamed: 13,Unnamed: 14
-F001,Eliminate combos where combo sum equals 1,True,"""True""","""combo_sum == 1""",,,,,,,,,,
-F002,"XXXIf seed includes 4,5,6,8 eliminate all even-sum combos",True,"""set(seed_digits).issuperset({4,5,6,8})""","""combo_sum % 2 == 0""",,,,,,,,,,
-F003,"If seed includes 1,2,4,7 eliminate all even-sum combos",True,"""set(seed_digits).issuperset({1,2,4,7})""","""combo_sum % 2 == 0""",,,,,,,,,,
+0F001,Eliminate combos where combo sum equals 1,True,"""True""","""combo_sum == 1""",,,,,,,,,,
+4F002,"XXXIf seed includes 4,5,6,8 eliminate all even-sum combos",True,"""set(seed_digits).issuperset({4,5,6,8})""","""combo_sum % 2 == 0""",,,,,,,,,,
+2F003,"If seed includes 1,2,4,7 eliminate all even-sum combos",True,"""set(seed_digits).issuperset({1,2,4,7})""","""combo_sum % 2 == 0""",,,,,,,,,,
 F004,"If seed includes 1,2,6,8 eliminate all even-sum combos",True,"""set(seed_digits).issuperset({1,2,6,8})""","""combo_sum % 2 == 0""",,,,,,,,,,
 F005,"If seed includes 5,7,8,9 eliminate all even-sum combos",True,"""set(seed_digits).issuperset({5,7,8,9})""","""combo_sum % 2 == 0""",,,,,,,,,,
 F006,"If seed includes 4,6,7,8 eliminate all even-sum combos",True,"""set(seed_digits).issuperset({4,6,7,8})""","""combo_sum % 2 == 0""",,,,,,,,,,
