@@ -132,13 +132,16 @@ def main():
                     init_counts[flt['id']]+=1
             except:
                 pass
-    # sort filters by initial elimination count
-    sorted_filters=sorted(filters, key=lambda flt: (init_counts[flt['id']]==0, -init_counts[flt['id']]))
-    # choose which to display based on hide_zero
+        # sort filters by initial elimination count (ascending)
+    sorted_filters = sorted(filters, key=lambda flt: init_counts[flt['id']])
+        # choose which to display based on hide_zero
     if hide_zero:
-        display_filters=[flt for flt in sorted_filters if init_counts[flt['id']]>0]
+        display_filters = [flt for flt in sorted_filters if init_counts[flt['id']] > 0]
     else:
-        display_filters=sorted_filters
+        display_filters = sorted_filters
+    # count displayed filters
+    num_display = len(display_filters)
+
 
             # dynamic counts (sequential elimination)
     pool = list(combos)
@@ -166,14 +169,16 @@ def main():
         dynamic_counts[flt['id']] = dc
         pool = survivors_pool
 
-    # Render Active Filters after counts
+        # Render Active Filters after counts
     st.header("🔧 Active Filters")
-    for flt in display_filters:
+    for idx, flt in enumerate(display_filters, 1):
         key = f"filter_{flt['id']}"
         ic = init_counts[flt['id']]
         dc = dynamic_counts.get(flt['id'], 0)
-        label = f"{flt['id']}: {flt['name']} — {dc}/{ic} eliminated"
-        st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
+        label = f"{idx}. {flt['id']}: {flt['name']} — {dc}/{ic} eliminated"
+        st.checkbox(label,
+                    key=key,
+                    value=st.session_state.get(key, select_all and flt['enabled_default']))
 
     # Show survivors under expander
     with st.expander("Show remaining combinations"):
