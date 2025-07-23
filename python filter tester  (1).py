@@ -116,4 +116,5 @@ def main():
             except: continue
         else: survivors.append(combo)
         # Sidebar summary with filter count
-    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(filters)}")
+        # Sidebar summary with count of displayed filters
+    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(display_filters)}")
