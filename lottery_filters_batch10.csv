@@ -185,7 +185,7 @@ id,name,enabled,applicable_if,expression,Unnamed: 5,Unnamed: 6,Unnamed: 7,Unname
 63F186,TRIPEliminate combos with three identical digits,True,"""True""","""any(v >=3 for v in Counter(combo_digits).values())""",,,,,,,,,,
 3F187,Eliminate combos with four identical digits,True,"""True""","""any(v >=4 for v in Counter(combo_digits).values())""",,,,,,,,,,
 15F188,XEliminate combos if combo sum equals mirror of seed sum,True,"""True""","""combo_sum == sum(mirror.get(int(x),int(x)) for x in str(seed_sum))""",,,,,,,,,,
-0F189,XEliminate if no combo digit in due_digits,True,"""True""","""not any(d in due_digits for d in combo_digits)""",,,,,,,,,,
+101F189,XEliminate if no combo digit in due_digits,True,"""True""","""not any(d in due_digits for d in combo_digits)""",,,,,,,,,,
 71F190,XEliminate if combo sum last digit equals seed sum first digit,True,"""True""","""int(str(combo_sum)[-1]) == int(str(seed_sum)[0])""",,,,,,,,,,
 6F191,XEliminate if seed has 0 and 7 and combo sum <8 or >28,True,"""set(seed_digits).issuperset({0,7})""","""combo_sum <8 or combo_sum >28""",,,,,,,,,,
 1F192,XEliminate if seed has 0 and 6 and combo sum <8 or >29,True,"""set(seed_digits).issuperset({0,6})""","""combo_sum <8 or combo_sum >29""",,,,,,,,,,
