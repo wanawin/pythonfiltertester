@@ -154,7 +154,7 @@ def main():
         else:
             survivors.append(combo)
 
-            # Compute initial elimination counts for all filters
+                # Compute initial elimination counts for all filters
     initial_counts = {}
     for flt in filters:
         cnt = 0
@@ -177,9 +177,20 @@ def main():
     )
 
     # Active Filters UI -- exactly as original
-    st.header("🔧 Active Filters")("Show remaining combinations"):
+    st.header("🔧 Active Filters")
+    for flt in relevant_filters:
+        key = f"filter_{flt['id']}"
+        count = initial_counts[flt['id']]
+        label = f"{flt['id']}: {flt['name']} — eliminated {count}"
+        st.checkbox(label,
+                    key=key,
+                    value=st.session_state.get(key, select_all and flt['enabled_default']))
+
+    # Show survivors
+    with st.expander("Show remaining combinations"):
         for c in survivors:
             st.write(c)
 
 if __name__ == '__main__':
+    main()
     main()
