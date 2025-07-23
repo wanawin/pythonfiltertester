@@ -140,15 +140,14 @@ def main():
     else:
         display_filters = sorted_filters
     # count displayed filters
-    num_display = len(display_filters)
+    
 
 
-            # dynamic counts (sequential elimination)
+                # dynamic counts (sequential elimination)
     pool = list(combos)
     dynamic_counts = {}
     for flt in display_filters:
         key = f"filter_{flt['id']}"
-        # only apply filter if active
         active = st.session_state.get(key, select_all and flt['enabled_default'])
         dc = 0
         survivors_pool = []
@@ -164,26 +163,29 @@ def main():
                 except:
                     survivors_pool.append(combo)
         else:
-            # if filter is inactive, it eliminates nothing from current pool
             survivors_pool = pool.copy()
         dynamic_counts[flt['id']] = dc
         pool = survivors_pool
 
-        # Render Active Filters after counts
+    # Display Active Filters with numbering and count
+    num_display = len(display_filters)
     st.header("🔧 Active Filters")
-    for idx, flt in enumerate(display_filters, 1):
+    for idx, flt in enumerate(display_filters, start=1):
         key = f"filter_{flt['id']}"
         ic = init_counts[flt['id']]
         dc = dynamic_counts.get(flt['id'], 0)
         label = f"{idx}. {flt['id']}: {flt['name']} — {dc}/{ic} eliminated"
         st.checkbox(label,
                     key=key,
+                    value=st.session_state.get(key, select_all and flt['enabled_default']))(label,
+                    key=key,
                     value=st.session_state.get(key, select_all and flt['enabled_default']))
 
     # Show survivors under expander
     with st.expander("Show remaining combinations"):
-        for c in survivors:
-            st.write(c)
+        for combo in survivors:
+            st.write(combo)
 
 if __name__ == '__main__':
+    main()
     main()
