@@ -154,7 +154,7 @@ def main():
         else:
             survivors.append(combo)
 
-        # Compute initial elimination counts for all filters
+            # Compute initial elimination counts for all filters
     initial_counts = {}
     for flt in filters:
         cnt = 0
@@ -167,28 +167,17 @@ def main():
             except:
                 pass
         initial_counts[flt['id']] = cnt
+
     # Determine relevant filters (those eliminating at least one combo)
     relevant_filters = [flt for flt in filters if initial_counts[flt['id']] > 0]
-        # Sidebar summary showing count of relevant filters
+
+    # Sidebar summary showing count of relevant filters
     st.sidebar.markdown(
         f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(relevant_filters)}"
-    )}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(relevant_filters)}")f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(filters)}")
+    )
 
     # Active Filters UI -- exactly as original
-    st.header("🔧 Active Filters")
-    for flt in filters:
-        key = f"filter_{flt['id']}"
-        count = sum(1 for combo in combos
-                    if st.session_state.get(key, select_all and flt['enabled_default'])
-                    and eval(flt['applicable_code'], gen_ctx([int(c) for c in combo]), gen_ctx([int(c) for c in combo]))
-                    and eval(flt['expr_code'],      gen_ctx([int(c) for c in combo]), gen_ctx([int(c) for c in combo])))
-        label = f"{flt['id']}: {flt['name']} — eliminated {count}"
-        st.checkbox(label,
-                    key=key,
-                    value=st.session_state.get(key, select_all and flt['enabled_default']))
-
-    # Show survivors
-    with st.expander("Show remaining combinations"):
+    st.header("🔧 Active Filters")("Show remaining combinations"):
         for c in survivors:
             st.write(c)
 
