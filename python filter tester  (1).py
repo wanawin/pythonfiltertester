@@ -1,4 +1,4 @@
-import streamlit as st
+
 from itertools import product
 import csv
 import os
@@ -117,4 +117,5 @@ def main():
         else: survivors.append(combo)
         # Sidebar summary with filter count
         # Sidebar summary with count of displayed filters
-    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(display_filters)}")
+        # Sidebar summary with count of all filters
+    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(filters)}")
