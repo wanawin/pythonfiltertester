@@ -115,7 +115,7 @@ def main():
                 if eval(flt['expr_code'],ctx,ctx): eliminated[combo]=flt['name'];break
             except: continue
         else: survivors.append(combo)
-    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
+    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}  Filters: {len(display_filters)}")
     if check_combo:
         norm=''.join(sorted(check_combo))
         if norm in eliminated: st.sidebar.info(f"Combo {check_combo} eliminated by {eliminated[norm]}")
