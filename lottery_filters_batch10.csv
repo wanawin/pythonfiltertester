@@ -544,7 +544,7 @@ id,name,enabled,applicable_if,expression,Unnamed: 5,Unnamed: 6,Unnamed: 7,Unname
 296F549,XEliminate if combo contains mirror digits and spread > 4,True,"""True""","""any(mirror.get(d,None) in combo_digits for d in combo_digits) and max(combo_digits) - min(combo_digits) > 4""",,,,,,,,,,
 367F550,DNUEliminate if combo contains mirror digits and has fewer than 4 digits ≤ 4,True,True,"any(mirror.get(d,None) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) < 4",,,,,,,,,,
 346F551,DNUEliminate if combo contains mirror digits and not all digits are odd,True,True,"any(mirror.get(d,None) in combo_digits for d in combo_digits) and not all(d % 2 == 1 for d in combo_digits)",,,,,,,,,,
-65F552,Eliminate if combo contains no mirror digits and spread ≤ 4,True,"""True""","""not any(mirror.get(d,None) in combo_digits for d in combo_digits) and max(combo_digits) - min(combo_digits) <= 4""",,,,,,,,,,
+105F552,Eliminate if combo contains no mirror digits and spread ≤ 4,True,"""True""","""not any(mirror.get(d,None) in combo_digits for d in combo_digits) and max(combo_digits) - min(combo_digits) <= 4""",,,,,,,,,,
 41F553,Eliminate if combo contains no mirror digits and has 4 or more digits ≤ 4,True,"""True""","""not any(mirror.get(d,None) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) >= 4""",,,,,,,,,,
 24F554,Eliminate if combo contains no mirror digits and all digits are odd,True,"""True""","""not any(mirror.get(d,None) in combo_digits for d in combo_digits) and all(d % 2 == 1 for d in combo_digits)""",,,,,,,,,,
 254F555,XEliminate if combo contains four digits and their mirrors,True,"""True""","""""""sum(1 for d in combo_digits if mirror.get(d) in combo_digits) >= 4""""""",,,,,,,,,,
