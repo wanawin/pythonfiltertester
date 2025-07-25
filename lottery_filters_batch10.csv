@@ -53,7 +53,7 @@ id,name,enabled,applicable_if,expression,Unnamed: 5,Unnamed: 6,Unnamed: 7,Unname
 3F052,"If seed is FullHouse structure, eliminate even-sum combos",True,"""set(seed_counts.values()) == {2,3}""","""combo_sum % 2 == 0""",,,,,,,,,,
 202F053,XXXEliminate combo missing new digits from seed vs prev_seed,True,"""new_seed_digits and not new_seed_digits.intersection(combo_digits)""","""True""",,,,,,,,,,
 147F054,XXXEliminate combo with >=2 digits from both prev draws,True,"""sum(d in common_to_both for d in combo_digits) >= 2""","""True""",,,,,,,,,,
-86F055,XXEliminate combo missing at least 2 digits from last 2 draws combined,True,"""len(last2.intersection(combo_digits)) < 2""","""True""",,,,,,,,,,
+91F055,XXEliminate combo missing at least 2 digits from last 2 draws combined,True,"""len(last2.intersection(combo_digits)) < 2""","""True""",,,,,,,,,,
 643F056,DNUEliminate combo with at least 2 distinct digits from last 2 draws,True,"""sum(1 for d in set(combo_digits) if d in last2) >= 2""","""True""",,,,,,,,,,
 95F057,XXEliminate combo missing any new digit vs last 2 draws,True,"""not any(d not in last2 for d in combo_digits)""","""True""",,,,,,,,,,
 6F058,If seed_sum ends in 7 and combo_sum ends in 8 eliminate,True,"""seed_sum % 10 == 7""","""combo_sum % 10 == 8""",,,,,,,,,,
