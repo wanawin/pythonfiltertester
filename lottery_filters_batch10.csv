@@ -197,7 +197,7 @@ NO75F196,"XEliminate if seed has 5 and combo has neither 2,3,1",True,"""5 in see
 40F198,XEliminate if no combo digit is cold digit,True,"""True""","""not any(d in cold_digits for d in combo_digits)""",,,,,,,,,,
 21F199,XEliminate if combo lacks mirrors of any seed digits,True,"""True""","""not any(mirror.get(d,None) in combo_digits for d in seed_digits) and combo_structure == 5 and combo_structure == 5""",,,,,,,,,,
 290F200,XEliminate if combo has any digit equal to mirror of seed sum last digit,True,"""True""","""any(d == mirror.get(int(str(seed_sum)[-1]),-1) for d in combo_digits)""",,,,,,,,,,
-71F201,"XEliminate if seed has 0 and combo lacks 1,2,3",True,"""0 in seed_digits""","""1 not in combo_digits and 2 not in combo_digits and 3 not in combo_digits""",,,,,,,,,,
+NO71F201,"XEliminate if seed has 0 and combo lacks 1,2,3",True,"""0 in seed_digits""","""1 not in combo_digits and 2 not in combo_digits and 3 not in combo_digits""",,,,,,,,,,
 NO139F202,XEliminate if all combo digits >=3,True,"""True""","""all(d >=3 for d in combo_digits)""",,,,,,,,,,
 NO204F203,XEliminate if combo has 2 or more digits >=8,True,"""True""","""sum(1 for d in combo_digits if d >=8) >=2""",,,,,,,,,,
 0F204,XEliminate if combo spread <4,True,"""True""","""max(combo_digits) - min(combo_digits) <4 and combo_structure == 5""",,,,,,,,,,
