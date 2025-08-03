@@ -533,7 +533,7 @@ NO296F355,XIf any combo digit = mirror of seed sum last digit,True,"""True""",""
 27F535,Eliminate if seed sum is 16–24 and combo sum is 0–15,True,"""True""","""(16 <= seed_sum <= 24) and (0 <= combo_sum <= 15)""",,,,,,,,,,
 23F536,XXEliminate if seed sum is 25–33 and combo sum is 0–15,True,"""True""","""(25 <= seed_sum <= 33) and (0 <= combo_sum <= 15)""",,,,,,,,,,
 18F537,Eliminate if seed sum is 34–45 and combo sum is 0–15,True,"""True""","""(34 <= seed_sum <= 45) and (0 <= combo_sum <= 15)""",,,,,,,,,,
-15F538,Eliminate if seed sum is 0–15 and combo sum is 0–15,True,"""True""","""(0 <= seed_sum <= 15) and (0 <= combo_sum <= 15)""",,,,,,,,,,
+N015F538,Eliminate if seed sum is 0–15 and combo sum is 0–15,True,"""True""","""(0 <= seed_sum <= 15) and (0 <= combo_sum <= 15)""",,,,,,,,,,
 124F539,XEliminate if no combo digit is hot digit,True,"""True""","""not any(d in hot_digits for d in combo_digits)""",,,,,,,,,,
 NO188F540,XEliminate if fewer than 2 hot digits in combo,True,"""True""","""sum(d in hot_digits for d in combo_digits) < 2""",,,,,,,,,,
 45F541,XEliminate if hot digits present and structure is 5 unique,True,"""any(d in hot_digits for d in combo_digits)""","""winner_structure == 5""",,,,,,,,,,
