@@ -180,7 +180,7 @@ NO95F057,XXEliminate combo missing any new digit vs last 2 draws,True,"""not any
 NO124F181,XEliminate if seed sum 16-24 and combo sum 25-33,True,"""16 <= seed_sum <= 24""","""25 <= combo_sum <= 33""",,,,,,,,,,
 33F182,XEliminate if seed sum 25-33 and combo sum 0-15,True,"""25 <= seed_sum <= 33""","""combo_sum <= 15""",,,,,,,,,,
 01F183,"Eliminate if ≥4 prime digits (2,3,5,7) and combo is single (5 unique digits)",True,"""True""","""sum(1 for d in combo_digits if d in {2,3,5,7}) >= 4 and winner_structure == 5""",,,,,,,,,,
-262F184,XEliminate if combo contains no  digit and its mirror,True,"""True""","""not any(mirror.get(d, None) in combo_digits for d in combo_digits)""",,,,,,,,,,
+NO262F184,XEliminate if combo contains no  digit and its mirror,True,"""True""","""not any(mirror.get(d, None) in combo_digits for d in combo_digits)""",,,,,,,,,,
 82F185,DUBDUBEliminate combos with exactly 3 unique digits where two appear twice,True,"""True""","""len(set(combo_digits)) == 3 and sorted(Counter(combo_digits).values())==[1,2,2]""",,,,,,,,,,
 63F186,TRIPEliminate combos with three identical digits,True,"""True""","""any(v >=3 for v in Counter(combo_digits).values())""",,,,,,,,,,
 3F187,Eliminate combos with four identical digits,True,"""True""","""any(v >=4 for v in Counter(combo_digits).values())""",,,,,,,,,,
