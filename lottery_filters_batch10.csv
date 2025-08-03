@@ -248,7 +248,7 @@ NO114F248,"XIf seed has 3 and combo lacks 5,4",True,"""3 in seed_digits""","""5 
 71F249,"XIf seed has 0 and combo lacks 1,2,3",True,"""0 in seed_digits""","""1 not in combo_digits and 2 not in combo_digits and 3 not in combo_digits""",,,,,,,,,,
 71F250,"XIf seed has 1 and combo lacks 2,3,4",True,"""1 in seed_digits""","""2 not in combo_digits and 3 not in combo_digits and 4 not in combo_digits""",,,,,,,,,,
 81F251,"XIf seed has 2 and combo lacks 5,4",True,"""2 in seed_digits""","""5 not in combo_digits and 4 not in combo_digits""",,,,,,,,,,
-123F252,XIf seed sum>=26 keep combo sum 20-28,True,"""seed_sum>=26""","""not (20<=combo_sum<=28)""",,,,,,,,,,
+NO123F252,XIf seed sum>=26 keep combo sum 20-28,True,"""seed_sum>=26""","""not (20<=combo_sum<=28)""",,,,,,,,,,
 20F253,If seed sum=17 keep combo sum 19-25,True,"""seed_sum==17""","""not (19<=combo_sum<=25)""",,,,,,,,,,
 50F254,XIf seed sum=22-23 keep combo sum 16-25,True,"""22<=seed_sum<=23""","""not (16<=combo_sum<=25)""",,,,,,,,,,
 59F255,XIf seed sum=19-21 keep combo sum 14-24,True,"""19<=seed_sum<=21""","""not (14<=combo_sum<=24)""",,,,,,,,,,
