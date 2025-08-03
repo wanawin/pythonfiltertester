@@ -717,7 +717,7 @@ NO25F556,"xeliminate if combo has >3 unique digits, no mirror digits, and spread
 NO172F550S,XEliminate Singles with mirror digits and fewer than 4 digits ≤ 4,True,True,"any(mirror.get(d,None) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) < 4",,,,,,,,,,
 21F551S,Eliminate Singles without any mirror digits,True,True,"len(set(combo_digits)) == 5 and not any(mirror.get(d,None) in combo_digits for d in combo_digits)",,,,,,,,,,
 29F550DD,Eliminate Double-Doubles that contain mirror digits,True,True,"any(mirror.get(d,None) in combo_digits for d in combo_digits) and sorted(Counter(combo_digits).values()) == [2, 2, 1]",,,,,,,,,,
-142F551D,XEliminate Doubles without any mirror digits,True,True,"not any(mirror.get(d,None) in combo_digits for d in combo_digits)",,,,,,,,,,
+NO142F551D,XEliminate Doubles without any mirror digits,True,True,"not any(mirror.get(d,None) in combo_digits for d in combo_digits)",,,,,,,,,,
 1F719,Eliminate Singles with 5 consecutive digits,True,True,"len(set(combo_digits)) == 5 and all(b - a == 1 for a, b in zip(sorted(combo_digits), sorted(combo_digits)[1:]))",,,,,,,,,,
 78F720,Eliminate combos containing more than 3 digits from the seed,True,"""True""","""sum(1 for d in combo_digits if d in seed_digits) > 3""",,,,,,,,,,
 110F721,Eliminate combos containing more than 2 distinct digits from the seed,True,"""True""","""len(set(combo_digits) & set(seed_digits)) > 2""",,,,,,,,,,
