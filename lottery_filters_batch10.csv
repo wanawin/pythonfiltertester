@@ -329,7 +329,7 @@ NO20F329,XIf seed sum<=12 and combo <12 or >25,True,"""seed_sum<=12""","""combo_
 NO35F330,xIf seed sum=24-25 and combo >19 or >25,True,"""24<=seed_sum<=25""","""combo_sum<19 or combo_sum>25""",,,,,,,,,,
 NO50F331,XIf seed sum=22-23 and combo <16 or >25,True,"""22<=seed_sum<=23""","""combo_sum<16 or combo_sum>25""",,,,,,,,,,
 59F332,If seed sum=19-21 and combo <14 or >24,True,"""19<=seed_sum<=21""","""combo_sum<14 or combo_sum>24""",,,,,,,,,,
-16F333,XIf combo sum = mirror of seed sum,True,"""True""","""combo_sum==sum(mirror.get(int(x),int(x)) for x in str(seed_sum))""",,,,,,,,,,
+NO16F333,XIf combo sum = mirror of seed sum,True,"""True""","""combo_sum==sum(mirror.get(int(x),int(x)) for x in str(seed_sum))""",,,,,,,,,,
 18F334,"XIf seed=16, combo <12 or >20",True,"""seed_sum==16""","""combo_sum<12 or combo_sum>20""",,,,,,,,,,
 58F335,XIf combo has no mirrors of seed digits,True,"""True""","""not any(mirror.get(d,-1) in combo_digits for d in seed_digits) and combo_structure == 5 and combo_structure == 5""",,,,,,,,,,
 2F336,If combo ≥4 shared digits and sum<10,True,"""True""","""sum(1 for d in combo_digits if d in seed_digits)>=4 and combo_sum<10 and combo_structure == 5 and combo_structure == 5 and combo_structure == 5 and combo_structure == 5""",,,,,,,,,,
