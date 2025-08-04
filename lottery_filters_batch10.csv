@@ -178,7 +178,7 @@ NO95F057,XXEliminate combo missing any new digit vs last 2 draws,True,"""not any
 7F179,If seed_sum ends in 3 and combo_sum ends in 1 eliminate,True,"""seed_sum % 10 == 3""","""combo_sum % 10 == 1""",,,,,,,,,,
 91F180,XEliminate combo with ≥5 shared digits with seed and sum <22,True,"""True""","""sum(1 for d in combo_digits if d in seed_digits) >=5 and combo_sum <22 and combo_structure == 5 and combo_structure == 5""",,,,,,,,,,
 NO124F181,XEliminate if seed sum 16-24 and combo sum 25-33,True,"""16 <= seed_sum <= 24""","""25 <= combo_sum <= 33""",,,,,,,,,,
-33F182,XEliminate if seed sum 25-33 and combo sum 0-15,True,"""25 <= seed_sum <= 33""","""combo_sum <= 15""",,,,,,,,,,
+NO33F182,XEliminate if seed sum 25-33 and combo sum 0-15,True,"""25 <= seed_sum <= 33""","""combo_sum <= 15""",,,,,,,,,,
 01F183,"Eliminate if ≥4 prime digits (2,3,5,7) and combo is single (5 unique digits)",True,"""True""","""sum(1 for d in combo_digits if d in {2,3,5,7}) >= 4 and winner_structure == 5""",,,,,,,,,,
 NO262F184,XEliminate if combo contains no  digit and its mirror,True,"""True""","""not any(mirror.get(d, None) in combo_digits for d in combo_digits)""",,,,,,,,,,
 82F185,DUBDUBEliminate combos with exactly 3 unique digits where two appear twice,True,"""True""","""len(set(combo_digits)) == 3 and sorted(Counter(combo_digits).values())==[1,2,2]""",,,,,,,,,,
