@@ -711,7 +711,7 @@ NO25F556,"xeliminate if combo has >3 unique digits, no mirror digits, and spread
 0F716,"If seed sum = 38 and combo has exactly 2 odd digits, eliminate combo",True,"""seed_sum == 38""","""sum(d % 2 == 1 for d in combo_digits) == 2""",,,,,,,,,,
 1F717,"If seed sum = 37 and combo has exactly 1 even digit, eliminate combo",True,"""seed_sum == 37""","""sum(d % 2 == 0 for d in combo_digits) == 1""",,,,,,,,,,
 1F718,"If seed sum = 37 and combo has exactly 2 odd digits, eliminate combo",True,"""seed_sum == 37""","""sum(d % 2 == 1 for d in combo_digits) == 2""",,,,,,,,,,
-NO69F314R,Keep only combos where sum not within ±15 of seed sum,True,"""abs(combo_sum - seed_sum) > 15""",,,,,,,,,,
+NO69F314R,"Keep only combos where sum not within ±15 of seed sum",True,"""abs(combo_sum - seed_sum) > 15""",,,,,,,,,,
 NO70F315R,Keep only combos where sum not within ±14 of seed sum,True,"""abs(combo_sum - seed_sum) > 14""",,,,,,,,,,
 NO101F316R,XKeep only combos where sum not within ±13 of seed sum,True,"""abs(combo_sum - seed_sum) > 13""",,,,,,,,,,
 NO172F550S,XEliminate Singles with mirror digits and fewer than 4 digits ≤ 4,True,"""any(mirror.get(d,None) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) < 4""",,,,,,,,,,
