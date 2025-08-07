@@ -714,7 +714,7 @@ NO25F556,"xeliminate if combo has >3 unique digits, no mirror digits, and spread
 NO69F314R,"Keep only combos where sum not within ±15 of seed sum",True,"""True""","""abs(combo_sum - seed_sum) > 15""",,,,,,,,,,
 NO70F315R,Keep only combos where sum not within ±14 of seed sum,True,"""True""","""abs(combo_sum - seed_sum) > 14""",,,,,,,,,,
 NO101F316R,XKeep only combos where sum not within ±13 of seed sum,True,"""True""","""abs(combo_sum - seed_sum) > 13""",,,,,,,,,,
-NO172F550S,XEliminate Singles with mirror digits and fewer than 4 digits ≤ 4,True,"""any(mirror.get(d,None) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) < 4""",,,,,,,,,,
+NO172F550S,"XEliminate Singles with mirror digits and fewer than 4 digits ≤ 4",True,"""True""","""any(mirror.get(d,None) in combo_digits for d in combo_digits) and sum(1 for d in combo_digits if d <= 4) < 4""",,,,,,,,,,
 NO21F551S,Eliminate Singles without any mirror digits,True,"""len(set(combo_digits)) == 5 and not any(mirror.get(d,None) in combo_digits for d in combo_digits)""",,,,,,,,,,
 29F550DD,Eliminate Double-Doubles that contain mirror digits,True,"""any(mirror.get(d,None) in combo_digits for d in combo_digits) and sorted(Counter(combo_digits).values()) == [2, 2, 1]""",,,,,,,,,,
 NO142F551D,XEliminate Doubles without any mirror digits,True,"""True""","""not any(mirror.get(d,None) in combo_digits for d in combo_digits)""",,,,,,,,,,
