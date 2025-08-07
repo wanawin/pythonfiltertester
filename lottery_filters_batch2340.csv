@@ -722,7 +722,7 @@ NO142F551D,XEliminate Doubles without any mirror digits,True,True,"not any(mirro
 NO78F720,Eliminate combos containing more than 3 digits from the seed,True,"""True""","""sum(1 for d in combo_digits if d in seed_digits) > 3""",,,,,,,,,,
 NO110F721,Eliminate combos containing more than 2 distinct digits from the seed,True,"""True""","""len(set(combo_digits) & set(seed_digits)) > 2""",,,,,,,,,,
 87F722,Eliminate if combo shares 2 or more digits with shared digits of last 2 draws,True,"""True""","""len(set(seed_digits_1).intersection(seed_digits_2).intersection(combo_digits)) >= 2""",,,,,,,,,,
-F723,"Eliminate If seed sum last digit equals combo sum last digit",True,"""str(combo_sum)[-1] != str(seed_sum)[-1]""",,,,,,,,,,
+F723,"Eliminate If seed sum last digit equals combo sum last digit",True,"""True""","""str(combo_sum)[-1] != str(seed_sum)[-1]""",,,,,,,,,,
 F724,"Eliminate If NOT (seed root sum divided by 3 is integer and in combo)",True,"""not (digital_root(int(seed_sum))/3 == int(digital_root(int(seed_sum))/3) and (digital_root(int(seed_sum))/3).is_integer() and int(digital_root(int(seed_sum))/3) in [int(d) for d in str(Result)])""",,,,,,,,,,
 F725,"eliminate If combo root sum = seed root sum",True,"""digital_root(combo_sum) != digital_root(int(seed_sum))""",,,,,,,,,,
 F723,"Eliminate If spread of seed equals root sum of combo",True,"""(max(int(d) for d in str(seed)) - min(int(d) for d in str(seed))) == digital_root(combo_sum)""",,,,,,,,,,
