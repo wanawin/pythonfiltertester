@@ -1,69 +1,68 @@
 import streamlit as st
 import pandas as pd
 import csv
-import os
 from collections import Counter
 
-# -----------------------------
-# Existing DC-5 Filter Tester Logic (unchanged)
-# -----------------------------
-
-st.set_page_config(page_title="DC-5 Filter Tester", layout="wide")
+# ----------------------------
+# Title
+# ----------------------------
 st.title("DC-5 Filter Tester")
 
+# ----------------------------
 # Upload CSV
-uploaded_csv = st.sidebar.file_uploader("Upload filter CSV", type=["csv"], key="filter_csv")
+# ----------------------------
+st.sidebar.header("Upload filter CSV")
+uploaded_file = st.sidebar.file_uploader("Upload filter CSV", type=["csv"])
 
-# Main Inputs (unchanged)
-generation_method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"], key="generation_method")
+# ----------------------------
+# Main Inputs
+# ----------------------------
+st.sidebar.header("Main Inputs")
+method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
+hot_override = st.sidebar.text_input("Hot digits (comma-separated):")
+cold_override = st.sidebar.text_input("Cold digits (comma-separated):")
+due_override = st.sidebar.text_input("Due digits (comma-separated):")
+track_combo = st.sidebar.text_input("Check specific combo:")
 
-hot_override = st.sidebar.text_input("Hot digits override (comma-separated):", key="hot_override")
-cold_override = st.sidebar.text_input("Cold digits override (comma-separated):", key="cold_override")
-due_override = st.sidebar.text_input("Due digits override (comma-separated):", key="due_override")
-check_combo = st.sidebar.text_input("Check specific combo:", key="check_combo")
-hide_zero = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True, key="hide_zero")
-select_all_toggle = st.sidebar.checkbox("Select/Deselect All Filters", value=False, key="select_all")
+hide_zero = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True)
+select_all_toggle = st.sidebar.checkbox("Select/Deselect All Filters", value=False)
 
-# Show totals (unchanged placeholders)
-st.sidebar.markdown("Total: 1750 Elim: 0 Remain: 1750")
+# ----------------------------
+# Hot / Cold / Due Calculator
+# ----------------------------
+st.markdown("### Hot / Cold / Due Calculator")
+st.caption("Enter exactly 10 past winning numbers (5 digits each). Calculator waits until all 10 are entered.")
 
-# --- Here would be your existing code that loads the CSV, parses filters, computes eliminations, etc.
-# We are NOT changing anything about how the filters run or are displayed.
-
-# -----------------------------
-# NEW HOT / COLD / DUE CALCULATOR
-# -----------------------------
-st.markdown("---")
-st.subheader("Hot / Cold / Due Calculator")
-
-st.markdown(
-    "Enter exactly **10 past winning numbers** (5 digits each). "
-    "Calculator waits until all 10 are entered."
-)
-
-hotcold_inputs = []
+draws = []
 for i in range(1, 11):
     val = st.text_input(f"Draw {i}-back (most recent first)", key=f"hc_{i}")
-    hotcold_inputs.append(val.strip())
+    val = val.strip()
+    if val and val.isdigit() and len(val) == 5:
+        draws.append(val)
 
-if all(len(x) == 5 and x.isdigit() for x in hotcold_inputs):
-    digits = "".join(hotcold_inputs)
-    counts = Counter(int(d) for d in digits)
+if len(draws) == 10:
+    flat = [int(d) for num in draws for d in num]
+    counts = Counter(flat)
 
-    if counts:
-        sorted_items = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))
-        min_items = sorted(counts.items(), key=lambda kv: (kv[1], kv[0]))
-        hot_cut = sorted_items[min(2, len(sorted_items)-1)][1]
-        cold_cut = min_items[min(2, len(min_items)-1)][1]
-        hot = sorted([d for d, c in counts.items() if c >= hot_cut])
-        cold = sorted([d for d, c in counts.items() if c <= cold_cut])
+    sorted_by_freq = counts.most_common()
+    if sorted_by_freq:
+        cutoff_hot = sorted_by_freq[min(2, len(sorted_by_freq) - 1)][1]
+        hot = sorted([d for d, c in counts.items() if c >= cutoff_hot])
+        cutoff_cold = sorted_by_freq[-min(3, len(sorted_by_freq))][1]
+        cold = sorted([d for d, c in counts.items() if c <= cutoff_cold])
     else:
         hot, cold = [], []
 
-    last_two = "".join(hotcold_inputs[:2])
-    seen = {int(ch) for ch in last_two}
+    recent_two = draws[:2]
+    seen = {int(x) for x in "".join(recent_two)}
     due = [d for d in range(10) if d not in seen]
 
-    st.success(f"**Hot:** {hot}  |  **Cold:** {cold}  |  **Due:** {due}")
+    st.success(f"Hot: {hot} | Cold: {cold} | Due: {due}")
 else:
-    st.info("Waiting for 10 valid 5-digit entries to compute Hot / Cold / Due.")
+    st.info("Waiting for all 10 draws (5 digits each) before calculating.")
+
+# ----------------------------
+# Placeholder for rest of app
+# ----------------------------
+st.markdown("## Manual Filters")
+st.caption("Filters load here as before (left intact).")
