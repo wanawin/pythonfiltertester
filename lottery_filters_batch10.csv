@@ -262,7 +262,7 @@ NO35F260,XIf seed sum=24-25 and combo <19 or >25,True,"""24<=seed_value<=25""","
 NO30F263,If seed sum=13-15 and combo <14 or >22,True,"""13<=seed_value<=15""","""combo_sum<14 or combo_sum>22""",,,,,,,,,,
 20F264,XIf seed sum<=12 and combo <12 or >25,True,"""seed_value<=12""","""combo_sum<12 or combo_sum>25""",,,,,,,,,,
 20F265,If seed sum=17-18 and combo <11 or >26,True,"""17<=seed_value<=18""","""combo_sum<11 or combo_sum>26""",,,,,,,,,,
-6F266,If seed sum ends in 2 and combo sum ends in 0,True,"""seed_value%10==2""","""combo_sum%10==0""",,,,,,,,,,
+6F266,"seed_sum % 10 == 2 and combo_sum % 10 == 0","Eliminate if the seed’s digit-sum ends in 2 and the combo’s digit-sum ends in 0""",,,,,,,,,,
 NO30F267,If seed sum=13-15 and combo <14 or >22,True,"""13<=seed_value<=15""","""combo_sum<14 or combo_sum>22""",,,,,,,,,,
 20F268,If seed sum=17-18 and combo <11 or >26,True,"""17<=seed_value<=18""","""combo_sum<11 or combo_sum>26""",,,,,,,,,,
 74F269,XIf combo has ≥4 shared digits with seed and combo sum <34,True,"""True""","""sum(1 for d in combo_digits if d in seed_digits) >=4 and combo_sum <34 and combo_structure == 5 and combo_structure == 5""",,,,,,,,,,
