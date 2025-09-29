@@ -1,452 +1,198 @@
-import streamlit as st
-from itertools import product
-import csv
 import os
-from collections import Counter
-import math
-
-# V-Trac and mirror mappings
-V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
-MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
-MIRROR = MIRROR_PAIRS
-mirror = MIRROR  # keep lowercase for CSV expressions
-
-def sum_category(total: int) -> str:
-    if 0 <= total <= 15:
-        return 'Very Low'
-    elif 16 <= total <= 24:
-        return 'Low'
-    elif 25 <= total <= 33:
-        return 'Mid'
-    else:
-        return 'High'
-
-def load_filters(path: str='lottery_filters_batch10.csv') -> list:
-    if not os.path.exists(path):
-        st.error(f"Filter file not found: {path}")
-        st.stop()
-    filters = []
-    with open(path, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for raw in reader:
-            row = {k.lower(): v for k, v in raw.items()}
-            row['id'] = row.get('id', row.get('fid', '')).strip()
-            for key in ('name', 'applicable_if', 'expression'):
-                if key in row and isinstance(row[key], str):
-                    row[key] = row[key].strip().strip('"').strip("'")
-            row['expression'] = row.get('expression', '').replace('!==', '!=')
-            applicable = row.get('applicable_if') or 'True'
-            expr = row.get('expression') or 'False'
-            try:
-                row['applicable_code'] = compile(applicable, '<applicable>', 'eval')
-                row['expr_code'] = compile(expr, '<expr>', 'eval')
-            except SyntaxError as e:
-                st.error(f"Syntax error in filter {row['id']}: {e}")
-                continue
-            row['enabled_default'] = row.get('enabled', '').lower() == 'true'
-            filters.append(row)
-    return filters
-
-def generate_combinations(seed: str, method: str) -> list:
-    all_digits = '0123456789'
-    combos_set = set()
-    sorted_seed = ''.join(sorted(seed))
-    if method == '1-digit':
-        for d in sorted_seed:
-            for p in product(all_digits, repeat=4):
-                combos_set.add(''.join(sorted(d + ''.join(p))))
-    else:
-        pairs = {''.join(sorted((sorted_seed[i], sorted_seed[j])))
-                 for i in range(len(sorted_seed)) for j in range(i+1, len(sorted_seed))}
-        for pair in pairs:
-            for p in product(all_digits, repeat=3):
-                combos_set.add(''.join(sorted(pair + ''.join(p))))
-    return sorted(combos_set)
-
-def compute_hot_cold(digits_list, hot_n=3, cold_n=3):
-    """Return top hot_n and cold_n digits with ties allowed"""
-    cnt = Counter(digits_list)
-    if not cnt: return [], []
-    freqs_desc = cnt.most_common()
-    cutoff_hot = freqs_desc[min(hot_n - 1, len(freqs_desc)-1)][1]
-    hot = sorted([d for d, c in cnt.items() if c >= cutoff_hot])
-    freqs_asc = sorted(cnt.items(), key=lambda kv: (kv[1], kv[0]))
-    cutoff_cold = freqs_asc[min(cold_n - 1, len(freqs_asc)-1)][1]
-    cold = sorted([d for d, c in cnt.items() if c <= cutoff_cold])
-    return hot, cold
-
-def main():
-    filters = load_filters()
-    st.sidebar.header("🔢 DC-5 Filter Tracker Full")
-
-    select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
-
-    # Accept 10 past draws
-    past_draws = []
-    for i in range(1, 11):
-        val = st.sidebar.text_input(f"Draw {i}-back:", help=f"Enter draw {i} back (required for accurate hot/cold)").strip()
-        if val:
-            past_draws.append(val)
-
-    method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
-    hot_input = st.sidebar.text_input("Hot digits override (comma-separated):").strip()
-    cold_input = st.sidebar.text_input("Cold digits override (comma-separated):").strip()
-    check_combo = st.sidebar.text_input("Check specific combo:").strip()
-    hide_zero = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True)
-
-    if not past_draws or len(past_draws[0]) != 5 or not past_draws[0].isdigit():
-        st.sidebar.error("Draw 1-back must be exactly 5 digits")
-        return
-
-    seed = past_draws[0]
-    seed_digits = [int(d) for d in seed]
-
-    # Hot/Cold auto calculation only if we have 10 draws (50 digits)
-    all_digits_flat = [int(d) for draw in past_draws if len(draw)==5 for d in draw if d.isdigit()]
-    if len(all_digits_flat) >= 50:
-        auto_hot, auto_cold = compute_hot_cold(all_digits_flat)
-    else:
-        auto_hot, auto_cold = [], []
-
-    # Parse overrides
-    hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()] or auto_hot
-    cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()] or auto_cold
-
-    # Due digits based on last two draws
-    last2_digits = [int(d) for draw in past_draws[:2] if len(draw)==5 for d in draw]
-    due_digits = [d for d in range(10) if d not in last2_digits]
-
-    # Display stats
-    st.sidebar.markdown(f"**Auto ➜** Hot {auto_hot} | Cold {auto_cold}")
-    st.sidebar.markdown(f"**Using ➜** Hot {hot_digits} | Cold {cold_digits} | Due {due_digits}")
-
-    # combos
-    combos = generate_combinations(seed, method)
-
-    # Build context generator
-    def gen_ctx(cdigits):
-        csum = sum(cdigits)
-        return {
-            'seed_digits': seed_digits,
-            'combo_digits': cdigits,
-            'combo_sum': csum,
-            'combo_sum_cat': sum_category(csum),
-            'hot_digits': hot_digits,
-            'cold_digits': cold_digits,
-            'due_digits': due_digits,
-            'V_TRAC_GROUPS': V_TRAC_GROUPS,
-            'mirror': MIRROR,
-            'Counter': Counter
-        }
-
-    eliminated = {}
-    survivors = []
-    for combo in combos:
-        cdigits = [int(c) for c in combo]
-        ctx = gen_ctx(cdigits)
-        for flt in filters:
-            key = f"filter_{flt['id']}"
-            if not st.session_state.get(key, select_all and flt['enabled_default']):
-                continue
-            try:
-                if not eval(flt['applicable_code'], ctx, ctx):
-                    continue
-                if eval(flt['expr_code'], ctx, ctx):
-                    eliminated[combo] = flt['name']
-                    break
-            except:
-                continue
-        else:
-            survivors.append(combo)
-
-    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
-
-    if check_combo:
-        norm = ''.join(sorted(check_combo))
-        if norm in eliminated:
-            st.sidebar.info(f"Combo {check_combo} eliminated by {eliminated[norm]}")
-        elif norm in survivors:
-            st.sidebar.success(f"Combo {check_combo} survived all filters")
-        else:
-            st.sidebar.warning("Combo not found in generated list")
-
-    # Initial counts
-    init_counts = {flt['id']: 0 for flt in filters}
-    for flt in filters:
-        for combo in combos:
-            cdigits = [int(c) for c in combo]
-            ctx = gen_ctx(cdigits)
-            try:
-                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
-                    init_counts[flt['id']] += 1
-            except:
-                pass
-
-    sorted_filters = sorted(filters, key=lambda flt: (init_counts[flt['id']] == 0, -init_counts[flt['id']]))
-    display_filters = [flt for flt in sorted_filters if init_counts[flt['id']] > 0] if hide_zero else sorted_filters
-
-    st.markdown(f"**Initial Manual Filters Count:** {len(display_filters)}")
-
-    pool = list(combos)
-    dynamic_counts = {}
-    for flt in display_filters:
-        key = f"filter_{flt['id']}"
-        active = st.session_state.get(key, select_all and flt['enabled_default'])
-        dc = 0
-        survivors_pool = []
-        if active:
-            for combo in pool:
-                cdigits = [int(c) for c in combo]
-                ctx = gen_ctx(cdigits)
-                try:
-                    if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
-                        dc += 1
-                    else:
-                        survivors_pool.append(combo)
-                except:
-                    survivors_pool.append(combo)
-        else:
-            survivors_pool = pool.copy()
-        dynamic_counts[flt['id']] = dc
-        pool = survivors_pool
-
-    st.header("🔧 Active Filters")
-    for flt in display_filters:
-        key = f"filter_{flt['id']}"
-        ic = init_counts[flt['id']]
-        dc = dynamic_counts.get(flt['id'], 0)
-        label = f"{flt['id']}: {flt['name']} — {dc}/{ic} eliminated"
-        st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
-
-    with st.expander("Show remaining combinations"):
-        for c in survivors:
-            st.write(c)
-
-if __name__ == '__main__':
-    main()
-import streamlit as st
-from itertools import product
 import csv
-import os
 from collections import Counter
-import math
+import pandas as pd
+import streamlit as st
 
-# V-Trac and mirror mappings
-V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
-MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
-MIRROR = MIRROR_PAIRS
-mirror = MIRROR  # keep lowercase for CSV expressions
+# -----------------------------
+# File constants
+# -----------------------------
+FILTER_FILE_CANDIDATES = [
+    "lottery_filters_batch10 (24).csv",
+    "lottery_filters_batch10.csv",
+]
 
-def sum_category(total: int) -> str:
-    if 0 <= total <= 15:
-        return 'Very Low'
-    elif 16 <= total <= 24:
-        return 'Low'
-    elif 25 <= total <= 33:
-        return 'Mid'
-    else:
-        return 'High'
+DIGITS = "0123456789"
 
-def load_filters(path: str='lottery_filters_batch10.csv') -> list:
-    if not os.path.exists(path):
-        st.error(f"Filter file not found: {path}")
-        st.stop()
-    filters = []
-    with open(path, newline='', encoding='utf-8') as f:
-        reader = csv.DictReader(f)
-        for raw in reader:
-            row = {k.lower(): v for k, v in raw.items()}
-            row['id'] = row.get('id', row.get('fid', '')).strip()
-            for key in ('name', 'applicable_if', 'expression'):
-                if key in row and isinstance(row[key], str):
-                    row[key] = row[key].strip().strip('"').strip("'")
-            row['expression'] = row.get('expression', '').replace('!==', '!=')
-            applicable = row.get('applicable_if') or 'True'
-            expr = row.get('expression') or 'False'
-            try:
-                row['applicable_code'] = compile(applicable, '<applicable>', 'eval')
-                row['expr_code'] = compile(expr, '<expr>', 'eval')
-            except SyntaxError as e:
-                st.error(f"Syntax error in filter {row['id']}: {e}")
+# -----------------------------
+# Utilities
+# -----------------------------
+def _exists(path: str) -> bool:
+    return path and os.path.exists(path)
+
+def _first_existing(paths):
+    return next((p for p in paths if _exists(p)), None)
+
+def _normalize_cols(raw: dict) -> dict:
+    return {(k or "").strip().lower(): v for k, v in raw.items()}
+
+def _safe_id(raw: str, fallback: str) -> str:
+    return (raw or fallback).strip()
+
+def _compile_expr(expr: str, fid: str):
+    try:
+        return compile(expr, f"<expr:{fid}>", "eval"), None
+    except SyntaxError as e:
+        return None, str(e)
+
+def load_filters(path: str):
+    if not _exists(path):
+        return []
+    out = []
+    with open(path, newline="", encoding="utf-8") as f:
+        rdr = csv.DictReader(f)
+        for i, raw in enumerate(rdr):
+            row = _normalize_cols(raw)
+            fid = _safe_id(row.get("id", row.get("filter_id", "")), f"row{i+1}")
+            layman = (row.get("layman") or row.get("layman_explanation") or "").strip()
+            expr_txt = (row.get("expression") or row.get("expr") or "").strip()
+            hist = (row.get("stat") or row.get("hist") or "").strip()
+            if not expr_txt:
+                out.append(dict(id=fid, layman="[no expression] "+layman, hist=hist, code=None))
                 continue
-            row['enabled_default'] = row.get('enabled', '').lower() == 'true'
-            filters.append(row)
-    return filters
+            code, cerr = _compile_expr(expr_txt, fid)
+            out.append(dict(
+                id=fid,
+                layman=f"[syntax error: {cerr}] {layman}" if cerr else layman,
+                hist=hist,
+                code=code
+            ))
+    return out
 
-def generate_combinations(seed: str, method: str) -> list:
-    all_digits = '0123456789'
-    combos_set = set()
-    sorted_seed = ''.join(sorted(seed))
-    if method == '1-digit':
-        for d in sorted_seed:
-            for p in product(all_digits, repeat=4):
-                combos_set.add(''.join(sorted(d + ''.join(p))))
-    else:
-        pairs = {''.join(sorted((sorted_seed[i], sorted_seed[j])))
-                 for i in range(len(sorted_seed)) for j in range(i+1, len(sorted_seed))}
-        for pair in pairs:
-            for p in product(all_digits, repeat=3):
-                combos_set.add(''.join(sorted(pair + ''.join(p))))
-    return sorted(combos_set)
+# -----------------------------
+# Hot / Cold / Due digits
+# -----------------------------
+def auto_hot_cold_due(history: list[str], hot_n=3, cold_n=3, hot_window=10, due_window=2):
+    """Compute Hot/Cold from last hot_window draws, Due from last due_window draws."""
+    seq_hotcold = "".join(history[:hot_window])
+    hot, cold = [], []
+    if seq_hotcold:
+        cnt = Counter(int(ch) for ch in seq_hotcold)
+        if cnt:
+            # hot
+            freqs_desc = cnt.most_common()
+            cutoff = freqs_desc[min(hot_n-1, len(freqs_desc)-1)][1] if freqs_desc else 0
+            hot = sorted([d for d,c in cnt.items() if c >= cutoff])
+            # cold
+            freqs_asc = sorted(cnt.items(), key=lambda kv: (kv[1], kv[0]))
+            cutoff_c = freqs_asc[min(cold_n-1, len(freqs_asc)-1)][1] if freqs_asc else 0
+            cold = sorted([d for d,c in cnt.items() if c <= cutoff_c])
+    seq_due = "".join(history[:due_window])
+    due = []
+    if seq_due:
+        seen = {int(ch) for ch in seq_due}
+        due = [d for d in range(10) if d not in seen]
+    return hot, cold, due
 
-def compute_hot_cold(digits_list, hot_n=3, cold_n=3):
-    """Return top hot_n and cold_n digits with ties allowed"""
-    cnt = Counter(digits_list)
-    if not cnt: return [], []
-    freqs_desc = cnt.most_common()
-    cutoff_hot = freqs_desc[min(hot_n - 1, len(freqs_desc)-1)][1]
-    hot = sorted([d for d, c in cnt.items() if c >= cutoff_hot])
-    freqs_asc = sorted(cnt.items(), key=lambda kv: (kv[1], kv[0]))
-    cutoff_cold = freqs_asc[min(cold_n - 1, len(freqs_asc)-1)][1]
-    cold = sorted([d for d, c in cnt.items() if c <= cutoff_cold])
-    return hot, cold
+# -----------------------------
+# Context builder for eval
+# -----------------------------
+def make_ctx(combo: str, seed: str, hot, cold, due):
+    combo_digits = [int(c) for c in combo]
+    seed_digits = [int(c) for c in seed]
+    return {
+        "combo_digits": combo_digits,
+        "seed_digits": seed_digits,
+        "combo": int(combo) if combo.isdigit() else combo,
+        "seed": int(seed) if seed.isdigit() else seed,
+        "winner": int(combo) if combo.isdigit() else combo,  # alias
+        "hot_digits": hot, "cold_digits": cold, "due_digits": due,
+        "hot": hot, "cold": cold, "due": due,
+        "abs": abs, "len": len, "set": set, "sorted": sorted, "max": max, "min": min,
+        "any": any, "all": all, "Counter": Counter
+    }
 
-def main():
-    filters = load_filters()
-    st.sidebar.header("🔢 DC-5 Filter Tracker Full")
+# -----------------------------
+# Streamlit UI
+# -----------------------------
+st.set_page_config(page_title="DC-5 Filter Tester", layout="wide")
+st.title("DC-5 Filter Tester")
 
-    select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
+st.sidebar.header("Inputs")
+seed = st.sidebar.text_input("Draw 1-back (required, 5 digits):", key="seed").strip()
+# 9 more previous draws
+prevs = [st.sidebar.text_input(f"Draw {i}-back:", key=f"prev_{i}").strip() for i in range(2, 11)]
 
-    # Accept 10 past draws
-    past_draws = []
-    for i in range(1, 11):
-        val = st.sidebar.text_input(f"Draw {i}-back:", help=f"Enter draw {i} back (required for accurate hot/cold)").strip()
-        if val:
-            past_draws.append(val)
+hot_override = st.sidebar.text_input("Hot digits override (comma-separated):", key="hot_override")
+cold_override = st.sidebar.text_input("Cold digits override (comma-separated):", key="cold_override")
+due_override = st.sidebar.text_input("Due digits override (comma-separated):", key="due_override")
+check_combo = st.sidebar.text_input("Check specific combo:", key="check_combo")
 
-    method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
-    hot_input = st.sidebar.text_input("Hot digits override (comma-separated):").strip()
-    cold_input = st.sidebar.text_input("Cold digits override (comma-separated):").strip()
-    check_combo = st.sidebar.text_input("Check specific combo:").strip()
-    hide_zero = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True)
+hide_zero = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True, key="hide_zero")
+select_all_toggle = st.sidebar.checkbox("Select/Deselect All Filters", value=True, key="select_all_toggle")
 
-    if not past_draws or len(past_draws[0]) != 5 or not past_draws[0].isdigit():
-        st.sidebar.error("Draw 1-back must be exactly 5 digits")
-        return
+# Validation
+if len(seed) != 5 or not all(ch in DIGITS for ch in seed):
+    st.info("Enter a valid 5-digit seed first (digits 0–9).")
+    st.stop()
 
-    seed = past_draws[0]
-    seed_digits = [int(d) for d in seed]
+# Load filters
+filter_path = _first_existing(FILTER_FILE_CANDIDATES)
+filters = load_filters(filter_path)
 
-    # Hot/Cold auto calculation only if we have 10 draws (50 digits)
-    all_digits_flat = [int(d) for draw in past_draws if len(draw)==5 for d in draw if d.isdigit()]
-    if len(all_digits_flat) >= 50:
-        auto_hot, auto_cold = compute_hot_cold(all_digits_flat)
-    else:
-        auto_hot, auto_cold = [], []
+# History for hot/cold/due
+history = [seed] + [p for p in prevs if p]
+if len(history) < 10:
+    st.warning("Hot/Cold/Due digits will auto-calc only after 10 draws are entered.")
+auto_hot, auto_cold, auto_due = ([], [], [])
+if len(history) >= 10:
+    auto_hot, auto_cold, auto_due = auto_hot_cold_due(history)
 
-    # Parse overrides
-    hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()] or auto_hot
-    cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()] or auto_cold
+parse_list = lambda txt: [int(t) for t in txt.replace(",", " ").split() if t.isdigit()]
+hot = parse_list(hot_override) or auto_hot
+cold = parse_list(cold_override) or auto_cold
+due = parse_list(due_override) or auto_due
 
-    # Due digits based on last two draws
-    last2_digits = [int(d) for draw in past_draws[:2] if len(draw)==5 for d in draw]
-    due_digits = [d for d in range(10) if d not in last2_digits]
+st.sidebar.markdown(f"**Auto ➜** Hot {auto_hot} | Cold {auto_cold} | Due {auto_due}")
+st.sidebar.markdown(f"**Using ➜** Hot {hot} | Cold {cold} | Due {due}")
 
-    # Display stats
-    st.sidebar.markdown(f"**Auto ➜** Hot {auto_hot} | Cold {auto_cold}")
-    st.sidebar.markdown(f"**Using ➜** Hot {hot_digits} | Cold {cold_digits} | Due {due_digits}")
+# -----------------------------
+# Filter initial cuts
+# -----------------------------
+test_combo = check_combo.strip() or seed
+init_counts = {}
+for f in filters:
+    cuts = 0
+    if f.get("code"):
+        ctx = make_ctx(test_combo, seed, hot, cold, due)
+        try:
+            if eval(f["code"], {}, ctx):
+                cuts += 1
+        except Exception:
+            # still count as 0 but show syntax error if compile failed earlier
+            pass
+    init_counts[f["id"]] = cuts
 
-    # combos
-    combos = generate_combinations(seed, method)
+display_filters = sorted(filters, key=lambda f: -init_counts.get(f["id"], 0))
+if hide_zero:
+    display_filters = [f for f in display_filters if init_counts.get(f["id"], 0) > 0]
 
-    # Build context generator
-    def gen_ctx(cdigits):
-        csum = sum(cdigits)
-        return {
-            'seed_digits': seed_digits,
-            'combo_digits': cdigits,
-            'combo_sum': csum,
-            'combo_sum_cat': sum_category(csum),
-            'hot_digits': hot_digits,
-            'cold_digits': cold_digits,
-            'due_digits': due_digits,
-            'V_TRAC_GROUPS': V_TRAC_GROUPS,
-            'mirror': MIRROR,
-            'Counter': Counter
-        }
+st.markdown("## 🛠 Manual Filters")
+st.caption(f"Applicable filters: **{len(display_filters)}**")
 
-    eliminated = {}
-    survivors = []
-    for combo in combos:
-        cdigits = [int(c) for c in combo]
-        ctx = gen_ctx(cdigits)
-        for flt in filters:
-            key = f"filter_{flt['id']}"
-            if not st.session_state.get(key, select_all and flt['enabled_default']):
-                continue
-            try:
-                if not eval(flt['applicable_code'], ctx, ctx):
-                    continue
-                if eval(flt['expr_code'], ctx, ctx):
-                    eliminated[combo] = flt['name']
-                    break
-            except:
-                continue
-        else:
-            survivors.append(combo)
+selection_state = {}
+for f in display_filters:
+    cid = f["id"]
+    cuts = init_counts.get(cid, 0)
+    label = f"{cid}: {f['layman']} | hist {f.get('hist','')} | init cut {cuts}"
+    checked = st.checkbox(label, key=f"chk_{cid}", value=select_all_toggle)
+    selection_state[cid] = checked
 
-    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
+# -----------------------------
+# Apply selected filters to test combo
+# -----------------------------
+combo_status = "survived"
+ctx = make_ctx(test_combo, seed, hot, cold, due)
+for f in display_filters:
+    if selection_state.get(f["id"]) and f.get("code"):
+        try:
+            if eval(f["code"], {}, ctx):
+                combo_status = f"eliminated_by:{f['id']}"
+                break
+        except Exception:
+            pass
 
-    if check_combo:
-        norm = ''.join(sorted(check_combo))
-        if norm in eliminated:
-            st.sidebar.info(f"Combo {check_combo} eliminated by {eliminated[norm]}")
-        elif norm in survivors:
-            st.sidebar.success(f"Combo {check_combo} survived all filters")
-        else:
-            st.sidebar.warning("Combo not found in generated list")
-
-    # Initial counts
-    init_counts = {flt['id']: 0 for flt in filters}
-    for flt in filters:
-        for combo in combos:
-            cdigits = [int(c) for c in combo]
-            ctx = gen_ctx(cdigits)
-            try:
-                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
-                    init_counts[flt['id']] += 1
-            except:
-                pass
-
-    sorted_filters = sorted(filters, key=lambda flt: (init_counts[flt['id']] == 0, -init_counts[flt['id']]))
-    display_filters = [flt for flt in sorted_filters if init_counts[flt['id']] > 0] if hide_zero else sorted_filters
-
-    st.markdown(f"**Initial Manual Filters Count:** {len(display_filters)}")
-
-    pool = list(combos)
-    dynamic_counts = {}
-    for flt in display_filters:
-        key = f"filter_{flt['id']}"
-        active = st.session_state.get(key, select_all and flt['enabled_default'])
-        dc = 0
-        survivors_pool = []
-        if active:
-            for combo in pool:
-                cdigits = [int(c) for c in combo]
-                ctx = gen_ctx(cdigits)
-                try:
-                    if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
-                        dc += 1
-                    else:
-                        survivors_pool.append(combo)
-                except:
-                    survivors_pool.append(combo)
-        else:
-            survivors_pool = pool.copy()
-        dynamic_counts[flt['id']] = dc
-        pool = survivors_pool
-
-    st.header("🔧 Active Filters")
-    for flt in display_filters:
-        key = f"filter_{flt['id']}"
-        ic = init_counts[flt['id']]
-        dc = dynamic_counts.get(flt['id'], 0)
-        label = f"{flt['id']}: {flt['name']} — {dc}/{ic} eliminated"
-        st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
-
-    with st.expander("Show remaining combinations"):
-        for c in survivors:
-            st.write(c)
-
-if __name__ == '__main__':
-    main()
+if combo_status == "survived":
+    st.success(f"Combo {test_combo} survived all filters")
+elif combo_status.startswith("eliminated_by:"):
+    st.error(f"Combo {test_combo} eliminated by {combo_status.split(':',1)[1]}")
