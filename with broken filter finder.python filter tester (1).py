@@ -3,12 +3,13 @@ from itertools import product
 import csv
 import os
 from collections import Counter
+import math
 
 # V-Trac and mirror mappings
 V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
 MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
 MIRROR = MIRROR_PAIRS
-mirror = MIRROR  # keep lowercase name available for CSV filters
+mirror = MIRROR  # keep lowercase for CSV expressions
 
 def sum_category(total: int) -> str:
     if 0 <= total <= 15:
@@ -69,6 +70,7 @@ def main():
     seed = st.sidebar.text_input("Draw 1-back (required):", help="Enter the draw immediately before the combo to test").strip()
     prev_seed = st.sidebar.text_input("Draw 2-back (optional):", help="Enter the draw two draws before the combo").strip()
     prev_prev = st.sidebar.text_input("Draw 3-back (optional):", help="Enter the draw three draws before the combo").strip()
+    prev_prev_prev = st.sidebar.text_input("Draw 4-back (optional):", help="Enter the draw four draws before the combo").strip()
     method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
     hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
     cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
@@ -83,6 +85,7 @@ def main():
     seed_digits = [int(d) for d in seed]
     prev_digits = [int(d) for d in prev_seed if d.isdigit()]
     prev_prev_digits = [int(d) for d in prev_prev if d.isdigit()]
+    prev_prev_prev_digits = [int(d) for d in prev_prev_prev if d.isdigit()]
     new_digits = set(seed_digits) - set(prev_digits)
     hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
     cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
@@ -100,17 +103,25 @@ def main():
     def gen_ctx(cdigits):
         csum = sum(cdigits)
         return {
+            'seed_value': int(seed),
+            'seed_sum': seed_sum,
+            'prev_seed_sum': sum(prev_digits) if prev_digits else None,
+            'prev_prev_seed_sum': sum(prev_prev_digits) if prev_prev_digits else None,
+            'prev_prev_prev_seed_sum': sum(prev_prev_prev_digits) if prev_prev_prev_digits else None,
+            'seed_digits_1': prev_digits,
+            'seed_digits_2': prev_prev_digits,
+            'seed_digits_3': prev_prev_prev_digits,
+            'nan': float('nan'),
             'seed_digits': seed_digits,
             'prev_seed_digits': prev_digits,
             'prev_prev_seed_digits': prev_prev_digits,
+            'prev_prev_prev_seed_digits': prev_prev_prev_digits,
             'new_seed_digits': new_digits,
             'prev_pattern': prev_pattern,
             'hot_digits': hot_digits,
             'cold_digits': cold_digits,
             'due_digits': due_digits,
             'seed_counts': seed_counts,
-            'seed_sum': seed_sum,
-            'prev_sum_cat': prev_sum_cat,
             'combo_digits': cdigits,
             'combo_sum': csum,
             'combo_sum_cat': sum_category(csum),
@@ -210,9 +221,7 @@ def main():
         for c in survivors:
             st.write(c)
 
-    # -------------------------
-    # 🔍 Diagnostic block for single combo testing
-    # -------------------------
+    # Diagnostic block
     if check_combo:
         test_digits = [int(c) for c in check_combo if c.isdigit()]
         ctx = gen_ctx(test_digits)
