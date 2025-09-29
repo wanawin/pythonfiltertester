@@ -1,92 +1,41 @@
-import os
+import streamlit as st
 import csv
+import os
 from collections import Counter
 import pandas as pd
-import streamlit as st
 
 # -----------------------------
-# File constants
+# Constants / Config
 # -----------------------------
-FILTER_FILE_CANDIDATES = [
-    "lottery_filters_batch10 (24).csv",
-    "lottery_filters_batch10.csv",
-]
-
+FILTER_FILE = "lottery_filters_batch10.csv"
 DIGITS = "0123456789"
 
 # -----------------------------
 # Utilities
 # -----------------------------
-def _exists(path: str) -> bool:
-    return path and os.path.exists(path)
-
-def _first_existing(paths):
-    return next((p for p in paths if _exists(p)), None)
-
-def _normalize_cols(raw: dict) -> dict:
-    return {(k or "").strip().lower(): v for k, v in raw.items()}
-
-def _safe_id(raw: str, fallback: str) -> str:
-    return (raw or fallback).strip()
-
-def _compile_expr(expr: str, fid: str):
-    try:
-        return compile(expr, f"<expr:{fid}>", "eval"), None
-    except SyntaxError as e:
-        return None, str(e)
-
 def load_filters(path: str):
-    if not _exists(path):
-        return []
-    out = []
-    with open(path, newline="", encoding="utf-8") as f:
-        rdr = csv.DictReader(f)
-        for i, raw in enumerate(rdr):
-            row = _normalize_cols(raw)
-            fid = _safe_id(row.get("id", row.get("filter_id", "")), f"row{i+1}")
-            layman = (row.get("layman") or row.get("layman_explanation") or "").strip()
-            expr_txt = (row.get("expression") or row.get("expr") or "").strip()
-            hist = (row.get("stat") or row.get("hist") or "").strip()
-            if not expr_txt:
-                out.append(dict(id=fid, layman="[no expression] "+layman, hist=hist, code=None))
+    if not os.path.exists(path):
+        st.error(f"Filter file not found: {path}")
+        st.stop()
+    filters = []
+    with open(path, newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for raw in reader:
+            row = {k.lower(): v for k, v in raw.items()}
+            fid = row.get('id') or row.get('filter_id') or ''
+            expr = (row.get('expression') or row.get('expr') or '').strip()
+            layman = (row.get('layman') or row.get('layman_explanation') or '').strip()
+            hist = (row.get('stat') or row.get('hist') or '').strip()
+            if not expr:
+                filters.append({"id": fid, "layman": "[no expression] " + layman, "hist": hist, "code": None})
                 continue
-            code, cerr = _compile_expr(expr_txt, fid)
-            out.append(dict(
-                id=fid,
-                layman=f"[syntax error: {cerr}] {layman}" if cerr else layman,
-                hist=hist,
-                code=code
-            ))
-    return out
+            try:
+                code = compile(expr, f"<expr:{fid}>", "eval")
+                filters.append({"id": fid, "layman": layman, "hist": hist, "code": code})
+            except SyntaxError as e:
+                filters.append({"id": fid, "layman": f"[syntax error: {e}] {layman}", "hist": hist, "code": None})
+    return filters
 
-# -----------------------------
-# Hot / Cold / Due digits
-# -----------------------------
-def auto_hot_cold_due(history: list[str], hot_n=3, cold_n=3, hot_window=10, due_window=2):
-    """Compute Hot/Cold from last hot_window draws, Due from last due_window draws."""
-    seq_hotcold = "".join(history[:hot_window])
-    hot, cold = [], []
-    if seq_hotcold:
-        cnt = Counter(int(ch) for ch in seq_hotcold)
-        if cnt:
-            # hot
-            freqs_desc = cnt.most_common()
-            cutoff = freqs_desc[min(hot_n-1, len(freqs_desc)-1)][1] if freqs_desc else 0
-            hot = sorted([d for d,c in cnt.items() if c >= cutoff])
-            # cold
-            freqs_asc = sorted(cnt.items(), key=lambda kv: (kv[1], kv[0]))
-            cutoff_c = freqs_asc[min(cold_n-1, len(freqs_asc)-1)][1] if freqs_asc else 0
-            cold = sorted([d for d,c in cnt.items() if c <= cutoff_c])
-    seq_due = "".join(history[:due_window])
-    due = []
-    if seq_due:
-        seen = {int(ch) for ch in seq_due}
-        due = [d for d in range(10) if d not in seen]
-    return hot, cold, due
-
-# -----------------------------
-# Context builder for eval
-# -----------------------------
 def make_ctx(combo: str, seed: str, hot, cold, due):
     combo_digits = [int(c) for c in combo]
     seed_digits = [int(c) for c in seed]
@@ -102,15 +51,28 @@ def make_ctx(combo: str, seed: str, hot, cold, due):
         "any": any, "all": all, "Counter": Counter
     }
 
+def auto_hot_cold(history: list[str], hot_n=3, cold_n=3):
+    """Compute hot/cold digits from entire history list."""
+    seq = "".join(history)
+    cnt = Counter(int(ch) for ch in seq)
+    if not cnt: return [], []
+    freqs_desc = cnt.most_common()
+    cutoff = freqs_desc[min(hot_n-1, len(freqs_desc)-1)][1] if freqs_desc else 0
+    hot = sorted([d for d,c in cnt.items() if c >= cutoff])
+    freqs_asc = sorted(cnt.items(), key=lambda kv: (kv[1], kv[0]))
+    cutoff_c = freqs_asc[min(cold_n-1, len(freqs_asc)-1)][1] if freqs_asc else 0
+    cold = sorted([d for d,c in cnt.items() if c <= cutoff_c])
+    return hot, cold
+
 # -----------------------------
-# Streamlit UI
+# UI
 # -----------------------------
 st.set_page_config(page_title="DC-5 Filter Tester", layout="wide")
 st.title("DC-5 Filter Tester")
 
 st.sidebar.header("Inputs")
+
 seed = st.sidebar.text_input("Draw 1-back (required, 5 digits):", key="seed").strip()
-# 9 more previous draws
 prevs = [st.sidebar.text_input(f"Draw {i}-back:", key=f"prev_{i}").strip() for i in range(2, 11)]
 
 hot_override = st.sidebar.text_input("Hot digits override (comma-separated):", key="hot_override")
@@ -121,33 +83,34 @@ check_combo = st.sidebar.text_input("Check specific combo:", key="check_combo")
 hide_zero = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True, key="hide_zero")
 select_all_toggle = st.sidebar.checkbox("Select/Deselect All Filters", value=True, key="select_all_toggle")
 
-# Validation
-if len(seed) != 5 or not all(ch in DIGITS for ch in seed):
+# Validate seed
+if len(seed) != 5 or not seed.isdigit():
     st.info("Enter a valid 5-digit seed first (digits 0–9).")
     st.stop()
 
 # Load filters
-filter_path = _first_existing(FILTER_FILE_CANDIDATES)
-filters = load_filters(filter_path)
+filters = load_filters(FILTER_FILE)
 
-# History for hot/cold/due
+# Hot/Cold auto-calc if full 10 draws
 history = [seed] + [p for p in prevs if p]
-if len(history) < 10:
-    st.warning("Hot/Cold/Due digits will auto-calc only after 10 draws are entered.")
-auto_hot, auto_cold, auto_due = ([], [], [])
-if len(history) >= 10:
-    auto_hot, auto_cold, auto_due = auto_hot_cold_due(history)
+auto_hot, auto_cold = ([], [])
+if len(history) >= 10 and all(len(d)==5 and d.isdigit() for d in history[:10]):
+    auto_hot, auto_cold = auto_hot_cold(history)
 
 parse_list = lambda txt: [int(t) for t in txt.replace(",", " ").split() if t.isdigit()]
 hot = parse_list(hot_override) or auto_hot
 cold = parse_list(cold_override) or auto_cold
-due = parse_list(due_override) or auto_due
 
-st.sidebar.markdown(f"**Auto ➜** Hot {auto_hot} | Cold {auto_cold} | Due {auto_due}")
+# Due digits based on last 2 draws
+last2_digits = [int(d) for draw in history[:2] if len(draw)==5 for d in draw]
+due = parse_list(due_override) or [d for d in range(10) if d not in last2_digits]
+
+# Display
+st.sidebar.markdown(f"**Auto ➜** Hot {auto_hot} | Cold {auto_cold}")
 st.sidebar.markdown(f"**Using ➜** Hot {hot} | Cold {cold} | Due {due}")
 
 # -----------------------------
-# Filter initial cuts
+# Initial filter counts
 # -----------------------------
 test_combo = check_combo.strip() or seed
 init_counts = {}
@@ -159,7 +122,6 @@ for f in filters:
             if eval(f["code"], {}, ctx):
                 cuts += 1
         except Exception:
-            # still count as 0 but show syntax error if compile failed earlier
             pass
     init_counts[f["id"]] = cuts
 
