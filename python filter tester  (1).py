@@ -85,7 +85,7 @@ def main():
     new_digits = set(seed_digits) - set(prev_digits)
     hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
     cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
-    due_digits = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]
+    due_digits = [d for d in range(10) if d not in seed_digits and d not in prev_prev_digits]
     seed_counts = Counter(seed_digits)
     seed_vtracs = set(V_TRAC_GROUPS[d] for d in seed_digits)
     seed_sum = sum(seed_digits)
