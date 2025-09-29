@@ -242,7 +242,7 @@ def main():
             for fid, msg in failed:
                 st.text(f"{fid}: {msg}")
 
-    # =========================
+     # =========================
     # APPENDED: HOT/COLD/DUE CALCULATOR
     # =========================
     st.sidebar.markdown("---")
@@ -257,26 +257,30 @@ def main():
             ).strip()
         )
 
-    auto_hot, auto_cold, auto_due = [], [], []
+    # Only calculate if ALL 10 are valid 5-digit draws
     if all(len(d) == 5 and d.isdigit() for d in calc_draws):
         seq = "".join(calc_draws)
         cnt = Counter(int(ch) for ch in seq)
+        auto_hot, auto_cold, auto_due = [], [], []
+
         if cnt:
             # HOT: top 3 with ties
             hot_cutoff = cnt.most_common(3)[-1][1] if len(cnt) >= 3 else cnt.most_common()[-1][1]
             auto_hot = sorted([d for d, c in cnt.items() if c >= hot_cutoff])
+
             # COLD: bottom 3 with ties
             sorted_asc = sorted(cnt.items(), key=lambda kv: (kv[1], kv[0]))
             cold_cutoff = sorted_asc[min(2, len(sorted_asc)-1)][1] if len(sorted_asc) >= 3 else sorted_asc[-1][1]
             auto_cold = sorted([d for d, c in cnt.items() if c <= cold_cutoff])
-        # DUE: digits not seen in last 2 draws
-        last2 = "".join(calc_draws[:2])
-        seen = {int(x) for x in last2}
-        auto_due = [d for d in range(10) if d not in seen]
 
-    st.sidebar.write(f"**Hot:** {auto_hot}")
-    st.sidebar.write(f"**Cold:** {auto_cold}")
-    st.sidebar.write(f"**Due:** {auto_due}")
+            # DUE: digits not seen in last 2 draws
+            last2 = "".join(calc_draws[:2])
+            seen = {int(x) for x in last2}
+            auto_due = [d for d in range(10) if d not in seen]
 
-if __name__ == '__main__':
-    main()
+        st.sidebar.write(f"**Hot:** {auto_hot}")
+        st.sidebar.write(f"**Cold:** {auto_cold}")
+        st.sidebar.write(f"**Due:** {auto_due}")
+    else:
+        st.sidebar.info("Enter all 10 past draws (5 digits each) to calculate Hot/Cold/Due.")
+
