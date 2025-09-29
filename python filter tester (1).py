@@ -1,75 +1,188 @@
 import streamlit as st
-import pandas as pd
-import ast
-import re
+from itertools import product
+import csv
+import os
 from collections import Counter
+import math
 
-st.set_page_config(page_title="DC-5 Filter Tester", layout="wide")
-st.title("DC-5 Filter Tester")
+# V-Trac and mirror mappings
+V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
+MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
+MIRROR = MIRROR_PAIRS
+mirror = MIRROR  # keep lowercase for CSV expressions
 
-# --------------------
-# Upload CSV of filters
-# --------------------
-uploaded_file = st.sidebar.file_uploader("Upload filter CSV", type=["csv"])
-if uploaded_file:
-    filters_df = pd.read_csv(uploaded_file)
+def sum_category(total: int) -> str:
+    if 0 <= total <= 15:
+        return 'Very Low'
+    elif 16 <= total <= 24:
+        return 'Low'
+    elif 25 <= total <= 33:
+        return 'Mid'
+    else:
+        return 'High'
 
-# --------------------
-# Original Inputs (unchanged)
-# --------------------
-st.sidebar.markdown("### Main Inputs")
-generation_method = st.sidebar.selectbox("Generation Method:", ["1-digit", "other"])
-hot_override = st.sidebar.text_input("Hot digits override (comma-separated):")
-cold_override = st.sidebar.text_input("Cold digits override (comma-separated):")
-due_override = st.sidebar.text_input("Due digits override (comma-separated):")
-check_combo = st.sidebar.text_input("Check specific combo:")
-hide_zero = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True)
-select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
+def load_filters(path: str='lottery_filters_batch10.csv') -> list:
+    if not os.path.exists(path):
+        st.error(f"Filter file not found: {path}")
+        st.stop()
+    filters = []
+    with open(path, newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for raw in reader:
+            row = {k.lower(): v for k, v in raw.items()}
+            row['id'] = row.get('id', row.get('fid', '')).strip()
+            for key in ('name', 'applicable_if', 'expression'):
+                if key in row and isinstance(row[key], str):
+                    row[key] = row[key].strip().strip('"').strip("'")
+            row['expression'] = row.get('expression', '').replace('!==', '!=')
+            applicable = row.get('applicable_if') or 'True'
+            expr = row.get('expression') or 'False'
+            try:
+                row['applicable_code'] = compile(applicable, '<applicable>', 'eval')
+                row['expr_code'] = compile(expr, '<expr>', 'eval')
+            except SyntaxError as e:
+                st.error(f"Syntax error in filter {row['id']}: {e}")
+                continue
+            row['enabled_default'] = row.get('enabled', '').lower() == 'true'
+            filters.append(row)
+    return filters
 
-# --------------------
-# SAFE Standalone Hot/Cold/Due Calculator
-# --------------------
-st.sidebar.markdown("### Hot / Cold / Due Calculator")
-calc_inputs = []
+def generate_combinations(seed: str, method: str) -> list:
+    all_digits = '0123456789'
+    combos_set = set()
+    sorted_seed = ''.join(sorted(seed))
+    if method == '1-digit':
+        for d in sorted_seed:
+            for p in product(all_digits, repeat=4):
+                combos_set.add(''.join(sorted(d + ''.join(p))))
+    else:
+        pairs = {''.join(sorted((sorted_seed[i], sorted_seed[j])))
+                 for i in range(len(sorted_seed)) for j in range(i+1, len(sorted_seed))}
+        for pair in pairs:
+            for p in product(all_digits, repeat=3):
+                combos_set.add(''.join(sorted(pair + ''.join(p))))
+    return sorted(combos_set)
+
+# ----------------------------
+# New HOT / COLD / DUE CALCULATOR (standalone, doesn't touch main filters)
+# ----------------------------
+st.sidebar.markdown("### 🔥 Hot / 🧊 Cold / ⏳ Due Calculator")
+seeds = []
 for i in range(1, 11):
-    calc_inputs.append(
-        st.sidebar.text_input(
-            f"Calculator Draw {i}-back",
-            key=f"calc_draw_safe_{i}"
-        ).strip()
-    )
+    s = st.sidebar.text_input(f"Seed {i} (5 digits):", key=f"hotcold_seed_{i}").strip()
+    seeds.append(s)
 
-if all(re.fullmatch(r"\d{5}", d) for d in calc_inputs):
-    seq = "".join(calc_inputs)
-    cnt = Counter(int(ch) for ch in seq)
-
-    if cnt:
-        # HOT: top 3 (include ties)
-        sorted_counts = cnt.most_common()
-        hot_min = sorted_counts[min(2, len(sorted_counts)-1)][1]
-        hot = sorted([n for n, c in cnt.items() if c >= hot_min])
-
-        # COLD: bottom 3 (include ties)
-        sorted_asc = sorted(cnt.items(), key=lambda kv: (kv[1], kv[0]))
-        cold_max = sorted_asc[min(2, len(sorted_asc)-1)][1]
-        cold = sorted([n for n, c in cnt.items() if c <= cold_max])
-
-        # DUE: digits missing from last 2 draws
-        last2 = "".join(calc_inputs[:2])
-        due = [d for d in range(10) if str(d) not in last2]
-
-        st.sidebar.success(f"Hot digits: {hot}")
-        st.sidebar.success(f"Cold digits: {cold}")
-        st.sidebar.success(f"Due digits: {due}")
+hotcold_ready = all(len(s)==5 and s.isdigit() for s in seeds)
+if hotcold_ready:
+    digits = [int(d) for s in seeds for d in s]
+    freq = Counter(digits)
+    # Hot = top 3 most frequent, Cold = bottom 3, Due = digits not seen at all
+    sorted_freq = sorted(freq.items(), key=lambda x: x[1], reverse=True)
+    hot = [d for d,_ in sorted_freq[:3]]
+    cold = [d for d,_ in sorted_freq[-3:]]
+    due = [d for d in range(10) if d not in freq]
+    st.sidebar.success(f"Hot digits: {hot}")
+    st.sidebar.info(f"Cold digits: {cold}")
+    st.sidebar.warning(f"Due digits: {due}")
 else:
-    st.sidebar.info("Enter exactly 10 previous 5-digit draws to compute Hot/Cold/Due.")
+    st.sidebar.caption("Enter all 10 seeds (each 5 digits) to compute hot/cold/due.")
 
-# --------------------
-# Rest of your original filter tester logic goes here
-# (reading filters_df, applying filters, showing elimination counts, etc.)
-# --------------------
+# ----------------------------
+# Main DC-5 Filter Tester
+# ----------------------------
+def main():
+    filters = load_filters()
+    st.sidebar.header("🔢 DC-5 Filter Tracker Full")
+    select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
+    seed = st.sidebar.text_input("Draw 1-back (required):", help="Enter the draw immediately before the combo to test").strip()
+    prev_seed = st.sidebar.text_input("Draw 2-back (optional):").strip()
+    prev_prev = st.sidebar.text_input("Draw 3-back (optional):").strip()
+    prev_prev_prev = st.sidebar.text_input("Draw 4-back (optional):").strip()
+    method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
+    hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
+    cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
+    check_combo = st.sidebar.text_input("Check specific combo:").strip()
+    hide_zero = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True)
 
-if uploaded_file is not None:
-    st.subheader("Filters loaded:")
-    st.dataframe(filters_df)
-    # TODO: keep your original filter execution & display code here.
+    if len(seed) != 5 or not seed.isdigit():
+        st.sidebar.error("Draw 1-back must be exactly 5 digits")
+        return
+
+    seed_digits = [int(d) for d in seed]
+    prev_digits = [int(d) for d in prev_seed if d.isdigit()]
+    prev_prev_digits = [int(d) for d in prev_prev if d.isdigit()]
+    prev_prev_prev_digits = [int(d) for d in prev_prev_prev if d.isdigit()]
+    new_digits = set(seed_digits) - set(prev_digits)
+    hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
+    cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
+    due_digits = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]
+    seed_counts = Counter(seed_digits)
+    seed_vtracs = set(V_TRAC_GROUPS[d] for d in seed_digits)
+    seed_sum = sum(seed_digits)
+    prev_pattern = []
+    for digs in (prev_prev_digits, prev_digits, seed_digits):
+        parity = 'Even' if sum(digs) % 2 == 0 else 'Odd'
+        prev_pattern.extend([sum_category(sum(digs)), parity])
+    prev_pattern = tuple(prev_pattern)
+
+    def gen_ctx(cdigits):
+        csum = sum(cdigits)
+        return {
+            'seed_value': int(seed),
+            'seed_sum': seed_sum,
+            'prev_seed_sum': sum(prev_digits) if prev_digits else None,
+            'prev_prev_seed_sum': sum(prev_prev_digits) if prev_prev_digits else None,
+            'prev_prev_prev_seed_sum': sum(prev_prev_prev_digits) if prev_prev_prev_digits else None,
+            'seed_digits': seed_digits,
+            'prev_seed_digits': prev_digits,
+            'prev_prev_seed_digits': prev_prev_digits,
+            'prev_prev_prev_seed_digits': prev_prev_prev_digits,
+            'new_seed_digits': new_digits,
+            'prev_pattern': prev_pattern,
+            'hot_digits': hot_digits,
+            'cold_digits': cold_digits,
+            'due_digits': due_digits,
+            'seed_counts': seed_counts,
+            'combo_digits': cdigits,
+            'combo_sum': csum,
+            'combo_sum_cat': sum_category(csum),
+            'seed_vtracs': seed_vtracs,
+            'combo_vtracs': set(V_TRAC_GROUPS[d] for d in cdigits),
+            'mirror': MIRROR,
+            'Counter': Counter
+        }
+
+    combos = generate_combinations(seed, method)
+    eliminated = {}
+    survivors = []
+    for combo in combos:
+        cdigits = [int(c) for c in combo]
+        ctx = gen_ctx(cdigits)
+        for flt in filters:
+            key = f"filter_{flt['id']}"
+            if not st.session_state.get(key, select_all and flt['enabled_default']):
+                continue
+            try:
+                if not eval(flt['applicable_code'], ctx, ctx):
+                    continue
+                if eval(flt['expr_code'], ctx, ctx):
+                    eliminated[combo] = flt['name']
+                    break
+            except:
+                continue
+        else:
+            survivors.append(combo)
+
+    st.sidebar.markdown(f"**Total:** {len(combos)}  Elim: {len(eliminated)}  Remain: {len(survivors)}")
+
+    if check_combo:
+        norm = ''.join(sorted(check_combo))
+        if norm in eliminated:
+            st.sidebar.info(f"Combo {check_combo} eliminated by {eliminated[norm]}")
+        elif norm in survivors:
+            st.sidebar.success(f"Combo {check_combo} survived all filters")
+        else:
+            st.sidebar.warning("Combo not found")
+
+if __name__ == '__main__':
+    main()
