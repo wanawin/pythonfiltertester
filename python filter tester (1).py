@@ -21,6 +21,24 @@ def sum_category(total: int) -> str:
     else:
         return 'High'
 
+def structure_of(digits):
+    counts = sorted(Counter(digits).values(), reverse=True)
+    if counts == [1,1,1,1,1]:
+        return 'SINGLE'
+    if counts == [2,1,1,1]:
+        return 'DOUBLE'
+    if counts == [2,2,1]:
+        return 'DOUBLE-DOUBLE'
+    if counts == [3,1,1]:
+        return 'TRIPLE'
+    if counts == [3,2]:
+        return 'TRIPLE-DOUBLE'
+    if counts == [4,1]:
+        return 'QUAD'
+    if counts == [5]:
+        return 'QUINT'
+    return f'OTHER-{counts}'
+
 def load_filters(path: str='lottery_filters_batch10.csv') -> list:
     if not os.path.exists(path):
         st.error(f"Filter file not found: {path}")
@@ -129,7 +147,10 @@ def main():
             'mirror': MIRROR,
             'common_to_both': set(seed_digits) & set(prev_digits),
             'last2': set(seed_digits) | set(prev_digits),
-            'Counter': Counter
+            'Counter': Counter,
+            # NEW — structure fields
+            'combo_structure': structure_of(cdigits),
+            'winner_structure': structure_of(seed_digits),
         }
 
     combos = generate_combinations(seed, method)
@@ -243,7 +264,7 @@ def main():
                 st.text(f"{fid}: {msg}")
 
     # =========================
-    # APPENDED: HOT/COLD/DUE CALCULATOR  (only show after all 10 valid)
+    # APPENDED: HOT/COLD/DUE CALCULATOR
     # =========================
     st.sidebar.markdown("---")
     st.sidebar.subheader("Hot / Cold / Due Calculator")
