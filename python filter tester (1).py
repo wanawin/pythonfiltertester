@@ -1,3 +1,4 @@
+
 import streamlit as st
 from itertools import product
 import csv
@@ -92,6 +93,10 @@ def main():
     method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
     hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
     cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
+
+    # NEW: manual due digits override
+    due_input = st.sidebar.text_input("Due digits (comma-separated, optional):").strip()
+
     check_combo = st.sidebar.text_input("Check specific combo:").strip()
     hide_zero = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True)
 
@@ -99,7 +104,6 @@ def main():
         st.sidebar.error("Draw 1-back must be exactly 5 digits")
         return
 
-    # build context
     seed_digits = [int(d) for d in seed]
     prev_digits = [int(d) for d in prev_seed if d.isdigit()]
     prev_prev_digits = [int(d) for d in prev_prev if d.isdigit()]
@@ -107,7 +111,13 @@ def main():
     new_digits = set(seed_digits) - set(prev_digits)
     hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
     cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
-    due_digits = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]
+
+    # use manual due digits if provided
+    if due_input:
+        due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
+    else:
+        due_digits = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]
+
     seed_counts = Counter(seed_digits)
     seed_vtracs = set(V_TRAC_GROUPS[d] for d in seed_digits)
     seed_sum = sum(seed_digits)
@@ -148,7 +158,6 @@ def main():
             'common_to_both': set(seed_digits) & set(prev_digits),
             'last2': set(seed_digits) | set(prev_digits),
             'Counter': Counter,
-            # NEW — structure fields
             'combo_structure': structure_of(cdigits),
             'winner_structure': structure_of(seed_digits),
         }
@@ -185,7 +194,6 @@ def main():
         else:
             st.sidebar.warning("Combo not found in generated list")
 
-    # initial counts
     init_counts = {flt['id']: 0 for flt in filters}
     for flt in filters:
         for combo in combos:
@@ -241,7 +249,6 @@ def main():
         for c in survivors:
             st.write(c)
 
-    # Diagnostic block
     if check_combo:
         test_digits = [int(c) for c in check_combo if c.isdigit()]
         ctx = gen_ctx(test_digits)
@@ -263,9 +270,6 @@ def main():
             for fid, msg in failed:
                 st.text(f"{fid}: {msg}")
 
-    # =========================
-    # APPENDED: HOT/COLD/DUE CALCULATOR
-    # =========================
     st.sidebar.markdown("---")
     st.sidebar.subheader("Hot / Cold / Due Calculator")
 
@@ -282,18 +286,15 @@ def main():
         seq = "".join(calc_draws)
         cnt = Counter(int(ch) for ch in seq)
 
-        # HOT: top 3 with ties
         auto_hot, auto_cold, auto_due = [], [], []
         if cnt:
             hot_cutoff = cnt.most_common(3)[-1][1] if len(cnt) >= 3 else cnt.most_common()[-1][1]
             auto_hot = sorted([d for d, c in cnt.items() if c >= hot_cutoff])
 
-            # COLD: bottom 3 with ties
             sorted_asc = sorted(cnt.items(), key=lambda kv: (kv[1], kv[0]))
             cold_cutoff = sorted_asc[min(2, len(sorted_asc)-1)][1] if len(sorted_asc) >= 3 else sorted_asc[-1][1]
             auto_cold = sorted([d for d, c in cnt.items() if c <= cold_cutoff])
 
-        # DUE: digits not seen in last 2 draws
         last2 = "".join(calc_draws[:2])
         seen = {int(x) for x in last2}
         auto_due = [d for d in range(10) if d not in seen]
