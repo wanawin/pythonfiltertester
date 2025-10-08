@@ -360,6 +360,17 @@ TEST_PP_0F358_REV,"[DIAG] prev_pattern == REVERSED ('Low','Even','High','Odd','H
 TEST_IDX_S3_HE,"[DIAG] prev_pattern[0:2] == ('High','Even') ?",True,"""True""","""(prev_pattern[0] == 'High' and prev_pattern[1] == 'Even') and False""",,,,,,,,,,
 TEST_IDX_S2_HO,"[DIAG] prev_pattern[2:4] == ('High','Odd') ?",True,"""True""","""(prev_pattern[2] == 'High' and prev_pattern[3] == 'Odd') and False""",,,,,,,,,,
 TEST_IDX_S1_LE,"[DIAG] prev_pattern[4:6] == ('Low','Even') ?",True,"""True""","""(prev_pattern[4] == 'Low' and prev_pattern[5] == 'Even') and False""",,,,,,,,,,
+TEST_IS_TUPLE,"[DIAG] isinstance(prev_pattern, tuple)?",True,"""True""","""(isinstance(prev_pattern, tuple)) and False""",,,,,,,,,,
+TEST_IS_LIST,"[DIAG] isinstance(prev_pattern, list)?",True,"""True""","""(isinstance(prev_pattern, list)) and False""",,,,,,,,,,
+TEST_IS_STR,"[DIAG] isinstance(prev_pattern, str)?",True,"""True""","""(isinstance(prev_pattern, str)) and False""",,,,,,,,,,
+TEST_LEN_6,"[DIAG] len(prev_pattern) == 6 ?",True,"""True""","""(hasattr(prev_pattern,'__len__') and len(prev_pattern)==6) and False""",,,,,,,,,,
+
+TEST_S0_ANY,"[DIAG] slot0 in expected set?",True,"""True""","""(isinstance(prev_pattern,(list,tuple)) and (prev_pattern[0] in ('High','Mid','Low','Very Low','H','M','L','VL'))) and False""",,,,,,,,,,
+TEST_S1_ANY,"[DIAG] slot1 in {'Even','Odd','E','O'} ?",True,"""True""","""(isinstance(prev_pattern,(list,tuple)) and (prev_pattern[1] in ('Even','Odd','E','O'))) and False""",,,,,,,,,,
+
+TEST_PP_0F358_TUP,"[DIAG] tuple(prev_pattern) == ('High','Even','High','Odd','Low','Even') ?",True,"""True""","""(isinstance(prev_pattern,(list,tuple)) and tuple(prev_pattern)==('High','Even','High','Odd','Low','Even')) and False""",,,,,,,,,,
+TEST_PP_0F358_ALT,"[DIAG] alt labels HVL?",True,"""True""","""(isinstance(prev_pattern,(list,tuple)) and tuple(prev_pattern) in (('H','E','H','O','L','E'),('High','Even','High','Odd','Low','Even'),('VeryLow','Even','High','Odd','Low','Even'))) and False""",,,,,,,,,,
+
 0F358,"If last three seeds are ('High','Even','High','Odd','Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"(prev_pattern == ('High','Even','High','Odd','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
 0F359,"If last three seeds are ('High','Even','Mid','Odd','Low','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"(prev_pattern == ('High','Even','Mid','Odd','Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
 0F360,"If last three seeds are ('High','Even','Mid','Odd','Mid','Even') eliminate combos outside Low (100% over 1 cases)",True,"(prev_pattern == ('High','Even','Mid','Odd','Mid','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
