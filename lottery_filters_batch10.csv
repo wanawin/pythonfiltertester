@@ -353,378 +353,126 @@ NO467F354,DNUIf combo contains digit and its mirror,True,"""True""","""any(mirro
 NO296F355,XIf any combo digit = mirror of seed sum last digit,True,"""True""","""any(d == mirror.get(int(str(seed_value)[-1]),-1) for d in combo_digits)""",,,,,,,,,,
 42F356,"XIf seed has 0,8 eliminate combos with even sum",True,"""set(seed_digits).issuperset({0,8})""","""combo_sum%2==0""",,,,,,,,,,
 22F357,"Eliminate combos when previous seed sum >20, current seed sum <20, and combo sum <20",True,"True","prev_seed_sum > 20 and seed_sum < 20 and combo_sum < 20",,,,,,,,,,
-DIAG0F358_PP,"[DIAG] prev_pattern == ('High','Even','High','Odd','Low','Even') ?",True,True,"prev_pattern == ('High','Even','High','Odd','Low','Even')",,,,,,,,,,
-DIAG0F358_MID,"[DIAG] combos where combo_sum_cat != 'Mid' (count only)",True,True,"combo_sum_cat != 'Mid'",,,,,,,,,,
-DIAG0F358_SIMPLE,"[DIAG] prev_pattern == ('High','Even','High','Odd','Low','Even') (simple)",True,True,"prev_pattern == ('High','Even','High','Odd','Low','Even')",,,,,,,,,,
-DIAG0F358_REV,"[DIAG] prev_pattern == REVERSED ('Low','Even','High','Odd','High','Even') ?",True,True,"prev_pattern == ('Low','Even','High','Odd','High','Even')",,,,,,,,,,
-DIAG0F358_S3_HE,"[DIAG] prev_pattern[0:2] == ('High','Even') ?",True,True,"tuple(prev_pattern[0:2]) == ('High','Even')",,,,,,,,,,
-DIAG0F358_S2_HO,"[DIAG] prev_pattern[2:4] == ('High','Odd') ?",True,True,"tuple(prev_pattern[2:4]) == ('High','Odd')",,,,,,,,,,
-DIAG0F358_S1_LE,"[DIAG] prev_pattern[4:6] == ('Low','Even') ?",True,True,"tuple(prev_pattern[4:6]) == ('Low','Even')",,,,,,,,,,
-DIAG0F358_TUP,"[DIAG] tuple(prev_pattern) == ('High','Even','High','Odd','Low','Even') ?",True,True,"tuple(prev_pattern) == ('High','Even','High','Odd','Low','Even')",,,,,,,,,,
-DIAG0F358_ALT,"[DIAG] alt labels HVL?",True,True,"True",,,,,,,,,,
-
-
-TEST_PP_0F358,"[DIAG] prev_pattern == ('High','Even','High','Odd','Low','Even') ?",True,"prev_pattern == ('High','Even','High','Odd','Low','Even')",True,,,,,,,,,,
-0F358,"If last three seeds are ('High','Even','High','Odd','Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('High','Even','High','Odd','Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_0F359,"[DIAG] prev_pattern == ('High','Even','Mid','Odd','Low','Odd') ?",True,"prev_pattern == ('High','Even','Mid','Odd','Low','Odd')",True,,,,,,,,,,
-0F359,"If last three seeds are ('High','Even','Mid','Odd','Low','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('High','Even','Mid','Odd','Low','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_0F360,"[DIAG] prev_pattern == ('High','Even','Mid','Odd','Mid','Even') ?",True,"prev_pattern == ('High','Even','Mid','Odd','Mid','Even')",True,,,,,,,,,,
-0F360,"If last three seeds are ('High','Even','Mid','Odd','Mid','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('High','Even','Mid','Odd','Mid','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_0F361,"[DIAG] prev_pattern == ('High','Even','Very Low','Odd','Mid','Even') ?",True,"prev_pattern == ('High','Even','Very Low','Odd','Mid','Even')",True,,,,,,,,,,
-0F361,"If last three seeds are ('High','Even','Very Low','Odd','Mid','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('High','Even','Very Low','Odd','Mid','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_0F362,"[DIAG] prev_pattern == ('High','Odd','Low','Even','High','Even') ?",True,"prev_pattern == ('High','Odd','Low','Even','High','Even')",True,,,,,,,,,,
-0F362,"If last three seeds are ('High','Odd','Low','Even','High','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('High','Odd','Low','Even','High','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_0F363,"[DIAG] prev_pattern == ('High','Odd','Low','Even','Low','Odd') ?",True,"prev_pattern == ('High','Odd','Low','Even','Low','Odd')",True,,,,,,,,,,
-0F363,"If last three seeds are ('High','Odd','Low','Even','Low','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('High','Odd','Low','Even','Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_0F364,"[DIAG] prev_pattern == ('High','Odd','Low','Even','Mid','Even') ?",True,"prev_pattern == ('High','Odd','Low','Even','Mid','Even')",True,,,,,,,,,,
-0F364,"If last three seeds are ('High','Odd','Low','Even','Mid','Even') eliminate combos outside High (100% over 1 cases)",True,"prev_pattern == ('High','Odd','Low','Even','Mid','Even')","combo_sum_cat != 'High'",,,,,,,,,,
-
-TEST_PP_0F365,"[DIAG] prev_pattern == ('High','Odd','Low','Odd','Low','Even') ?",True,"prev_pattern == ('High','Odd','Low','Odd','Low','Even')",True,,,,,,,,,,
-0F365,"If last three seeds are ('High','Odd','Low','Odd','Low','Even') eliminate combos outside Very Low (100% over 1 cases)",True,"prev_pattern == ('High','Odd','Low','Odd','Low','Even')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_0F366,"[DIAG] prev_pattern == ('High','Odd','Low','Odd','Mid','Even') ?",True,"prev_pattern == ('High','Odd','Low','Odd','Mid','Even')",True,,,,,,,,,,
-0F366,"If last three seeds are ('High','Odd','Low','Odd','Mid','Even') eliminate combos outside Very Low (100% over 1 cases)",True,"prev_pattern == ('High','Odd','Low','Odd','Mid','Even')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_0F367,"[DIAG] prev_pattern == ('High','Odd','Mid','Odd','Mid','Odd') ?",True,"prev_pattern == ('High','Odd','Mid','Odd','Mid','Odd')",True,,,,,,,,,,
-0F367,"If last three seeds are ('High','Odd','Mid','Odd','Mid','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('High','Odd','Mid','Odd','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F368,"[DIAG] prev_pattern == ('High','Odd','Very Low','Even','Low','Even') ?",True,"prev_pattern == ('High','Odd','Very Low','Even','Low','Even')",True,,,,,,,,,,
-1F368,"If last three seeds are ('High','Odd','Very Low','Even','Low','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('High','Odd','Very Low','Even','Low','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F369,"[DIAG] prev_pattern == ('High','Odd','Very Low','Odd','Mid','Odd') ?",True,"prev_pattern == ('High','Odd','Very Low','Odd','Mid','Odd')",True,,,,,,,,,,
-1F369,"If last three seeds are ('High','Odd','Very Low','Odd','Mid','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('High','Odd','Very Low','Odd','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F370,"[DIAG] prev_pattern == ('Low','Even','High','Even','Mid','Even') ?",True,"prev_pattern == ('Low','Even','High','Even','Mid','Even')",True,,,,,,,,,,
-1F370,"If last three seeds are ('Low','Even','High','Even','Mid','Even') eliminate combos outside High (100% over 1 cases)",True,"prev_pattern == ('Low','Even','High','Even','Mid','Even')","combo_sum_cat != 'High'",,,,,,,,,,
-
-TEST_PP_1F371,"[DIAG] prev_pattern == ('Low','Even','High','Odd','Low','Even') ?",True,"prev_pattern == ('Low','Even','High','Odd','Low','Even')",True,,,,,,,,,,
-1F371,"If last three seeds are ('Low','Even','High','Odd','Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Even','High','Odd','Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F372,"[DIAG] prev_pattern == ('Low','Even','High','Odd','Mid','Odd') ?",True,"prev_pattern == ('Low','Even','High','Odd','Mid','Odd')",True,,,,,,,,,,
-1F372,"If last three seeds are ('Low','Even','High','Odd','Mid','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Low','Even','High','Odd','Mid','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F373,"[DIAG] prev_pattern == ('Low','Even','High','Odd','Very Low','Odd') ?",True,"prev_pattern == ('Low','Even','High','Odd','Very Low','Odd')",True,,,,,,,,,,
-1F373,"If last three seeds are ('Low','Even','High','Odd','Very Low','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Even','High','Odd','Very Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_12F374,"[DIAG] prev_pattern == ('Low','Even','Low','Even','Mid','Odd') ?",True,"prev_pattern == ('Low','Even','Low','Even','Mid','Odd')",True,,,,,,,,,,
-12F374,"If last three seeds are ('Low','Even','Low','Even','Mid','Odd') eliminate combos outside Low (80% over 5 cases)",True,"prev_pattern == ('Low','Even','Low','Even','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_2F375,"[DIAG] prev_pattern == ('Low','Even','Low','Even','Very Low','Even') ?",True,"prev_pattern == ('Low','Even','Low','Even','Very Low','Even')",True,,,,,,,,,,
-2F375,"If last three seeds are ('Low','Even','Low','Even','Very Low','Even') eliminate combos outside Mid (100% over 2 cases)",True,"prev_pattern == ('Low','Even','Low','Even','Very Low','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F376,"[DIAG] prev_pattern == ('Low','Even','Low','Even','Very Low','Odd') ?",True,"prev_pattern == ('Low','Even','Low','Even','Very Low','Odd')",True,,,,,,,,,,
-1F376,"If last three seeds are ('Low','Even','Low','Even','Very Low','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Low','Even','Very Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F377,"[DIAG] prev_pattern == ('Low','Even','Low','Odd','Very Low','Even') ?",True,"prev_pattern == ('Low','Even','Low','Odd','Very Low','Even')",True,,,,,,,,,,
-1F377,"If last three seeds are ('Low','Even','Low','Odd','Very Low','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Low','Odd','Very Low','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F378,"[DIAG] prev_pattern == ('Low','Even','Mid','Even','High','Odd') ?",True,"prev_pattern == ('Low','Even','Mid','Even','High','Odd')",True,,,,,,,,,,
-1F378,"If last three seeds are ('Low','Even','Mid','Even','High','Odd') eliminate combos outside Very Low (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Mid','Even','High','Odd')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_0F379,"[DIAG] prev_pattern == ('Low','Even','Mid','Even','Low','Odd') ?",True,"prev_pattern == ('Low','Even','Mid','Even','Low','Odd')",True,,,,,,,,,,
-0F379,"If last three seeds are ('Low','Even','Mid','Even','Low','Odd') eliminate combos outside Low (80% over 5 cases)",True,"prev_pattern == ('Low','Even','Mid','Even','Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_3F380,"[DIAG] prev_pattern == ('Low','Even','Mid','Even','Mid','Odd') ?",True,"prev_pattern == ('Low','Even','Mid','Even','Mid','Odd')",True,,,,,,,,,,
-3F380,"If last three seeds are ('Low','Even','Mid','Even','Mid','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Mid','Even','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_4F381,"[DIAG] prev_pattern == ('Low','Even','Mid','Even','Very Low','Even') ?",True,"prev_pattern == ('Low','Even','Mid','Even','Very Low','Even')",True,,,,,,,,,,
-4F381,"If last three seeds are ('Low','Even','Mid','Even','Very Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Mid','Even','Very Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_9F382,"[DIAG] prev_pattern == ('Low','Even','Mid','Odd','Mid','Odd') ?",True,"prev_pattern == ('Low','Even','Mid','Odd','Mid','Odd')",True,,,,,,,,,,
-9F382,"If last three seeds are ('Low','Even','Mid','Odd','Mid','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Mid','Odd','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F383,"[DIAG] prev_pattern == ('Low','Even','Very Low','Even','High','Odd') ?",True,"prev_pattern == ('Low','Even','Very Low','Even','High','Odd')",True,,,,,,,,,,
-1F383,"If last three seeds are ('Low','Even','Very Low','Even','High','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Very Low','Even','High','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_2F384,"[DIAG] prev_pattern == ('Low','Even','Very Low','Even','Low','Even') ?",True,"prev_pattern == ('Low','Even','Very Low','Even','Low','Even')",True,,,,,,,,,,
-2F384,"If last three seeds are ('Low','Even','Very Low','Even','Low','Even') eliminate combos outside Very Low (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Very Low','Even','Low','Even')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_0F385,"[DIAG] prev_pattern == ('Low','Even','Very Low','Even','Low','Odd') ?",True,"prev_pattern == ('Low','Even','Very Low','Even','Low','Odd')",True,,,,,,,,,,
-0F385,"If last three seeds are ('Low','Even','Very Low','Even','Low','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Very Low','Even','Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_2F386,"[DIAG] prev_pattern == ('Low','Even','Very Low','Even','Mid','Even') ?",True,"prev_pattern == ('Low','Even','Very Low','Even','Mid','Even')",True,,,,,,,,,,
-2F386,"If last three seeds are ('Low','Even','Very Low','Even','Mid','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Very Low','Even','Mid','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_0F387,"[DIAG] prev_pattern == ('Low','Even','Very Low','Even','Mid','Odd') ?",True,"prev_pattern == ('Low','Even','Very Low','Even','Mid','Odd')",True,,,,,,,,,,
-0F387,"If last three seeds are ('Low','Even','Very Low','Even','Mid','Odd') eliminate combos outside Mid (100% over 2 cases)",True,"prev_pattern == ('Low','Even','Very Low','Even','Mid','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F388,"[DIAG] prev_pattern == ('Low','Even','Very Low','Even','Very Low','Even') ?",True,"prev_pattern == ('Low','Even','Very Low','Even','Very Low','Even')",True,,,,,,,,,,
-1F388,"If last three seeds are ('Low','Even','Very Low','Even','Very Low','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Very Low','Even','Very Low','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_2F389,"[DIAG] prev_pattern == ('Low','Even','Very Low','Odd','High','Odd') ?",True,"prev_pattern == ('Low','Even','Very Low','Odd','High','Odd')",True,,,,,,,,,,
-2F389,"If last three seeds are ('Low','Even','Very Low','Odd','High','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Very Low','Odd','High','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F390,"[DIAG] prev_pattern == ('Low','Even','Very Low','Odd','Low','Odd') ?",True,"prev_pattern == ('Low','Even','Very Low','Odd','Low','Odd')",True,,,,,,,,,,
-1F390,"If last three seeds are ('Low','Even','Very Low','Odd','Low','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Low','Even','Very Low','Odd','Low','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_2F391,"[DIAG] prev_pattern == ('Low','Even','Very Low','Odd','Mid','Odd') ?",True,"prev_pattern == ('Low','Even','Very Low','Odd','Mid','Odd')",True,,,,,,,,,,
-2F391,"If last three seeds are ('Low','Even','Very Low','Odd','Mid','Odd') eliminate combos outside Low (100% over 2 cases)",True,"prev_pattern == ('Low','Even','Very Low','Odd','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F392,"[DIAG] prev_pattern == ('Low','Odd','High','Even','High','Odd') ?",True,"prev_pattern == ('Low','Odd','High','Even','High','Odd')",True,,,,,,,,,,
-1F392,"If last three seeds are ('Low','Odd','High','Even','High','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Low','Odd','High','Even','High','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F393,"[DIAG] prev_pattern == ('Low','Odd','High','Even','Mid','Odd') ?",True,"prev_pattern == ('Low','Odd','High','Even','Mid','Odd')",True,,,,,,,,,,
-1F393,"If last three seeds are ('Low','Odd','High','Even','Mid','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Low','Odd','High','Even','Mid','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F394,"[DIAG] prev_pattern == ('Low','Odd','High','Odd','Low','Even') ?",True,"prev_pattern == ('Low','Odd','High','Odd','Low','Even')",True,,,,,,,,,,
-1F394,"If last three seeds are ('Low','Odd','High','Odd','Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Odd','High','Odd','Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F395,"[DIAG] prev_pattern == ('Low','Odd','High','Odd','Mid','Odd') ?",True,"prev_pattern == ('Low','Odd','High','Odd','Mid','Odd')",True,,,,,,,,,,
-1F395,"If last three seeds are ('Low','Odd','High','Odd','Mid','Odd') eliminate combos outside Very Low (100% over 1 cases)",True,"prev_pattern == ('Low','Odd','High','Odd','Mid','Odd')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_2F396,"[DIAG] prev_pattern == ('Low','Odd','Low','Even','High','Odd') ?",True,"prev_pattern == ('Low','Odd','Low','Even','High','Odd')",True,,,,,,,,,,
-2F396,"If last three seeds are ('Low','Odd','Low','Even','High','Odd') eliminate combos outside Mid (100% over 2 cases)",True,"prev_pattern == ('Low','Odd','Low','Even','High','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_3F397,"[DIAG] prev_pattern == ('Low','Odd','Low','Even','Low','Odd') ?",True,"prev_pattern == ('Low','Odd','Low','Even','Low','Odd')",True,,,,,,,,,,
-3F397,"If last three seeds are ('Low','Odd','Low','Even','Low','Odd') eliminate combos outside Low (100% over 3 cases)",True,"prev_pattern == ('Low','Odd','Low','Even','Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_4F398,"[DIAG] prev_pattern == ('Low','Odd','Low','Even','Mid','Odd') ?",True,"prev_pattern == ('Low','Odd','Low','Even','Mid','Odd')",True,,,,,,,,,,
-4F398,"If last three seeds are ('Low','Odd','Low','Even','Mid','Odd') eliminate combos outside Mid (80% over 5 cases)",True,"prev_pattern == ('Low','Odd','Low','Even','Mid','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F399,"[DIAG] prev_pattern == ('Low','Odd','Low','Odd','High','Odd') ?",True,"prev_pattern == ('Low','Odd','Low','Odd','High','Odd')",True,,,,,,,,,,
-1F399,"If last three seeds are ('Low','Odd','Low','Odd','High','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Odd','Low','Odd','High','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F400,"[DIAG] prev_pattern == ('Low','Odd','Low','Odd','Mid','Even') ?",True,"prev_pattern == ('Low','Odd','Low','Odd','Mid','Even')",True,,,,,,,,,,
-1F400,"If last three seeds are ('Low','Odd','Low','Odd','Mid','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Low','Odd','Low','Odd','Mid','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_2F401,"[DIAG] prev_pattern == ('Low','Odd','Low','Odd','Very Low','Even') ?",True,"prev_pattern == ('Low','Odd','Low','Odd','Very Low','Even')",True,,,,,,,,,,
-2F401,"If last three seeds are ('Low','Odd','Low','Odd','Very Low','Even') eliminate combos outside Low (100% over 2 cases)",True,"prev_pattern == ('Low','Odd','Low','Odd','Very Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_3F402,"[DIAG] prev_pattern == ('Low','Odd','Mid','Even','Low','Odd') ?",True,"prev_pattern == ('Low','Odd','Mid','Even','Low','Odd')",True,,,,,,,,,,
-3F402,"If last three seeds are ('Low','Odd','Mid','Even','Low','Odd') eliminate combos outside Mid (100% over 3 cases)",True,"prev_pattern == ('Low','Odd','Mid','Even','Low','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F403,"[DIAG] prev_pattern == ('Low','Odd','Mid','Even','Very Low','Even') ?",True,"prev_pattern == ('Low','Odd','Mid','Even','Very Low','Even')",True,,,,,,,,,,
-1F403,"If last three seeds are ('Low','Odd','Mid','Even','Very Low','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Low','Odd','Mid','Even','Very Low','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_2F404,"[DIAG] prev_pattern == ('Low','Odd','Mid','Odd','Mid','Even') ?",True,"prev_pattern == ('Low','Odd','Mid','Odd','Mid','Even')",True,,,,,,,,,,
-2F404,"If last three seeds are ('Low','Odd','Mid','Odd','Mid','Even') eliminate combos outside Low (100% over 2 cases)",True,"prev_pattern == ('Low','Odd','Mid','Odd','Mid','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F405,"[DIAG] prev_pattern == ('Low','Odd','Very Low','Even','Low','Even') ?",True,"prev_pattern == ('Low','Odd','Very Low','Even','Low','Even')",True,,,,,,,,,,
-1F405,"If last three seeds are ('Low','Odd','Very Low','Even','Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Odd','Very Low','Even','Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F406,"[DIAG] prev_pattern == ('Low','Odd','Very Low','Even','Mid','Odd') ?",True,"prev_pattern == ('Low','Odd','Very Low','Even','Mid','Odd')",True,,,,,,,,,,
-1F406,"If last three seeds are ('Low','Odd','Very Low','Even','Mid','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Odd','Very Low','Even','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F407,"[DIAG] prev_pattern == ('Low','Odd','Very Low','Even','Very Low','Odd') ?",True,"prev_pattern == ('Low','Odd','Very Low','Even','Very Low','Odd')",True,,,,,,,,,,
-1F407,"If last three seeds are ('Low','Odd','Very Low','Even','Very Low','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Odd','Very Low','Even','Very Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F408,"[DIAG] prev_pattern == ('Low','Odd','Very Low','Odd','Mid','Odd') ?",True,"prev_pattern == ('Low','Odd','Very Low','Odd','Mid','Odd')",True,,,,,,,,,,
-1F408,"If last three seeds are ('Low','Odd','Very Low','Odd','Mid','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Low','Odd','Very Low','Odd','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F409,"[DIAG] prev_pattern == ('Low','Odd','Very Low','Odd','Very Low','Odd') ?",True,"prev_pattern == ('Low','Odd','Very Low','Odd','Very Low','Odd')",True,,,,,,,,,,
-1F409,"If last three seeds are ('Low','Odd','Very Low','Odd','Very Low','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Low','Odd','Very Low','Odd','Very Low','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F410,"[DIAG] prev_pattern == ('Mid','Even','High','Even','Mid','Odd') ?",True,"prev_pattern == ('Mid','Even','High','Even','Mid','Odd')",True,,,,,,,,,,
-1F410,"If last three seeds are ('Mid','Even','High','Even','Mid','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','High','Even','Mid','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F411,"[DIAG] prev_pattern == ('Mid','Even','High','Odd','Mid','Odd') ?",True,"prev_pattern == ('Mid','Even','High','Odd','Mid','Odd')",True,,,,,,,,,,
-1F411,"If last three seeds are ('Mid','Even','High','Odd','Mid','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','High','Odd','Mid','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F412,"[DIAG] prev_pattern == ('Mid','Even','High','Odd','Very Low','Even') ?",True,"prev_pattern == ('Mid','Even','High','Odd','Very Low','Even')",True,,,,,,,,,,
-1F412,"If last three seeds are ('Mid','Even','High','Odd','Very Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','High','Odd','Very Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F413,"[DIAG] prev_pattern == ('Mid','Even','Low','Even','High','Odd') ?",True,"prev_pattern == ('Mid','Even','Low','Even','High','Odd')",True,,,,,,,,,,
-1F413,"If last three seeds are ('Mid','Even','Low','Even','High','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Low','Even','High','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F414,"[DIAG] prev_pattern == ('Mid','Even','Low','Even','Mid','Even') ?",True,"prev_pattern == ('Mid','Even','Low','Even','Mid','Even')",True,,,,,,,,,,
-1F414,"If last three seeds are ('Mid','Even','Low','Even','Mid','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Low','Even','Mid','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F415,"[DIAG] prev_pattern == ('Mid','Even','Low','Even','Mid','Odd') ?",True,"prev_pattern == ('Mid','Even','Low','Even','Mid','Odd')",True,,,,,,,,,,
-1F415,"If last three seeds are ('Mid','Even','Low','Even','Mid','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Low','Even','Mid','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_2F416,"[DIAG] prev_pattern == ('Mid','Even','Low','Even','Very Low','Even') ?",True,"prev_pattern == ('Mid','Even','Low','Even','Very Low','Even')",True,,,,,,,,,,
-2F416,"If last three seeds are ('Mid','Even','Low','Even','Very Low','Even') eliminate combos outside Mid (100% over 2 cases)",True,"prev_pattern == ('Mid','Even','Low','Even','Very Low','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F417,"[DIAG] prev_pattern == ('Mid','Even','Low','Even','Very Low','Odd') ?",True,"prev_pattern == ('Mid','Even','Low','Even','Very Low','Odd')",True,,,,,,,,,,
-1F417,"If last three seeds are ('Mid','Even','Low','Even','Very Low','Odd') eliminate combos outside Very Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Low','Even','Very Low','Odd')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_2F418,"[DIAG] prev_pattern == ('Mid','Even','Low','Odd','High','Even') ?",True,"prev_pattern == ('Mid','Even','Low','Odd','High','Even')",True,,,,,,,,,,
-2F418,"If last three seeds are ('Mid','Even','Low','Odd','High','Even') eliminate combos outside Low (100% over 2 cases)",True,"prev_pattern == ('Mid','Even','Low','Odd','High','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_2F419,"[DIAG] prev_pattern == ('Mid','Even','Low','Odd','Mid','Odd') ?",True,"prev_pattern == ('Mid','Even','Low','Odd','Mid','Odd')",True,,,,,,,,,,
-2F419,"If last three seeds are ('Mid','Even','Low','Odd','Mid','Odd') eliminate combos outside Low (100% over 2 cases)",True,"prev_pattern == ('Mid','Even','Low','Odd','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F420,"[DIAG] prev_pattern == ('Mid','Even','Low','Odd','Very Low','Odd') ?",True,"prev_pattern == ('Mid','Even','Low','Odd','Very Low','Odd')",True,,,,,,,,,,
-1F420,"If last three seeds are ('Mid','Even','Low','Odd','Very Low','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Low','Odd','Very Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_2F421,"[DIAG] prev_pattern == ('Mid','Even','Mid','Even','Low','Odd') ?",True,"prev_pattern == ('Mid','Even','Mid','Even','Low','Odd')",True,,,,,,,,,,
-2F421,"If last three seeds are ('Mid','Even','Mid','Even','Low','Odd') eliminate combos outside Mid (100% over 2 cases)",True,"prev_pattern == ('Mid','Even','Mid','Even','Low','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F422,"[DIAG] prev_pattern == ('Mid','Even','Mid','Even','Mid','Even') ?",True,"prev_pattern == ('Mid','Even','Mid','Even','Mid','Even')",True,,,,,,,,,,
-1F422,"If last three seeds are ('Mid','Even','Mid','Even','Mid','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Mid','Even','Mid','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F423,"[DIAG] prev_pattern == ('Mid','Even','Mid','Odd','High','Even') ?",True,"prev_pattern == ('Mid','Even','Mid','Odd','High','Even')",True,,,,,,,,,,
-1F423,"If last three seeds are ('Mid','Even','Mid','Odd','High','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Mid','Odd','High','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F424,"[DIAG] prev_pattern == ('Mid','Even','Mid','Odd','Low','Odd') ?",True,"prev_pattern == ('Mid','Even','Mid','Odd','Low','Odd')",True,,,,,,,,,,
-1F424,"If last three seeds are ('Mid','Even','Mid','Odd','Low','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Mid','Odd','Low','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_2F425,"[DIAG] prev_pattern == ('Mid','Even','Mid','Odd','Low','Odd') ?",True,"prev_pattern == ('Mid','Even','Mid','Odd','Low','Odd')",True,,,,,,,,,,
-2F425,"If last three seeds are ('Mid','Even','Mid','Odd','Low','Odd') eliminate combos outside Mid (100% over 2 cases)",True,"prev_pattern == ('Mid','Even','Mid','Odd','Low','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_2F426,"[DIAG] prev_pattern == ('Mid','Even','Mid','Odd','Mid','Even') ?",True,"prev_pattern == ('Mid','Even','Mid','Odd','Mid','Even')",True,,,,,,,,,,
-2F426,"If last three seeds are ('Mid','Even','Mid','Odd','Mid','Even') eliminate combos outside Low (100% over 2 cases)",True,"prev_pattern == ('Mid','Even','Mid','Odd','Mid','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F427,"[DIAG] prev_pattern == ('Mid','Even','Mid','Odd','Mid','Odd') ?",True,"prev_pattern == ('Mid','Even','Mid','Odd','Mid','Odd')",True,,,,,,,,,,
-1F427,"If last three seeds are ('Mid','Even','Mid','Odd','Mid','Odd') eliminate combos outside Very Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Mid','Odd','Mid','Odd')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_1F428,"[DIAG] prev_pattern == ('Mid','Even','Mid','Odd','Very Low','Even') ?",True,"prev_pattern == ('Mid','Even','Mid','Odd','Very Low','Even')",True,,,,,,,,,,
-1F428,"If last three seeds are ('Mid','Even','Mid','Odd','Very Low','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Mid','Odd','Very Low','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F429,"[DIAG] prev_pattern == ('Mid','Even','Very Low','Even','Low','Even') ?",True,"prev_pattern == ('Mid','Even','Very Low','Even','Low','Even')",True,,,,,,,,,,
-1F429,"If last three seeds are ('Mid','Even','Very Low','Even','Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Very Low','Even','Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F430,"[DIAG] prev_pattern == ('Mid','Even','Very Low','Even','Low','Odd') ?",True,"prev_pattern == ('Mid','Even','Very Low','Even','Low','Odd')",True,,,,,,,,,,
-1F430,"If last three seeds are ('Mid','Even','Very Low','Even','Low','Odd') eliminate combos outside Very Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Very Low','Even','Low','Odd')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_1F431,"[DIAG] prev_pattern == ('Mid','Even','Very Low','Even','Very Low','Even') ?",True,"prev_pattern == ('Mid','Even','Very Low','Even','Very Low','Even')",True,,,,,,,,,,
-1F431,"If last three seeds are ('Mid','Even','Very Low','Even','Very Low','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Mid','Even','Very Low','Even','Very Low','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_2F432,"[DIAG] prev_pattern == ('Mid','Even','Very Low','Odd','Low','Odd') ?",True,"prev_pattern == ('Mid','Even','Very Low','Odd','Low','Odd')",True,,,,,,,,,,
-2F432,"If last three seeds are ('Mid','Even','Very Low','Odd','Low','Odd') eliminate combos outside Low (100% over 2 cases)",True,"prev_pattern == ('Mid','Even','Very Low','Odd','Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F433,"[DIAG] prev_pattern == ('Mid','Odd','High','Even','Very Low','Odd') ?",True,"prev_pattern == ('Mid','Odd','High','Even','Very Low','Odd')",True,,,,,,,,,,
-1F433,"If last three seeds are ('Mid','Odd','High','Even','Very Low','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','High','Even','Very Low','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F434,"[DIAG] prev_pattern == ('Mid','Odd','Low','Even','Mid','Even') ?",True,"prev_pattern == ('Mid','Odd','Low','Even','Mid','Even')",True,,,,,,,,,,
-1F434,"If last three seeds are ('Mid','Odd','Low','Even','Mid','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Low','Even','Mid','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_4F435,"[DIAG] prev_pattern == ('Mid','Odd','Low','Even','Mid','Odd') ?",True,"prev_pattern == ('Mid','Odd','Low','Even','Mid','Odd')",True,,,,,,,,,,
-4F435,"If last three seeds are ('Mid','Odd','Low','Even','Mid','Odd') eliminate combos outside Low (100% over 4 cases)",True,"prev_pattern == ('Mid','Odd','Low','Even','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F436,"[DIAG] prev_pattern == ('Mid','Odd','Low','Odd','Very Low','Odd') ?",True,"prev_pattern == ('Mid','Odd','Low','Odd','Very Low','Odd')",True,,,,,,,,,,
-1F436,"If last three seeds are ('Mid','Odd','Low','Odd','Very Low','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Low','Odd','Very Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F437,"[DIAG] prev_pattern == ('Mid','Odd','Mid','Even','High','Even') ?",True,"prev_pattern == ('Mid','Odd','Mid','Even','High','Even')",True,,,,,,,,,,
-1F437,"If last three seeds are ('Mid','Odd','Mid','Even','High','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Mid','Even','High','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F438,"[DIAG] prev_pattern == ('Mid','Odd','Mid','Even','High','Odd') ?",True,"prev_pattern == ('Mid','Odd','Mid','Even','High','Odd')",True,,,,,,,,,,
-1F438,"If last three seeds are ('Mid','Odd','Mid','Even','High','Odd') eliminate combos outside Very Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Mid','Even','High','Odd')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_4F439,"[DIAG] prev_pattern == ('Mid','Odd','Mid','Even','Low','Even') ?",True,"prev_pattern == ('Mid','Odd','Mid','Even','Low','Even')",True,,,,,,,,,,
-4F439,"If last three seeds are ('Mid','Odd','Mid','Even','Low','Even') eliminate combos outside Low (80% over 5 cases)",True,"prev_pattern == ('Mid','Odd','Mid','Even','Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F440,"[DIAG] prev_pattern == ('Mid','Odd','Mid','Even','Mid','Odd') ?",True,"prev_pattern == ('Mid','Odd','Mid','Even','Mid','Odd')",True,,,,,,,,,,
-1F440,"If last three seeds are ('Mid','Odd','Mid','Even','Mid','Odd') eliminate combos outside High (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Mid','Even','Mid','Odd')","combo_sum_cat != 'High'",,,,,,,,,,
-
-TEST_PP_1F441,"[DIAG] prev_pattern == ('Mid','Odd','Mid','Odd','Low','Even') ?",True,"prev_pattern == ('Mid','Odd','Mid','Odd','Low','Even')",True,,,,,,,,,,
-1F441,"If last three seeds are ('Mid','Odd','Mid','Odd','Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Mid','Odd','Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F442,"[DIAG] prev_pattern == ('Mid','Odd','Mid','Odd','Low','Odd') ?",True,"prev_pattern == ('Mid','Odd','Mid','Odd','Low','Odd')",True,,,,,,,,,,
-1F442,"If last three seeds are ('Mid','Odd','Mid','Odd','Low','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Mid','Odd','Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F443,"[DIAG] prev_pattern == ('Mid','Odd','Mid','Odd','Very Low','Even') ?",True,"prev_pattern == ('Mid','Odd','Mid','Odd','Very Low','Even')",True,,,,,,,,,,
-1F443,"If last three seeds are ('Mid','Odd','Mid','Odd','Very Low','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Mid','Odd','Very Low','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F444,"[DIAG] prev_pattern == ('Mid','Odd','Mid','Odd','Very Low','Odd') ?",True,"prev_pattern == ('Mid','Odd','Mid','Odd','Very Low','Odd')",True,,,,,,,,,,
-1F444,"If last three seeds are ('Mid','Odd','Mid','Odd','Very Low','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Mid','Odd','Very Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_2F445,"[DIAG] prev_pattern == ('Mid','Odd','Very Low','Even','Low','Even') ?",True,"prev_pattern == ('Mid','Odd','Very Low','Even','Low','Even')",True,,,,,,,,,,
-2F445,"If last three seeds are ('Mid','Odd','Very Low','Even','Low','Even') eliminate combos outside Low (100% over 2 cases)",True,"prev_pattern == ('Mid','Odd','Very Low','Even','Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F446,"[DIAG] prev_pattern == ('Mid','Odd','Very Low','Even','Mid','Even') ?",True,"prev_pattern == ('Mid','Odd','Very Low','Even','Mid','Even')",True,,,,,,,,,,
-1F446,"If last three seeds are ('Mid','Odd','Very Low','Even','Mid','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Very Low','Even','Mid','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F447,"[DIAG] prev_pattern == ('Mid','Odd','Very Low','Even','Mid','Odd') ?",True,"prev_pattern == ('Mid','Odd','Very Low','Even','Mid','Odd')",True,,,,,,,,,,
-1F447,"If last three seeds are ('Mid','Odd','Very Low','Even','Mid','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Very Low','Even','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F448,"[DIAG] prev_pattern == ('Mid','Odd','Very Low','Even','Very Low','Odd') ?",True,"prev_pattern == ('Mid','Odd','Very Low','Even','Very Low','Odd')",True,,,,,,,,,,
-1F448,"If last three seeds are ('Mid','Odd','Very Low','Even','Very Low','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Very Low','Even','Very Low','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F449,"[DIAG] prev_pattern == ('Mid','Odd','Very Low','Odd','Mid','Odd') ?",True,"prev_pattern == ('Mid','Odd','Very Low','Odd','Mid','Odd')",True,,,,,,,,,,
-1F449,"If last three seeds are ('Mid','Odd','Very Low','Odd','Mid','Odd') eliminate combos outside Very Low (100% over 1 cases)",True,"prev_pattern == ('Mid','Odd','Very Low','Odd','Mid','Odd')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_1F450,"[DIAG] prev_pattern == ('Very Low','Even','High','Even','Mid','Even') ?",True,"prev_pattern == ('Very Low','Even','High','Even','Mid','Even')",True,,,,,,,,,,
-1F450,"If last three seeds are ('Very Low','Even','High','Even','Mid','Even') eliminate combos outside Very Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Even','High','Even','Mid','Even')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_1F451,"[DIAG] prev_pattern == ('Very Low','Even','High','Odd','Low','Odd') ?",True,"prev_pattern == ('Very Low','Even','High','Odd','Low','Odd')",True,,,,,,,,,,
-1F451,"If last three seeds are ('Very Low','Even','High','Odd','Low','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Even','High','Odd','Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F452,"[DIAG] prev_pattern == ('Very Low','Even','Low','Even','Mid','Even') ?",True,"prev_pattern == ('Very Low','Even','Low','Even','Mid','Even')",True,,,,,,,,,,
-1F452,"If last three seeds are ('Very Low','Even','Low','Even','Mid','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Very Low','Even','Low','Even','Mid','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F453,"[DIAG] prev_pattern == ('Very Low','Even','Low','Even','Very Low','Even') ?",True,"prev_pattern == ('Very Low','Even','Low','Even','Very Low','Even')",True,,,,,,,,,,
-1F453,"If last three seeds are ('Very Low','Even','Low','Even','Very Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Even','Low','Even','Very Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F454,"[DIAG] prev_pattern == ('Very Low','Even','Low','Odd','Mid','Even') ?",True,"prev_pattern == ('Very Low','Even','Low','Odd','Mid','Even')",True,,,,,,,,,,
-1F454,"If last three seeds are ('Very Low','Even','Low','Odd','Mid','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Even','Low','Odd','Mid','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F455,"[DIAG] prev_pattern == ('Very Low','Even','Mid','Even','Low','Odd') ?",True,"prev_pattern == ('Very Low','Even','Mid','Even','Low','Odd')",True,,,,,,,,,,
-1F455,"If last three seeds are ('Very Low','Even','Mid','Even','Low','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Very Low','Even','Mid','Even','Low','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F456,"[DIAG] prev_pattern == ('Very Low','Even','Mid','Even','Mid','Odd') ?",True,"prev_pattern == ('Very Low','Even','Mid','Even','Mid','Odd')",True,,,,,,,,,,
-1F456,"If last three seeds are ('Very Low','Even','Mid','Even','Mid','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Very Low','Even','Mid','Even','Mid','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F457,"[DIAG] prev_pattern == ('Very Low','Even','Mid','Odd','Mid','Even') ?",True,"prev_pattern == ('Very Low','Even','Mid','Odd','Mid','Even')",True,,,,,,,,,,
-1F457,"If last three seeds are ('Very Low','Even','Mid','Odd','Mid','Even') eliminate combos outside Very Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Even','Mid','Odd','Mid','Even')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_2F458,"[DIAG] prev_pattern == ('Very Low','Even','Mid','Odd','Very Low','Odd') ?",True,"prev_pattern == ('Very Low','Even','Mid','Odd','Very Low','Odd')",True,,,,,,,,,,
-2F458,"If last three seeds are ('Very Low','Even','Mid','Odd','Very Low','Odd') eliminate combos outside Low (100% over 2 cases)",True,"prev_pattern == ('Very Low','Even','Mid','Odd','Very Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F459,"[DIAG] prev_pattern == ('Very Low','Even','Very Low','Even','Low','Odd') ?",True,"prev_pattern == ('Very Low','Even','Very Low','Even','Low','Odd')",True,,,,,,,,,,
-1F459,"If last three seeds are ('Very Low','Even','Very Low','Even','Low','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Even','Very Low','Even','Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F460,"[DIAG] prev_pattern == ('Very Low','Even','Very Low','Even','Mid','Odd') ?",True,"prev_pattern == ('Very Low','Even','Very Low','Even','Mid','Odd')",True,,,,,,,,,,
-1F460,"If last three seeds are ('Very Low','Even','Very Low','Even','Mid','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Very Low','Even','Very Low','Even','Mid','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F461,"[DIAG] prev_pattern == ('Very Low','Even','Very Low','Odd','Low','Even') ?",True,"prev_pattern == ('Very Low','Even','Very Low','Odd','Low','Even')",True,,,,,,,,,,
-1F461,"If last three seeds are ('Very Low','Even','Very Low','Odd','Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Even','Very Low','Odd','Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F462,"[DIAG] prev_pattern == ('Very Low','Even','Very Low','Odd','Low','Odd') ?",True,"prev_pattern == ('Very Low','Even','Very Low','Odd','Low','Odd')",True,,,,,,,,,,
-1F462,"If last three seeds are ('Very Low','Even','Very Low','Odd','Low','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Very Low','Even','Very Low','Odd','Low','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F463,"[DIAG] prev_pattern == ('Very Low','Odd','High','Odd','Low','Odd') ?",True,"prev_pattern == ('Very Low','Odd','High','Odd','Low','Odd')",True,,,,,,,,,,
-1F463,"If last three seeds are ('Very Low','Odd','High','Odd','Low','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','High','Odd','Low','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F464,"[DIAG] prev_pattern == ('Very Low','Odd','Low','Even','Low','Even') ?",True,"prev_pattern == ('Very Low','Odd','Low','Even','Low','Even')",True,,,,,,,,,,
-1F464,"If last three seeds are ('Very Low','Odd','Low','Even','Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Low','Even','Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_2F465,"[DIAG] prev_pattern == ('Very Low','Odd','Low','Even','Mid','Even') ?",True,"prev_pattern == ('Very Low','Odd','Low','Even','Mid','Even')",True,,,,,,,,,,
-2F465,"If last three seeds are ('Very Low','Odd','Low','Even','Mid','Even') eliminate combos outside Very Low (100% over 2 cases)",True,"prev_pattern == ('Very Low','Odd','Low','Even','Mid','Even')","combo_sum_cat != 'Very Low'",,,,,,,,,,
-
-TEST_PP_1F466,"[DIAG] prev_pattern == ('Very Low','Odd','Low','Even','Mid','Odd') ?",True,"prev_pattern == ('Very Low','Odd','Low','Even','Mid','Odd')",True,,,,,,,,,,
-1F466,"If last three seeds are ('Very Low','Odd','Low','Even','Mid','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Low','Even','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F467,"[DIAG] prev_pattern == ('Very Low','Odd','Low','Odd','High','Odd') ?",True,"prev_pattern == ('Very Low','Odd','Low','Odd','High','Odd')",True,,,,,,,,,,
-1F467,"If last three seeds are ('Very Low','Odd','Low','Odd','High','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Low','Odd','High','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F468,"[DIAG] prev_pattern == ('Very Low','Odd','Low','Odd','Low','Odd') ?",True,"prev_pattern == ('Very Low','Odd','Low','Odd','Low','Odd')",True,,,,,,,,,,
-1F468,"If last three seeds are ('Very Low','Odd','Low','Odd','Low','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Low','Odd','Low','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F469,"[DIAG] prev_pattern == ('Very Low','Odd','Low','Odd','Mid','Odd') ?",True,"prev_pattern == ('Very Low','Odd','Low','Odd','Mid','Odd')",True,,,,,,,,,,
-1F469,"If last three seeds are ('Very Low','Odd','Low','Odd','Mid','Odd') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Low','Odd','Mid','Odd')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F470,"[DIAG] prev_pattern == ('Very Low','Odd','Mid','Even','Low','Odd') ?",True,"prev_pattern == ('Very Low','Odd','Mid','Even','Low','Odd')",True,,,,,,,,,,
-1F470,"If last three seeds are ('Very Low','Odd','Mid','Even','Low','Odd') eliminate combos outside High (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Mid','Even','Low','Odd')","combo_sum_cat != 'High'",,,,,,,,,,
-
-TEST_PP_1F471,"[DIAG] prev_pattern == ('Very Low','Odd','Mid','Even','Mid','Odd') ?",True,"prev_pattern == ('Very Low','Odd','Mid','Even','Mid','Odd')",True,,,,,,,,,,
-1F471,"If last three seeds are ('Very Low','Odd','Mid','Even','Mid','Odd') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Mid','Even','Mid','Odd')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F472,"[DIAG] prev_pattern == ('Very Low','Odd','Mid','Even','Very Low','Even') ?",True,"prev_pattern == ('Very Low','Odd','Mid','Even','Very Low','Even')",True,,,,,,,,,,
-1F472,"If last three seeds are ('Very Low','Odd','Mid','Even','Very Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Mid','Even','Very Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F473,"[DIAG] prev_pattern == ('Very Low','Odd','Mid','Odd','Low','Even') ?",True,"prev_pattern == ('Very Low','Odd','Mid','Odd','Low','Even')",True,,,,,,,,,,
-1F473,"If last three seeds are ('Very Low','Odd','Mid','Odd','Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Mid','Odd','Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-TEST_PP_1F474,"[DIAG] prev_pattern == ('Very Low','Odd','Mid','Odd','Mid','Even') ?",True,"prev_pattern == ('Very Low','Odd','Mid','Odd','Mid','Even')",True,,,,,,,,,,
-1F474,"If last three seeds are ('Very Low','Odd','Mid','Odd','Mid','Even') eliminate combos outside High (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Mid','Odd','Mid','Even')","combo_sum_cat != 'High'",,,,,,,,,,
-
-TEST_PP_1F475,"[DIAG] prev_pattern == ('Very Low','Odd','Very Low','Even','High','Even') ?",True,"prev_pattern == ('Very Low','Odd','Very Low','Even','High','Even')",True,,,,,,,,,,
-1F475,"If last three seeds are ('Very Low','Odd','Very Low','Even','High','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Very Low','Even','High','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F476,"[DIAG] prev_pattern == ('Very Low','Odd','Very Low','Even','Low','Even') ?",True,"prev_pattern == ('Very Low','Odd','Very Low','Even','Low','Even')",True,,,,,,,,,,
-1F476,"If last three seeds are ('Very Low','Odd','Very Low','Even','Low','Even') eliminate combos outside Mid (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Very Low','Even','Low','Even')","combo_sum_cat != 'Mid'",,,,,,,,,,
-
-TEST_PP_1F477,"[DIAG] prev_pattern == ('Very Low','Odd','Very Low','Odd','Low','Even') ?",True,"prev_pattern == ('Very Low','Odd','Very Low','Odd','Low','Even')",True,,,,,,,,,,
-1F477,"If last three seeds are ('Very Low','Odd','Very Low','Odd','Low','Even') eliminate combos outside Low (100% over 1 cases)",True,"prev_pattern == ('Very Low','Odd','Very Low','Odd','Low','Even')","combo_sum_cat != 'Low'",,,,,,,,,,
-
-
+0F358,"If seed=('High','Even'), prev_seed=('High','Odd'), prev_prev_seed=('Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('High','Even','High','Odd','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+0F359,"If seed=('High','Even'), prev_seed=('Mid','Odd'), prev_prev_seed=('Low','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('High','Even','Mid','Odd','Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+0F360,"If seed=('High','Even'), prev_seed=('Mid','Odd'), prev_prev_seed=('Mid','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('High','Even','Mid','Odd','Mid','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+0F361,"If seed=('High','Even'), prev_seed=('Very Low','Odd'), prev_prev_seed=('Mid','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('High','Even','Very Low','Odd','Mid','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+0F362,"If seed=('High','Odd'), prev_seed=('Low','Even'), prev_prev_seed=('High','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('High','Odd','Low','Even','High','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+0F363,"If seed=('High','Odd'), prev_seed=('Low','Even'), prev_prev_seed=('Low','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('High','Odd','Low','Even','Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+0F364,"If seed=('High','Odd'), prev_seed=('Low','Even'), prev_prev_seed=('Mid','Even') then eliminate combos outside High (100% over 1 cases)",True,True,"(prev_pattern == ('High','Odd','Low','Even','Mid','Even')) and (combo_sum_cat != 'High')",,,,,,,,,,
+0F365,"If seed=('High','Odd'), prev_seed=('Low','Odd'), prev_prev_seed=('Low','Even') then eliminate combos outside Very Low (100% over 1 cases)",True,True,"(prev_pattern == ('High','Odd','Low','Odd','Low','Even')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+0F366,"If seed=('High','Odd'), prev_seed=('Low','Odd'), prev_prev_seed=('Mid','Even') then eliminate combos outside Very Low (100% over 1 cases)",True,True,"(prev_pattern == ('High','Odd','Low','Odd','Mid','Even')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+0F367,"If seed=('High','Odd'), prev_seed=('Mid','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('High','Odd','Mid','Odd','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F368,"If seed=('High','Odd'), prev_seed=('Very Low','Even'), prev_prev_seed=('Low','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('High','Odd','Very Low','Even','Low','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F369,"If seed=('High','Odd'), prev_seed=('Very Low','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('High','Odd','Very Low','Odd','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F370,"If seed=('Low','Even'), prev_seed=('High','Even'), prev_prev_seed=('Mid','Even') then eliminate combos outside High (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','High','Even','Mid','Even')) and (combo_sum_cat != 'High')",,,,,,,,,,
+1F371,"If seed=('Low','Even'), prev_seed=('High','Odd'), prev_prev_seed=('Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','High','Odd','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F372,"If seed=('Low','Even'), prev_seed=('High','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','High','Odd','Mid','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F373,"If seed=('Low','Even'), prev_seed=('High','Odd'), prev_prev_seed=('Very Low','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','High','Odd','Very Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+12F374,"If seed=('Low','Even'), prev_seed=('Low','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (80% over 5 cases)",True,True,"(prev_pattern == ('Low','Even','Low','Even','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+2F375,"If seed=('Low','Even'), prev_seed=('Low','Even'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Mid (100% over 2 cases)",True,True,"(prev_pattern == ('Low','Even','Low','Even','Very Low','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F376,"If seed=('Low','Even'), prev_seed=('Low','Even'), prev_prev_seed=('Very Low','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Low','Even','Very Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F377,"If seed=('Low','Even'), prev_seed=('Low','Odd'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Low','Odd','Very Low','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F378,"If seed=('Low','Even'), prev_seed=('Mid','Even'), prev_prev_seed=('High','Odd') then eliminate combos outside Very Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Mid','Even','High','Odd')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+0F379,"If seed=('Low','Even'), prev_seed=('Mid','Even'), prev_prev_seed=('Low','Odd') then eliminate combos outside Low (80% over 5 cases)",True,True,"(prev_pattern == ('Low','Even','Mid','Even','Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+3F380,"If seed=('Low','Even'), prev_seed=('Mid','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Mid','Even','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+4F381,"If seed=('Low','Even'), prev_seed=('Mid','Even'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Mid','Even','Very Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+9F382,"If seed=('Low','Even'), prev_seed=('Mid','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Mid','Odd','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F383,"If seed=('Low','Even'), prev_seed=('Very Low','Even'), prev_prev_seed=('High','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Very Low','Even','High','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+2F384,"If seed=('Low','Even'), prev_seed=('Very Low','Even'), prev_prev_seed=('Low','Even') then eliminate combos outside Very Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Very Low','Even','Low','Even')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+0F385,"If seed=('Low','Even'), prev_seed=('Very Low','Even'), prev_prev_seed=('Low','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Very Low','Even','Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+2F386,"If seed=('Low','Even'), prev_seed=('Very Low','Even'), prev_prev_seed=('Mid','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Very Low','Even','Mid','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+0F387,"If seed=('Low','Even'), prev_seed=('Very Low','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid (100% over 2 cases)",True,True,"(prev_pattern == ('Low','Even','Very Low','Even','Mid','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F388,"If seed=('Low','Even'), prev_seed=('Very Low','Even'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Very Low','Even','Very Low','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+2F389,"If seed=('Low','Even'), prev_seed=('Very Low','Odd'), prev_prev_seed=('High','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Very Low','Odd','High','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F390,"If seed=('Low','Even'), prev_seed=('Very Low','Odd'), prev_prev_seed=('Low','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Even','Very Low','Odd','Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+2F391,"If seed=('Low','Even'), prev_seed=('Very Low','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (100% over 2 cases)",True,True,"(prev_pattern == ('Low','Even','Very Low','Odd','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F392,"If seed=('Low','Odd'), prev_seed=('High','Even'), prev_prev_seed=('High','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Odd','High','Even','High','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F393,"If seed=('Low','Odd'), prev_seed=('High','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Odd','High','Even','Mid','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F394,"If seed=('Low','Odd'), prev_seed=('High','Odd'), prev_prev_seed=('Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Odd','High','Odd','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F395,"If seed=('Low','Odd'), prev_seed=('High','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Very Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Odd','High','Odd','Mid','Odd')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+2F396,"If seed=('Low','Odd'), prev_seed=('Low','Even'), prev_prev_seed=('High','Odd') then eliminate combos outside Mid (100% over 2 cases)",True,True,"(prev_pattern == ('Low','Odd','Low','Even','High','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+3F397,"If seed=('Low','Odd'), prev_seed=('Low','Even'), prev_prev_seed=('Low','Odd') then eliminate combos outside Low (100% over 3 cases)",True,True,"(prev_pattern == ('Low','Odd','Low','Even','Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+4F398,"If seed=('Low','Odd'), prev_seed=('Low','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid (80% over 5 cases)",True,True,"(prev_pattern == ('Low','Odd','Low','Even','Mid','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F399,"If seed=('Low','Odd'), prev_seed=('Low','Odd'), prev_prev_seed=('High','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Odd','Low','Odd','High','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F400,"If seed=('Low','Odd'), prev_seed=('Low','Odd'), prev_prev_seed=('Mid','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Odd','Low','Odd','Mid','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+2F401,"If seed=('Low','Odd'), prev_seed=('Low','Odd'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Low (100% over 2 cases)",True,True,"(prev_pattern == ('Low','Odd','Low','Odd','Very Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+3F402,"If seed=('Low','Odd'), prev_seed=('Mid','Even'), prev_prev_seed=('Low','Odd') then eliminate combos outside Mid (100% over 3 cases)",True,True,"(prev_pattern == ('Low','Odd','Mid','Even','Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F403,"If seed=('Low','Odd'), prev_seed=('Mid','Even'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Odd','Mid','Even','Very Low','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+2F404,"If seed=('Low','Odd'), prev_seed=('Mid','Odd'), prev_prev_seed=('Mid','Even') then eliminate combos outside Low (100% over 2 cases)",True,True,"(prev_pattern == ('Low','Odd','Mid','Odd','Mid','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F405,"If seed=('Low','Odd'), prev_seed=('Very Low','Even'), prev_prev_seed=('Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Odd','Very Low','Even','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F406,"If seed=('Low','Odd'), prev_seed=('Very Low','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Odd','Very Low','Even','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F407,"If seed=('Low','Odd'), prev_seed=('Very Low','Even'), prev_prev_seed=('Very Low','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Odd','Very Low','Even','Very Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F408,"If seed=('Low','Odd'), prev_seed=('Very Low','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Odd','Very Low','Odd','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F409,"If seed=('Low','Odd'), prev_seed=('Very Low','Odd'), prev_prev_seed=('Very Low','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Low','Odd','Very Low','Odd','Very Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F410,"If seed=('Mid','Even'), prev_seed=('High','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','High','Even','Mid','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F411,"If seed=('Mid','Even'), prev_seed=('High','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','High','Odd','Mid','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F412,"If seed=('Mid','Even'), prev_seed=('High','Odd'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','High','Odd','Very Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F413,"If seed=('Mid','Even'), prev_seed=('Low','Even'), prev_prev_seed=('High','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Low','Even','High','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F414,"If seed=('Mid','Even'), prev_seed=('Low','Even'), prev_prev_seed=('Mid','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Low','Even','Mid','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F415,"If seed=('Mid','Even'), prev_seed=('Low','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Low','Even','Mid','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+2F416,"If seed=('Mid','Even'), prev_seed=('Low','Even'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Mid (100% over 2 cases)",True,True,"(prev_pattern == ('Mid','Even','Low','Even','Very Low','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F417,"If seed=('Mid','Even'), prev_seed=('Low','Even'), prev_prev_seed=('Very Low','Odd') then eliminate combos outside Very Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Low','Even','Very Low','Odd')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+2F418,"If seed=('Mid','Even'), prev_seed=('Low','Odd'), prev_prev_seed=('High','Even') then eliminate combos outside Low (100% over 2 cases)",True,True,"(prev_pattern == ('Mid','Even','Low','Odd','High','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+2F419,"If seed=('Mid','Even'), prev_seed=('Low','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (100% over 2 cases)",True,True,"(prev_pattern == ('Mid','Even','Low','Odd','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F420,"If seed=('Mid','Even'), prev_seed=('Low','Odd'), prev_prev_seed=('Very Low','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Low','Odd','Very Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+2F421,"If seed=('Mid','Even'), prev_seed=('Mid','Even'), prev_prev_seed=('Low','Odd') then eliminate combos outside Mid (100% over 2 cases)",True,True,"(prev_pattern == ('Mid','Even','Mid','Even','Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F422,"If seed=('Mid','Even'), prev_seed=('Mid','Even'), prev_prev_seed=('Mid','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Mid','Even','Mid','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F423,"If seed=('Mid','Even'), prev_seed=('Mid','Odd'), prev_prev_seed=('High','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Mid','Odd','High','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F424,"If seed=('Mid','Even'), prev_seed=('Mid','Odd'), prev_prev_seed=('Low','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Mid','Odd','Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+2F425,"If seed=('Mid','Even'), prev_seed=('Mid','Odd'), prev_prev_seed=('Low','Odd') then eliminate combos outside Mid (100% over 2 cases)",True,True,"(prev_pattern == ('Mid','Even','Mid','Odd','Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+2F426,"If seed=('Mid','Even'), prev_seed=('Mid','Odd'), prev_prev_seed=('Mid','Even') then eliminate combos outside Low (100% over 2 cases)",True,True,"(prev_pattern == ('Mid','Even','Mid','Odd','Mid','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F427,"If seed=('Mid','Even'), prev_seed=('Mid','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Very Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Mid','Odd','Mid','Odd')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+1F428,"If seed=('Mid','Even'), prev_seed=('Mid','Odd'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Mid','Odd','Very Low','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F429,"If seed=('Mid','Even'), prev_seed=('Very Low','Even'), prev_prev_seed=('Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Very Low','Even','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F430,"If seed=('Mid','Even'), prev_seed=('Very Low','Even'), prev_prev_seed=('Low','Odd') then eliminate combos outside Very Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Very Low','Even','Low','Odd')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+1F431,"If seed=('Mid','Even'), prev_seed=('Very Low','Even'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Even','Very Low','Even','Very Low','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+2F432,"If seed=('Mid','Even'), prev_seed=('Very Low','Odd'), prev_prev_seed=('Low','Odd') then eliminate combos outside Low (100% over 2 cases)",True,True,"(prev_pattern == ('Mid','Even','Very Low','Odd','Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F433,"If seed=('Mid','Odd'), prev_seed=('High','Even'), prev_prev_seed=('Very Low','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','High','Even','Very Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F434,"If seed=('Mid','Odd'), prev_seed=('Low','Even'), prev_prev_seed=('Mid','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Low','Even','Mid','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+4F435,"If seed=('Mid','Odd'), prev_seed=('Low','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (100% over 4 cases)",True,True,"(prev_pattern == ('Mid','Odd','Low','Even','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F436,"If seed=('Mid','Odd'), prev_seed=('Low','Odd'), prev_prev_seed=('Very Low','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Low','Odd','Very Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F437,"If seed=('Mid','Odd'), prev_seed=('Mid','Even'), prev_prev_seed=('High','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Mid','Even','High','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F438,"If seed=('Mid','Odd'), prev_seed=('Mid','Even'), prev_prev_seed=('High','Odd') then eliminate combos outside Very Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Mid','Even','High','Odd')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+4F439,"If seed=('Mid','Odd'), prev_seed=('Mid','Even'), prev_prev_seed=('Low','Even') then eliminate combos outside Low (80% over 5 cases)",True,True,"(prev_pattern == ('Mid','Odd','Mid','Even','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F440,"If seed=('Mid','Odd'), prev_seed=('Mid','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside High (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Mid','Even','Mid','Odd')) and (combo_sum_cat != 'High')",,,,,,,,,,
+1F441,"If seed=('Mid','Odd'), prev_seed=('Mid','Odd'), prev_prev_seed=('Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Mid','Odd','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F442,"If seed=('Mid','Odd'), prev_seed=('Mid','Odd'), prev_prev_seed=('Low','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Mid','Odd','Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F443,"If seed=('Mid','Odd'), prev_seed=('Mid','Odd'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Mid','Odd','Very Low','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F444,"If seed=('Mid','Odd'), prev_seed=('Mid','Odd'), prev_prev_seed=('Very Low','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Mid','Odd','Very Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+2F445,"If seed=('Mid','Odd'), prev_seed=('Very Low','Even'), prev_prev_seed=('Low','Even') then eliminate combos outside Low (100% over 2 cases)",True,True,"(prev_pattern == ('Mid','Odd','Very Low','Even','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F446,"If seed=('Mid','Odd'), prev_seed=('Very Low','Even'), prev_prev_seed=('Mid','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Very Low','Even','Mid','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F447,"If seed=('Mid','Odd'), prev_seed=('Very Low','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Very Low','Even','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F448,"If seed=('Mid','Odd'), prev_seed=('Very Low','Even'), prev_prev_seed=('Very Low','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Very Low','Even','Very Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F449,"If seed=('Mid','Odd'), prev_seed=('Very Low','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Very Low (100% over 1 cases)",True,True,"(prev_pattern == ('Mid','Odd','Very Low','Odd','Mid','Odd')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+1F450,"If seed=('Very Low','Even'), prev_seed=('High','Even'), prev_prev_seed=('Mid','Even') then eliminate combos outside Very Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Even','High','Even','Mid','Even')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+1F451,"If seed=('Very Low','Even'), prev_seed=('High','Odd'), prev_prev_seed=('Low','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Even','High','Odd','Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F452,"If seed=('Very Low','Even'), prev_seed=('Low','Even'), prev_prev_seed=('Mid','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Even','Low','Even','Mid','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F453,"If seed=('Very Low','Even'), prev_seed=('Low','Even'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Even','Low','Even','Very Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F454,"If seed=('Very Low','Even'), prev_seed=('Low','Odd'), prev_prev_seed=('Mid','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Even','Low','Odd','Mid','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F455,"If seed=('Very Low','Even'), prev_seed=('Mid','Even'), prev_prev_seed=('Low','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Even','Mid','Even','Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F456,"If seed=('Very Low','Even'), prev_seed=('Mid','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Even','Mid','Even','Mid','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F457,"If seed=('Very Low','Even'), prev_seed=('Mid','Odd'), prev_prev_seed=('Mid','Even') then eliminate combos outside Very Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Even','Mid','Odd','Mid','Even')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+2F458,"If seed=('Very Low','Even'), prev_seed=('Mid','Odd'), prev_prev_seed=('Very Low','Odd') then eliminate combos outside Low (100% over 2 cases)",True,True,"(prev_pattern == ('Very Low','Even','Mid','Odd','Very Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F459,"If seed=('Very Low','Even'), prev_seed=('Very Low','Even'), prev_prev_seed=('Low','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Even','Very Low','Even','Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F460,"If seed=('Very Low','Even'), prev_seed=('Very Low','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Even','Very Low','Even','Mid','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F461,"If seed=('Very Low','Even'), prev_seed=('Very Low','Odd'), prev_prev_seed=('Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Even','Very Low','Odd','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F462,"If seed=('Very Low','Even'), prev_seed=('Very Low','Odd'), prev_prev_seed=('Low','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Even','Very Low','Odd','Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F463,"If seed=('Very Low','Odd'), prev_seed=('High','Odd'), prev_prev_seed=('Low','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','High','Odd','Low','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F464,"If seed=('Very Low','Odd'), prev_seed=('Low','Even'), prev_prev_seed=('Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Low','Even','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+2F465,"If seed=('Very Low','Odd'), prev_seed=('Low','Even'), prev_prev_seed=('Mid','Even') then eliminate combos outside Very Low (100% over 2 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Low','Even','Mid','Even')) and (combo_sum_cat != 'Very Low')",,,,,,,,,,
+1F466,"If seed=('Very Low','Odd'), prev_seed=('Low','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Low','Even','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F467,"If seed=('Very Low','Odd'), prev_seed=('Low','Odd'), prev_prev_seed=('High','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Low','Odd','High','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F468,"If seed=('Very Low','Odd'), prev_seed=('Low','Odd'), prev_prev_seed=('Low','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Low','Odd','Low','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F469,"If seed=('Very Low','Odd'), prev_seed=('Low','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Low','Odd','Mid','Odd')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F470,"If seed=('Very Low','Odd'), prev_seed=('Mid','Even'), prev_prev_seed=('Low','Odd') then eliminate combos outside High (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Mid','Even','Low','Odd')) and (combo_sum_cat != 'High')",,,,,,,,,,
+1F471,"If seed=('Very Low','Odd'), prev_seed=('Mid','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Mid','Even','Mid','Odd')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F472,"If seed=('Very Low','Odd'), prev_seed=('Mid','Even'), prev_prev_seed=('Very Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Mid','Even','Very Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F473,"If seed=('Very Low','Odd'), prev_seed=('Mid','Odd'), prev_prev_seed=('Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Mid','Odd','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
+1F474,"If seed=('Very Low','Odd'), prev_seed=('Mid','Odd'), prev_prev_seed=('Mid','Even') then eliminate combos outside High (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Mid','Odd','Mid','Even')) and (combo_sum_cat != 'High')",,,,,,,,,,
+1F475,"If seed=('Very Low','Odd'), prev_seed=('Very Low','Even'), prev_prev_seed=('High','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Very Low','Even','High','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F476,"If seed=('Very Low','Odd'), prev_seed=('Very Low','Even'), prev_prev_seed=('Low','Even') then eliminate combos outside Mid (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Very Low','Even','Low','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F477,"If seed=('Very Low','Odd'), prev_seed=('Very Low','Odd'), prev_prev_seed=('Low','Even') then eliminate combos outside Low (100% over 1 cases)",True,True,"(prev_pattern == ('Very Low','Odd','Very Low','Odd','Low','Even')) and (combo_sum_cat != 'Low')",,,,,,,,,,
 365F478,DNUEliminate all odd-sum combos,True,"""True""","""combo_sum % 2 != 0""",,,,,,,,,,
 364F479,DNUEliminate all even-sum combos,True,"""True""","""combo_sum % 2 == 0""",,,,,,,,,,
 0F480,"xIf seed includes 0,0 eliminate odd-sum combos",True,"""seed_digits.count(0) >= 2""","""combo_sum % 2 != 0""",,,,,,,,,,
