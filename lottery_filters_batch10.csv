@@ -408,7 +408,8 @@ NO296F355,XIf any combo digit = mirror of seed sum last digit,True,"""True""",""
 1F410,"If seed=('Mid','Even'), prev_seed=('High','Even'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid",True,True,"(prev_pattern == ('Mid','Odd','High','Even','Mid','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
 ZZ_PREV,"[DIAG] prev_pattern={prev_pattern}",True,True,"True",,,,,,,,,,
 ZZ_BUCKETS,"[DIAG] seed={seed_sum_cat}/{seed_sum_parity} | prev={prev_seed_sum_cat}/{prev_seed_parity} | prevprev={prev_prev_seed_sum_cat}/{prev_prev_seed_sum_parity}",True,True,"True",,,,,,,,,,
-1F411,"If seed=('Mid','Even'), prev_seed=('High','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid",True,True,"(prev_pattern == ('Mid','Odd','High','Odd','Mid','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
+1F411B,"If seed=('Mid','Even'), prev_seed=('High','Odd'), prev_prev_seed=('Mid','Odd') then eliminate combos outside Mid",True,True,"(prev_pattern == ('Mid','Odd','High','Odd','Mid','Even')) and (combo_sum_cat == 'Low' or combo_sum_cat == 'Very Low' or combo_sum_cat == 'High')",,,,,,,,,,
+
 
 1F412,"If seed=('Mid','Even'), prev_seed=('Low','Even'), prev_prev_seed=('High','Even') then eliminate combos outside Low or Very Low",True,True,"(prev_pattern == ('High','Even','Low','Even','Mid','Even')) and (combo_sum_cat not in ('Low','Very Low'))",,,,,,,,,,
 1F413,"If seed=('Mid','Even'), prev_seed=('Low','Even'), prev_prev_seed=('Mid','Even') then eliminate combos outside Mid",True,True,"(prev_pattern == ('Mid','Even','Low','Even','Mid','Even')) and (combo_sum_cat != 'Mid')",,,,,,,,,,
