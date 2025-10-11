@@ -15,9 +15,9 @@ mirror = MIRROR  # keep lowercase for CSV expressions
 def sum_category(total: int) -> str:
     if 0 <= total <= 14:
         return 'Very Low'
-    elif 15 <= total <= 19:
+    elif 15 <= total <= 20:
         return 'Low'
-    elif 20 <= total <= 24:
+    elif 21 <= total <= 26:
         return 'Mid'
     else:
         return 'High'
