@@ -733,4 +733,6 @@ F724C,Eliminate If (seed root/3 is integer & in combo),True,"""True""","""(((see
 NEWF725,"Eliminate IF combo has neither 5,8 nor 5", True," ""True""","""5 not in combo_digits and 8 not in combo_digits and 5 not in combo_digits""",,,,,,,,,, 
 ZZ_PREV,"[DIAG] prev_pattern={prev_pattern}",True,True,"True",,,,,,,,,,
 ZZ_BUCKETS,"[DIAG] seed={seed_sum_cat}/{seed_sum_parity} | prev={prev_seed_sum_cat}/{prev_seed_parity} | prevprev={prev_prev_seed_sum_cat}/{prev_prev_seed_sum_parity}",True,True,"True",,,,,,,,,,
-
+B200,"Keep winners with ≥2 of {0,4,5,8}; eliminate others",True,True,"(sum(int(d) in {0,4,5,8} for d in combo_digits) < 2)",,,,,,,,,,
+B201R,"Eliminate combos that have 0 AND at least one of {4,5,8}; keep others",True,True,"((0 in [int(x) for x in combo_digits]) and any(int(d) in {4,5,8} for d in combo_digits))",,,,,,,,,,
+B202R,"Eliminate combos with ≥3 of {0,4,5,8}; keep others",True,True,"(sum(int(d) in {0,4,5,8} for d in combo_digits) >= 3)",,,,,,,,,,
