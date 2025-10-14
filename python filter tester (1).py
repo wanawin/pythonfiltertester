@@ -81,6 +81,12 @@ def generate_combinations(seed: str, method: str) -> list:
             for p in product(all_digits, repeat=3):
                 combos_set.add(''.join(sorted(pair + ''.join(p))))
     return sorted(combos_set)
+# combos is your final list of 5-digit strings (or lists of digits)
+if combos and isinstance(combos[0], list):
+    combos = [''.join(map(str, combos[i])) for i in range(len(combos))]
+combos = [str(c).zfill(5) for c in combos]   # normalize to 5-char strings
+st.session_state['combo_pool'] = combos
+    
 
 def main():
     filters = load_filters()
