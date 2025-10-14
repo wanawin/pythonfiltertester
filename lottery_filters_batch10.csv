@@ -738,4 +738,4 @@ B201R,"Eliminate combos that have 0 AND at least one of {4,5,8}; keep others",Tr
 B202R,"Eliminate combos with ≥3 of {0,4,5,8}; keep others",True,True,"(sum(int(d) in {0,4,5,8} for d in combo_digits) >= 3)",,,,,,,,,,
 New726,"eliminate combos that have 0", True,True,"(0 in [int(x) for x in combo_digits])",,,,,,,,,, 
 New727,"eliminate combos that have 8",True,True,"(8 in [int(x) for x in combo_digits])",,,,,,,,,, 
-NEWF728,"Eliminate IF combo has n0 7", True,"5 not in combo_digits",,,,,,,,,,
+NEWF728,"Eliminate IF combo has n0 7", True,"7 not in combo_digits",,,,,,,,,,
