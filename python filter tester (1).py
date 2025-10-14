@@ -307,11 +307,25 @@ def main():
 
 if __name__ == '__main__':
     main()
-    try:
-      from filter_checker_footer import render_filter_checker
-      except ModuleNotFoundError:
+# --- Diagnostics footer import + call ---
+
+# 1) Import the helper module. Keep `except` aligned with `try`.
+try:
+    from filter_checker_footer import render_filter_checker
+except Exception as e:  # ModuleNotFoundError or any import error
     import streamlit as st
     def render_filter_checker(*args, **kwargs):
-        st.error("filter_checker_footer.py not found in app root — please add the file to enable diagnostics.")
+        st.error(f"filter_checker_footer.py not found or failed to import: {e}")
 
+# 2) Call the footer. It will render the checker UI.
+#    If your generator stored the pool in session_state, we pass that as a fallback.
+_pool_guess = []
+if 'combos' in locals() and combos:
+    _pool_guess = combos
+elif 'combo_pool' in st.session_state:
+    _pool_guess = st.session_state['combo_pool']
+
+# If your app already has a dataframe of filters at this point, pass it as filters_df=that_df.
+render_filter_checker(combos=_pool_guess, filters_df=None)
+   
 
