@@ -290,4 +290,7 @@ if st.button("Run Tester"):
     except Exception as e:
         st.error(f"Tester error: {e}")
 
-st.info("Notes: CSV header must include id,name,enabled,applicable_if,expression. Use triple-quoted strings for booleans ("""True"""). combo_digits are ints; V-Tracs groups are 1..5. A sanity row that always fires can help verify parsing.")
+st.info('Notes: CSV header must include id,name,enabled,applicable_if,expression. '
+        'Use triple-quoted strings for booleans ("""True"""); combo_digits are ints; '
+        'V-Tracs groups are 1..5. A sanity row that should eliminate everything is: '
+        'ZZZTST,"ALWAYS FIRE","""True""","""True""","""True"""')
