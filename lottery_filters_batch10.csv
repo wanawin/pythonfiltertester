@@ -737,5 +737,5 @@ B200,"Keep winners with ≥2 of {0,4,5,8}; eliminate others",True,True,"(sum(int
 B201R,"Eliminate combos that have 0 AND at least one of {4,5,8}; keep others",True,True,"((0 in [int(x) for x in combo_digits]) and any(int(d) in {4,5,8} for d in combo_digits))",,,,,,,,,,
 B202R,"Eliminate combos with ≥3 of {0,4,5,8}; keep others",True,True,"(sum(int(d) in {0,4,5,8} for d in combo_digits) >= 3)",,,,,,,,,,
 New726,"eliminate combos that have 0", True,True,"(0 in [int(x) for x in combo_digits])",,,,,,,,,, 
-New727,"eliminate combos that have 2","""True""","""(2 in [int(x) for x in combo_digits])""",,,,,,,,,, 
+NEW727,"eliminate combos that have 2","""True""","""(2 in [int(x) for x in combo_digits])""",,,,,,,,,,
 NEWF728,"Eliminate IF combo has no 7", """True""","""7 not in combo_digits""",,,,,,,,,,
