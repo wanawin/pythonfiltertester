@@ -1,10 +1,19 @@
-
 import streamlit as st
 from itertools import product
 import csv
 import os
 from collections import Counter
 import math
+import ast
+
+# ---------- Safe built-ins for eval ----------
+ALLOWED_BUILTINS = {
+    "len": len, "sum": sum, "any": any, "all": all,
+    "set": set, "range": range, "sorted": sorted,
+    "min": min, "max": max, "abs": abs, "int": int, "str": str,
+    "Counter": Counter,
+}
+# --------------------------------------------
 
 # V-Trac and mirror mappings
 V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
@@ -40,30 +49,56 @@ def structure_of(digits):
         return 'QUINT'
     return f'OTHER-{counts}'
 
+def _enabled_value(val: str) -> bool:
+    s = (val or "").strip().lower()
+    return s in {'"""true"""','"true"','true','1','yes','y'}
+
 def load_filters(path: str='lottery_filters_batch10.csv') -> list:
     if not os.path.exists(path):
         st.error(f"Filter file not found: {path}")
         st.stop()
+
     filters = []
     with open(path, newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for raw in reader:
             row = {k.lower(): v for k, v in raw.items()}
-            row['id'] = row.get('id', row.get('fid', '')).strip()
-            for key in ('name', 'applicable_if', 'expression'):
+            row['id'] = (row.get('id') or row.get('fid') or '').strip()
+            # normalize fields
+            for key in ('name', 'applicable_if', 'expression', 'enabled'):
                 if key in row and isinstance(row[key], str):
                     row[key] = row[key].strip().strip('"').strip("'")
-            row['expression'] = row.get('expression', '').replace('!==', '!=')
+
             applicable = row.get('applicable_if') or 'True'
             expr = row.get('expression') or 'False'
+
+            # compile-only check to surface syntax/08 issues early
             try:
-                row['applicable_code'] = compile(applicable, '<applicable>', 'eval')
-                row['expr_code'] = compile(expr, '<expr>', 'eval')
+                ast.parse(f"({applicable})", mode='eval')
+                ast.parse(f"({expr})", mode='eval')
             except SyntaxError as e:
-                st.error(f"Syntax error in filter {row['id']}: {e}")
+                # keep it but mark disabled; footer/diagnostics can show this row
+                filters.append({
+                    "id": row['id'],
+                    "name": row.get('name',''),
+                    "enabled_default": False,
+                    "applicable_code": compile('False', '<applicable>', 'eval'),
+                    "expr_code": compile('False', '<expr>', 'eval'),
+                    "compile_error": f"SyntaxError: {e}",
+                })
                 continue
-            row['enabled_default'] = row.get('enabled', '').lower() == 'true'
-            filters.append(row)
+
+            flt = {
+                "id": row['id'],
+                "name": row.get('name',''),
+                "enabled_default": _enabled_value(row.get('enabled','')),
+                # store compiled objects but we will eval with safe builtins
+                "applicable_code": compile(applicable, '<applicable>', 'eval'),
+                "expr_code": compile(expr, '<expr>', 'eval'),
+                "compile_error": "",
+            }
+            filters.append(flt)
+
     return filters
 
 def generate_combinations(seed: str, method: str) -> list:
@@ -81,17 +116,12 @@ def generate_combinations(seed: str, method: str) -> list:
             for p in product(all_digits, repeat=3):
                 combos_set.add(''.join(sorted(pair + ''.join(p))))
     return sorted(combos_set)
-# combos is your final list of 5-digit strings (or lists of digits)
-if combos and isinstance(combos[0], list):
-    combos = [''.join(map(str, combos[i])) for i in range(len(combos))]
-combos = [str(c).zfill(5) for c in combos]   # normalize to 5-char strings
-st.session_state['combo_pool'] = combos
-    
 
 def main():
     filters = load_filters()
     st.sidebar.header("🔢 DC-5 Filter Tracker Full")
     select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
+
     seed = st.sidebar.text_input("Draw 1-back (required):", help="Enter the draw immediately before the combo to test").strip()
     prev_seed = st.sidebar.text_input("Draw 2-back (optional):", help="Enter the draw two draws before the combo").strip()
     prev_prev = st.sidebar.text_input("Draw 3-back (optional):", help="Enter the draw three draws before the combo").strip()
@@ -100,7 +130,7 @@ def main():
     hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
     cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
 
-    # NEW: manual due digits override
+    # manual due digits override
     due_input = st.sidebar.text_input("Due digits (comma-separated, optional):").strip()
 
     check_combo = st.sidebar.text_input("Check specific combo:").strip()
@@ -118,7 +148,6 @@ def main():
     hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
     cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
 
-    # use manual due digits if provided
     if due_input:
         due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
     else:
@@ -168,7 +197,12 @@ def main():
             'winner_structure': structure_of(seed_digits),
         }
 
+    # ----- Generate pool -----
     combos = generate_combinations(seed, method)
+    # Save to session so the footer can see it (normalize defensively)
+    st.session_state['combo_pool'] = [str(c).zfill(5) for c in combos if str(c).isdigit() and len(str(c)) == 5]
+
+    # ----- Run filters (initial elimination pass) -----
     eliminated = {}
     survivors = []
     for combo in combos:
@@ -179,12 +213,14 @@ def main():
             if not st.session_state.get(key, select_all and flt['enabled_default']):
                 continue
             try:
-                if not eval(flt['applicable_code'], ctx, ctx):
+                ok_if = eval(flt['applicable_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx)
+                if not ok_if:
                     continue
-                if eval(flt['expr_code'], ctx, ctx):
+                if eval(flt['expr_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx):
                     eliminated[combo] = flt['name']
                     break
-            except:
+            except Exception:
+                # treat as not firing for the initial pass
                 continue
         else:
             survivors.append(combo)
@@ -200,15 +236,17 @@ def main():
         else:
             st.sidebar.warning("Combo not found in generated list")
 
+    # ----- “initial eliminations” counts for UI -----
     init_counts = {flt['id']: 0 for flt in filters}
     for flt in filters:
         for combo in combos:
             cdigits = [int(c) for c in combo]
             ctx = gen_ctx(cdigits)
             try:
-                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
+                if eval(flt['applicable_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx) and \
+                   eval(flt['expr_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx):
                     init_counts[flt['id']] += 1
-            except:
+            except Exception:
                 pass
 
     sorted_filters = sorted(filters, key=lambda flt: (init_counts[flt['id']] == 0, -init_counts[flt['id']]))
@@ -220,6 +258,7 @@ def main():
 
     st.markdown(f"**Initial Manual Filters Count:** {len(display_filters)}")
 
+    # ----- Dynamic apply based on toggles -----
     pool = list(combos)
     dynamic_counts = {}
     for flt in display_filters:
@@ -232,11 +271,12 @@ def main():
                 cdigits = [int(c) for c in combo]
                 ctx = gen_ctx(cdigits)
                 try:
-                    if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
+                    if eval(flt['applicable_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx) and \
+                       eval(flt['expr_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx):
                         dc += 1
                     else:
                         survivors_pool.append(combo)
-                except:
+                except Exception:
                     survivors_pool.append(combo)
         else:
             survivors_pool = pool.copy()
@@ -255,6 +295,7 @@ def main():
         for c in survivors:
             st.write(c)
 
+    # ----- Per-combo diagnostics (on demand) -----
     if check_combo:
         test_digits = [int(c) for c in check_combo if c.isdigit()]
         ctx = gen_ctx(test_digits)
@@ -262,7 +303,8 @@ def main():
         failed = []
         for flt in filters:
             try:
-                if eval(flt['applicable_code'], ctx, ctx) and eval(flt['expr_code'], ctx, ctx):
+                if eval(flt['applicable_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx) and \
+                   eval(flt['expr_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx):
                     triggered.append(flt['id'])
             except Exception as e:
                 failed.append((flt['id'], f"{flt['name']} → {e}"))
@@ -276,6 +318,7 @@ def main():
             for fid, msg in failed:
                 st.text(f"{fid}: {msg}")
 
+    # ----- Hot / Cold / Due calculator -----
     st.sidebar.markdown("---")
     st.sidebar.subheader("Hot / Cold / Due Calculator")
 
@@ -313,9 +356,9 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 # --- Diagnostics footer import + call ---
 
-# 1) Import the helper module. Keep `except` aligned with `try`.
 try:
     from filter_checker_footer import render_filter_checker
 except Exception as e:  # ModuleNotFoundError or any import error
@@ -323,15 +366,9 @@ except Exception as e:  # ModuleNotFoundError or any import error
     def render_filter_checker(*args, **kwargs):
         st.error(f"filter_checker_footer.py not found or failed to import: {e}")
 
-# 2) Call the footer. It will render the checker UI.
-#    If your generator stored the pool in session_state, we pass that as a fallback.
-_pool_guess = []
-if 'combos' in locals() and combos:
-    _pool_guess = combos
-elif 'combo_pool' in st.session_state:
-    _pool_guess = st.session_state['combo_pool']
+# Pool for footer: prefer current combos, else session_state
+_pool_guess = st.session_state.get('combo_pool', [])
+if 'combos' in locals() and locals()['combos']:
+    _pool_guess = locals()['combos']
 
-# If your app already has a dataframe of filters at this point, pass it as filters_df=that_df.
 render_filter_checker(combos=_pool_guess, filters_df=None)
-   
-
