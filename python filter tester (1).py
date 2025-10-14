@@ -307,6 +307,13 @@ def main():
 
 if __name__ == '__main__':
     main()
+    try:
+    from filter_checker_footer import render_filter_checker
+except ModuleNotFoundError:
+    import streamlit as st
+    def render_filter_checker(*args, **kwargs):
+        st.error("filter_checker_footer.py not found in app root — please add the file to enable diagnostics.")
+
 from filter_checker_footer import render_filter_checker
 render_filter_checker(combos=combos, filters_df=filters_df)  # pass what you have; either may be None
     
