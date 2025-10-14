@@ -210,7 +210,7 @@ NO204F203,XEliminate if combo has 2 or more digits >=8,True,"""True""","""sum(1 
 3F211,If seed has 0 and 2 and combo sum <7 or >26,True,"""set(seed_digits).issuperset({0,2})""","""combo_sum <7 or combo_sum >26""",,,,,,,,,,
 11F212,If seed has '00' and combo sum <11 or >33,True,"""seed_counts.get(0,0)>=2""","""combo_sum <11 or combo_sum >33""",,,,,,,,,,
 142F213,XEliminate if single (5 unique) <25 shares ≥3 with seed,True,"""len(set(combo_digits))==5""","""combo_sum <25 and sum(1 for d in combo_digits if d in seed_digits) >=3""",,,,,,,,,,
-10F214,XEliminate if none of seed v-tracs in combo,True,"""True""","""not any(v in combo_vtracs for v in seed_vtracs)""",,,,,,,,,,
+10F214,"XEliminate if none of seed v-tracs in combo","""True""","""True""","""len( set({0:0,5:0,1:1,6:1,2:2,7:2,3:3,8:3,4:4,9:4}[int(d)] for d in combo_digits) & set({0:0,5:0,1:1,6:1,2:2,7:2,3:3,8:3,4:4,9:4}[int(d)] for d in prev_winner_digits) ) == 0""",,,,,,,,,,
 NO135F215,XEliminate if all seed v-tracs present in combo,True,"""True""","""all(v in combo_vtracs for v in seed_vtracs)""",,,,,,,,,,
 21F216,XEliminate if combo digits are from 5 different v-trac groups,True,"""True""","""len(set(combo_vtracs))==5""",,,,,,,,,,
 NO81F217,XEliminate if combo digits are from ≤2 v-trac groups,True,"""True""","""len(set(combo_vtracs))<=2""",,,,,,,,,,
