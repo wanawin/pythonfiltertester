@@ -736,5 +736,5 @@ ZZ_BUCKETS,"[DIAG] seed={seed_sum_cat}/{seed_sum_parity} | prev={prev_seed_sum_c
 B200,"Keep winners with ≥2 of {0,4,5,8}; eliminate others",True,True,"(sum(int(d) in {0,4,5,8} for d in combo_digits) < 2)",,,,,,,,,,
 B201R,"Eliminate combos that have 0 AND at least one of {4,5,8}; keep others",True,True,"((0 in [int(x) for x in combo_digits]) and any(int(d) in {4,5,8} for d in combo_digits))",,,,,,,,,,
 B202R,"Eliminate combos with ≥3 of {0,4,5,8}; keep others",True,True,"(sum(int(d) in {0,4,5,8} for d in combo_digits) >= 3)",,,,,,,,,,
-New726,"eliminate combos that have 0", ,True,True,"((0 in [int(x) for x in combo_digits]))",,,,,,,,,, 
-New727,"eliminate combos that have 8", ,True,True,"((8 in [int(x) for x in combo_digits]))",,,,,,,,,, 
+New726,"eliminate combos that have 0", ,True,True,"(0 in [int(x) for x in combo_digits])",,,,,,,,,, 
+New727,"eliminate combos that have 8", ,True,True,"(8 in [int(x) for x in combo_digits])",,,,,,,,,, 
