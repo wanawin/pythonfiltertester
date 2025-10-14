@@ -309,7 +309,7 @@ if __name__ == '__main__':
     main()
     try:
       from filter_checker_footer import render_filter_checker
-except ModuleNotFoundError:
+      except ModuleNotFoundError:
     import streamlit as st
     def render_filter_checker(*args, **kwargs):
         st.error("filter_checker_footer.py not found in app root — please add the file to enable diagnostics.")
