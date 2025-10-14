@@ -308,7 +308,7 @@ def main():
 if __name__ == '__main__':
     main()
     try:
-    from filter_checker_footer import render_filter_checker
+      from filter_checker_footer import render_filter_checker
 except ModuleNotFoundError:
     import streamlit as st
     def render_filter_checker(*args, **kwargs):
