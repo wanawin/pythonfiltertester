@@ -241,7 +241,7 @@ NO4F225,Eliminate if combo sum=37 unless seed>=30,True,"""True""","""combo_sum==
 0F242,Eliminate if combo sum=3,True,"""True""","""combo_sum==3""",,,,,,,,,,
 0F243,Eliminate if combo sum=2,True,"""True""","""combo_sum==2""",,,,,,,,,,
 NO9F244,Eliminate if combo sum=34 unless seed>=30,True,"""True""","""combo_sum==34 and seed_value<30""",,,,,,,,,,
-33F245,Eliminate if combo has ≤4 consecutive digits regardless order,True,"""True""","""any(set(range(n,n+4)).issubset(set(combo_digits)) for n in range(7))and combo_structure == 5 and combo_structure == 5""",,,,,,,,,,
+33F245,"Eliminate if combo has a run of 4 consecutive digits (any order) and is single","""True""","""True""","""(any(set({n,n+1,n+2,n+3}).issubset(set(int(d) for d in combo_digits)) for n in range(7))) and (len(set(combo_digits)) == 5)""",,,,,,,,,,
 114F246,"XIf seed has 2 and combo lacks 5,4",True,"""2 in seed_digits""","""5 not in combo_digits and 4 not in combo_digits""",,,,,,,,,,
 15F247,XIf seed sum=16 and combo sum <12 or >20,True,"""seed_value==16""","""combo_sum<12 or combo_sum>20""",,,,,,,,,,
 NO114F248,"XIf seed has 3 and combo lacks 5,4",True,"""3 in seed_digits""","""5 not in combo_digits and 4 not in combo_digits""",,,,,,,,,,
