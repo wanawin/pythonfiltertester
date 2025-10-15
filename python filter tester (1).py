@@ -5,11 +5,9 @@ import os
 from collections import Counter
 import math
 import ast
+import re
 
 # ---------- Safe built-ins for eval ----------
-from collections import Counter
-import math
-
 ALLOWED_BUILTINS = {
     # common funcs
     "len": len, "sum": sum, "any": any, "all": all,
@@ -27,7 +25,6 @@ ALLOWED_BUILTINS = {
     "Counter": Counter,
     "math": math,
 }
-
 # --------------------------------------------
 
 # V-Trac and mirror mappings
@@ -35,6 +32,14 @@ V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
 MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
 MIRROR = MIRROR_PAIRS
 mirror = MIRROR  # keep lowercase for CSV expressions
+
+# Aliases so older filters keep working
+VTRAC_GROUP = V_TRAC_GROUPS
+V_TRAC = V_TRAC_GROUPS
+VTRAC_GROUPS = V_TRAC_GROUPS
+vtrac = V_TRAC_GROUPS
+mirror_pairs = MIRROR_PAIRS
+mirrir = MIRROR  # common typo alias
 
 def sum_category(total: int) -> str:
     if 0 <= total <= 14:
@@ -68,6 +73,22 @@ def _enabled_value(val: str) -> bool:
     s = (val or "").strip().lower()
     return s in {'"""true"""','"true"','true','1','yes','y'}
 
+# --- literal sanitizer for legacy 08/09 style ints ---
+_leading_zero_int = re.compile(r'(?<![\w])0+(\d+)(?!\s*\.)')  # 08 -> 8, leaves 0.5 alone
+def _sanitize_numeric_literals(code_or_obj):
+    if isinstance(code_or_obj, str):
+        return _leading_zero_int.sub(r"\1", code_or_obj)
+    return code_or_obj
+
+def _eval_code(code_or_obj, ctx):
+    """Eval code object or string with safe builtins; retry once after sanitizing legacy ints."""
+    g = {"__builtins__": ALLOWED_BUILTINS}
+    try:
+        return eval(code_or_obj, g, ctx)
+    except SyntaxError:
+        # If string expression has 08/09 etc., sanitize and retry
+        return eval(_sanitize_numeric_literals(code_or_obj), g, ctx)
+
 def load_filters(path: str='lottery_filters_batch10.csv') -> list:
     if not os.path.exists(path):
         st.error(f"Filter file not found: {path}")
@@ -87,30 +108,25 @@ def load_filters(path: str='lottery_filters_batch10.csv') -> list:
             applicable = row.get('applicable_if') or 'True'
             expr = row.get('expression') or 'False'
 
-            # compile-only check to surface syntax/08 issues early
+            # Try to compile; if that fails, keep raw strings (we'll sanitize at eval time)
             try:
                 ast.parse(f"({applicable})", mode='eval')
+                app_code = compile(applicable, '<applicable>', 'eval')
+            except SyntaxError:
+                app_code = applicable  # keep as string
+
+            try:
                 ast.parse(f"({expr})", mode='eval')
-            except SyntaxError as e:
-                # keep it but mark disabled; footer/diagnostics can show this row
-                filters.append({
-                    "id": row['id'],
-                    "name": row.get('name',''),
-                    "enabled_default": False,
-                    "applicable_code": compile('False', '<applicable>', 'eval'),
-                    "expr_code": compile('False', '<expr>', 'eval'),
-                    "compile_error": f"SyntaxError: {e}",
-                })
-                continue
+                expr_code = compile(expr, '<expr>', 'eval')
+            except SyntaxError:
+                expr_code = expr  # keep as string
 
             flt = {
                 "id": row['id'],
                 "name": row.get('name',''),
                 "enabled_default": _enabled_value(row.get('enabled','')),
-                # store compiled objects but we will eval with safe builtins
-                "applicable_code": compile(applicable, '<applicable>', 'eval'),
-                "expr_code": compile(expr, '<expr>', 'eval'),
-                "compile_error": "",
+                "applicable_code": app_code,
+                "expr_code": expr_code,
             }
             filters.append(flt)
 
@@ -182,6 +198,7 @@ def main():
         return {
             'seed_value': int(seed),
             'seed_sum': seed_sum,
+            'seed_sum_last_digit': seed_sum % 10,  # convenience
             'prev_seed_sum': sum(prev_digits) if prev_digits else None,
             'prev_prev_seed_sum': sum(prev_prev_digits) if prev_prev_digits else None,
             'prev_prev_prev_seed_sum': sum(prev_prev_prev_digits) if prev_prev_prev_digits else None,
@@ -204,12 +221,21 @@ def main():
             'combo_sum_cat': sum_category(csum),
             'seed_vtracs': seed_vtracs,
             'combo_vtracs': set(V_TRAC_GROUPS[d] for d in cdigits),
-            'mirror': MIRROR,
+
+            # mappings & aliases many filters use
+            'MIRROR': MIRROR, 'mirror': MIRROR, 'mirrir': MIRROR, 'MIRROR_PAIRS': MIRROR_PAIRS,
+            'V_TRAC_GROUPS': V_TRAC_GROUPS, 'VTRAC_GROUPS': V_TRAC_GROUPS,
+            'V_TRAC': V_TRAC_GROUPS, 'VTRAC_GROUP': V_TRAC_GROUPS, 'vtrac': V_TRAC_GROUPS,
+
             'common_to_both': set(seed_digits) & set(prev_digits),
             'last2': set(seed_digits) | set(prev_digits),
             'Counter': Counter,
             'combo_structure': structure_of(cdigits),
             'winner_structure': structure_of(seed_digits),
+
+            # helpers callable from expressions
+            'sum_category': sum_category,
+            'structure_of': structure_of,
         }
 
     # ----- Generate pool -----
@@ -228,10 +254,10 @@ def main():
             if not st.session_state.get(key, select_all and flt['enabled_default']):
                 continue
             try:
-                ok_if = eval(flt['applicable_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx)
+                ok_if = _eval_code(flt['applicable_code'], ctx)
                 if not ok_if:
                     continue
-                if eval(flt['expr_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx):
+                if _eval_code(flt['expr_code'], ctx):
                     eliminated[combo] = flt['name']
                     break
             except Exception:
@@ -258,8 +284,7 @@ def main():
             cdigits = [int(c) for c in combo]
             ctx = gen_ctx(cdigits)
             try:
-                if eval(flt['applicable_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx) and \
-                   eval(flt['expr_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx):
+                if _eval_code(flt['applicable_code'], ctx) and _eval_code(flt['expr_code'], ctx):
                     init_counts[flt['id']] += 1
             except Exception:
                 pass
@@ -286,8 +311,7 @@ def main():
                 cdigits = [int(c) for c in combo]
                 ctx = gen_ctx(cdigits)
                 try:
-                    if eval(flt['applicable_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx) and \
-                       eval(flt['expr_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx):
+                    if _eval_code(flt['applicable_code'], ctx) and _eval_code(flt['expr_code'], ctx):
                         dc += 1
                     else:
                         survivors_pool.append(combo)
@@ -318,8 +342,7 @@ def main():
         failed = []
         for flt in filters:
             try:
-                if eval(flt['applicable_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx) and \
-                   eval(flt['expr_code'], {"__builtins__": ALLOWED_BUILTINS}, ctx):
+                if _eval_code(flt['applicable_code'], ctx) and _eval_code(flt['expr_code'], ctx):
                     triggered.append(flt['id'])
             except Exception as e:
                 failed.append((flt['id'], f"{flt['name']} → {e}"))
@@ -373,13 +396,12 @@ if __name__ == '__main__':
     main()
 
 # --- Diagnostics footer import + call ---
-
 try:
     from filter_checker_footer import render_filter_checker
-except Exception as e:  # ModuleNotFoundError or any import error
-    import streamlit as st
+except Exception as _e:  # ModuleNotFoundError or any import error
+    _FOOTER_ERR = f"filter_checker_footer.py not found or failed to import: {_e}"
     def render_filter_checker(*args, **kwargs):
-        st.error(f"filter_checker_footer.py not found or failed to import: {e}")
+        st.error(_FOOTER_ERR)
 
 # Pool for footer: prefer current combos, else session_state
 _pool_guess = st.session_state.get('combo_pool', [])
