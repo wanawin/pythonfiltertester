@@ -7,12 +7,27 @@ import math
 import ast
 
 # ---------- Safe built-ins for eval ----------
+from collections import Counter
+import math
+
 ALLOWED_BUILTINS = {
+    # common funcs
     "len": len, "sum": sum, "any": any, "all": all,
     "set": set, "range": range, "sorted": sorted,
-    "min": min, "max": max, "abs": abs, "int": int, "str": str,
+    "min": min, "max": max, "abs": abs, "round": round,
+
+    # types & converters often used in filters
+    "int": int, "float": float, "str": str, "bool": bool,
+    "tuple": tuple, "list": list, "dict": dict,
+
+    # utilities used in some rows
+    "zip": zip, "map": map, "enumerate": enumerate,
+
+    # extras
     "Counter": Counter,
+    "math": math,
 }
+
 # --------------------------------------------
 
 # V-Trac and mirror mappings
