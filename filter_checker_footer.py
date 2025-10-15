@@ -43,6 +43,23 @@ def _compile_only(code: str):
     ast.parse(f"({code})", mode="eval")
 
 def _base_ctx():
+    def _base_ctx():
+    seed_digits = st.session_state.get("seed_digits", [])
+    prev_seed_digits = st.session_state.get("prev_seed_digits", [])
+    seed_sum = sum(seed_digits) if seed_digits else 0
+
+    return {
+        # ...everything you already have...
+        "seed_digits": seed_digits,
+        "prev_seed_digits": prev_seed_digits,
+        "seed_sum": seed_sum,
+        "seed_sum_last_digit": seed_sum % 10,
+        "mirror": MIRROR, "MIRROR": MIRROR, "mirrir": MIRROR, "MIRROR_PAIRS": MIRROR_PAIRS,
+        # helpers your CSVs sometimes call:
+        "sum_category": sum_category if "sum_category" in globals() else (lambda x: x),
+        "structure_of": structure_of if "structure_of" in globals() else (lambda x: x),
+    }
+
     seed_digits = st.session_state.get("seed_digits", [])
     prev_seed_digits = st.session_state.get("prev_seed_digits", [])
     winner_structure = st.session_state.get("winner_structure", "")
