@@ -108,6 +108,52 @@ def _eval_code(code_or_obj, ctx):
     except SyntaxError:
         # If string expression has 08/09 etc., sanitize and retry
         return eval(_sanitize_numeric_literals(code_or_obj), g, ctx)
+# === Helper definitions for LL-series filters ===
+# These are required by LL001–LL007a and related filters.
+
+# Ensure combo_digits exists before evaluation
+try:
+    combo_digits
+except NameError:
+    combo_digits = []
+
+# --- Core helper functions ---
+def combo_has_run(core_digits, run_len=3):
+    """True if the combo contains ≥run_len consecutive identical digits from core_digits."""
+    s = "".join(str(d) for d in combo_digits)
+    for d in core_digits:
+        seq = str(d) * run_len
+        if seq in s:
+            return True
+    return False
+
+def count_core_digits(*core_digits):
+    """Count how many core digits appear in the combo."""
+    return sum(int(d) in combo_digits for d in core_digits)
+
+def score_core_digits(*core_digits):
+    """Soft filter metric – number of core digits present."""
+    return sum(int(d) in combo_digits for d in core_digits)
+
+# --- Letter mapping for B/E/J filters ---
+# Hot→cold order (A–J).  Update dynamically if your app provides one;
+# otherwise this default keeps filters from erroring.
+LETTER_MAP = {
+    'A': 0, 'B': 1, 'C': 2, 'D': 3, 'E': 4,
+    'F': 5, 'G': 6, 'H': 7, 'I': 8, 'J': 9
+}
+
+# Provide default globals so filters referencing them don’t fail
+try:
+    combo_letters
+except NameError:
+    combo_letters = [k for d in combo_digits for k, v in LETTER_MAP.items() if v == int(d)]
+try:
+    core_letters
+except NameError:
+    core_letters = []
+
+# === END helper definitions ===
 
 def load_filters(path: str='lottery_filters_batch10.csv') -> list:
     if not os.path.exists(path):
