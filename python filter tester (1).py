@@ -26,6 +26,26 @@ ALLOWED_BUILTINS = {
     "math": math,
 }
 # --------------------------------------------
+# === Helper functions and variable pre-definitions for LL filters ===
+def combo_has_run(core_digits, run_len=3):
+    """Return True if any 3+ consecutive digits from core_digits appear."""
+    s = "".join(str(d) for d in combo_digits)
+    for d in core_digits:
+        if str(d) * run_len in s:
+            return True
+    return False
+
+def count_core_digits(*core_digits):
+    """Count how many unique core digits appear in combo."""
+    return sum(1 for d in core_digits if int(d) in combo_digits)
+
+def score_core_digits(*core_digits):
+    """Soft filter metric — number of core digits present."""
+    return sum(1 for d in core_digits if int(d) in combo_digits)
+
+# Variables referenced by expressions
+combo_letters = []  # letters corresponding to digits (if your app defines letter mapping)
+core_letters = []   # core letters for the current seed
 
 # V-Trac and mirror mappings
 V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
