@@ -241,49 +241,8 @@ def main():
     select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
 
     seed = st.sidebar.text_input("Draw 1-back (required):", help="Enter the draw immediately before the combo to test").strip()
-    prev_seed = st.sidebar.text_input("Draw 2-back (optional):", help="Enter the draw two draws before the combo").strip()
-    prev_prev = st.sidebar.text_input("Draw 3-back (optional):", help="Enter the draw three draws before the combo").strip()
-    prev_prev_prev = st.sidebar.text_input("Draw 4-back (optional):", help="Enter the draw four draws before the combo").strip()
-    method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
-    hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
-    cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
-
-    # manual due digits override
-    due_input = st.sidebar.text_input("Due digits (comma-separated, optional):").strip()
-
-    check_combo = st.sidebar.text_input("Check specific combo:").strip()
-    hide_zero = st.sidebar.checkbox("Hide filters with 0 initial eliminations", value=True)
-
-    if len(seed) != 5 or not seed.isdigit():
-        st.sidebar.error("Draw 1-back must be exactly 5 digits")
-        return
-# =============================
-# Define shared variables needed for LL filters
-# =============================
-combo_digits = []
-seed_digits = []
-combo_has_run = True
-info = {}
-rankings = {}
-
-# Safety: ensure ord() is available for numeric checks
-def ord(x):
-    try:
-        return __builtins__.ord(x)
-    except Exception:
-        return 0
-# =============================
-
-    seed_digits = [int(d) for d in seed]
-    prev_digits = [int(d) for d in prev_seed if d.isdigit()]
-    prev_prev_digits = [int(d) for d in prev_prev if d.isdigit()]
-    prev_prev_prev_digits = [int(d) for d in prev_prev_prev if d.isdigit()]
-    new_digits = set(seed_digits) - set(prev_digits)
-    hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
-    cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
-
-    if due_input:
-        due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
+   
+    due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
     else:
         due_digits = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]
 
