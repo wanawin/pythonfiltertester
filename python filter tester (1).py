@@ -152,8 +152,6 @@ try:
     core_letters
 except NameError:
     core_letters = []
-combo_digits = list(str(combo))
-seed_digits = list(str(seed))
 
 # === END helper definitions ===
 
@@ -344,6 +342,26 @@ def main():
             st.sidebar.success(f"Combo {check_combo} survived all filters")
         else:
             st.sidebar.warning("Combo not found in generated list")
+# =============================
+# Define shared variables needed for LL filters
+# =============================
+
+# Convert combo and seed into lists of digits
+combo_digits = list(str(combo)) if 'combo' in locals() else []
+seed_digits = list(str(seed)) if 'seed' in locals() else []
+
+# Convenience: establish variable name aliases
+combo_has_run = True
+info = {}
+rankings = {}
+
+# Safety: ensure ord() is available for numeric checks
+# (Already built-in, but we redefine to suppress “ord not defined” errors)
+def ord(x): 
+    try:
+        return __builtins__.ord(x)
+    except Exception:
+        return 0
 
     # ----- “initial eliminations” counts for UI -----
     init_counts = {flt['id']: 0 for flt in filters}
