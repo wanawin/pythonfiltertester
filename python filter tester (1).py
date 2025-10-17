@@ -152,6 +152,8 @@ try:
     core_letters
 except NameError:
     core_letters = []
+combo_digits = list(str(combo))
+seed_digits = list(str(seed))
 
 # === END helper definitions ===
 
