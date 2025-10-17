@@ -208,14 +208,14 @@ def ord(x):
         due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
     else:
         due_digits = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]  
-        flt = {
+    flt = {
                 "id": row['id'],
                 "name": row.get('name',''),
                 "enabled_default": _enabled_value(row.get('enabled','')),
                 "applicable_code": app_code,
                 "expr_code": expr_code,
-            }
-            filters.append(flt)
+    }
+    filters.append(flt)
 
     return filters
 
