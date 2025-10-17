@@ -241,7 +241,7 @@ def main():
     select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
 
     if due_input:
-    due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
+         due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
 else:
     due_digits = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]
 
