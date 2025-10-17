@@ -236,6 +236,22 @@ def main():
     if len(seed) != 5 or not seed.isdigit():
         st.sidebar.error("Draw 1-back must be exactly 5 digits")
         return
+# =============================
+# Define shared variables needed for LL filters
+# =============================
+combo_digits = []
+seed_digits = []
+combo_has_run = True
+info = {}
+rankings = {}
+
+# Safety: ensure ord() is available for numeric checks
+def ord(x):
+    try:
+        return __builtins__.ord(x)
+    except Exception:
+        return 0
+# =============================
 
     seed_digits = [int(d) for d in seed]
     prev_digits = [int(d) for d in prev_seed if d.isdigit()]
@@ -393,33 +409,7 @@ def ord(x):
         dc = 0
         survivors_pool = []
         if active:
-            for combo in pool:
-                cdigits = [int(c) for c in combo]
-                ctx = gen_ctx(cdigits)
-                try:
-                    if _eval_code(flt['applicable_code'], ctx) and _eval_code(flt['expr_code'], ctx):
-                        dc += 1
-                    else:
-                        survivors_pool.append(combo)
-                except Exception:
-                    survivors_pool.append(combo)
-        else:
-            survivors_pool = pool.copy()
-        dynamic_counts[flt['id']] = dc
-        pool = survivors_pool
-
-    st.header("🔧 Active Filters")
-    for flt in display_filters:
-        key = f"filter_{flt['id']}"
-        ic = init_counts[flt['id']]
-        dc = dynamic_counts.get(flt['id'], 0)
-        label = f"{flt['id']}: {flt['name']} — {dc}/{ic} eliminated"
-        st.checkbox(label, key=key, value=st.session_state.get(key, select_all and flt['enabled_default']))
-
-    with st.expander("Show remaining combinations"):
-        for c in survivors:
-            st.write(c)
-
+        
     # ----- Per-combo diagnostics (on demand) -----
     if check_combo:
         test_digits = [int(c) for c in check_combo if c.isdigit()]
