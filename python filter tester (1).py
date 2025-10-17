@@ -240,11 +240,10 @@ def main():
     st.sidebar.header("🔢 DC-5 Filter Tracker Full")
     select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
 
-    seed = st.sidebar.text_input("Draw 1-back (required):", help="Enter the draw immediately before the combo to test").strip()
-   
+    if due_input:
     due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
-    else:
-        due_digits = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]
+else:
+    due_digits = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]
 
     seed_counts = Counter(seed_digits)
     seed_vtracs = set(V_TRAC_GROUPS[d] for d in seed_digits)
