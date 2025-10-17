@@ -403,11 +403,11 @@ def ord(x):
     # ----- Dynamic apply based on toggles -----
     survivors_pool = []
         if active:pool = list(combos)
-    dynamic_counts = {}
-    for flt in display_filters:
-        key = f"filter_{flt['id']}"
-        active = st.session_state.get(key, select_all and flt['enabled_default'])
-        dc = 0
+        dynamic_counts = {}
+        for flt in display_filters:
+            key = f"filter_{flt['id']}"
+            active = st.session_state.get(key, select_all and flt['enabled_default'])
+            dc = 0
              
     # ----- Per-combo diagnostics (on demand) -----
     if check_combo:
