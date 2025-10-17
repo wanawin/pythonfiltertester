@@ -187,7 +187,27 @@ def load_filters(path: str='lottery_filters_batch10.csv') -> list:
             except SyntaxError:
                 expr_code = expr  # keep as string
 
-            flt = {
+      
+# Safety: ensure ord() is available for numeric checks
+def ord(x):
+    try:
+        return __builtins__.ord(x)
+    except Exception:
+        return 0
+# =============================
+
+    seed_digits = [int(d) for d in seed]
+    prev_digits = [int(d) for d in prev_seed if d.isdigit()]
+    prev_prev_digits = [int(d) for d in prev_prev if d.isdigit()]
+    prev_prev_prev_digits = [int(d) for d in prev_prev_prev if d.isdigit()]
+    new_digits = set(seed_digits) - set(prev_digits)
+    hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
+    cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
+
+    if due_input:
+        due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
+    else:
+        due_digits = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]      flt = {
                 "id": row['id'],
                 "name": row.get('name',''),
                 "enabled_default": _enabled_value(row.get('enabled','')),
