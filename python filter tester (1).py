@@ -241,21 +241,21 @@ def main():
     select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
     
 due_input = st.sidebar.text_input("Due digits (comma-separated, optional):", key="due_input").strip()
-    if due_input:
+if due_input:
          due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
-    else:
+else:
          due_digits = [d for d in range(10) if d not in prev_digits and d not in prev_prev_digits]
 
-    seed_counts = Counter(seed_digits)
-    seed_vtracs = set(V_TRAC_GROUPS[d] for d in seed_digits)
-    seed_sum = sum(seed_digits)
-    prev_pattern = []
-    for digs in (prev_prev_digits, prev_digits, seed_digits):
+seed_counts = Counter(seed_digits)
+seed_vtracs = set(V_TRAC_GROUPS[d] for d in seed_digits)
+seed_sum = sum(seed_digits)
+prev_pattern = []
+for digs in (prev_prev_digits, prev_digits, seed_digits):
         parity = 'Even' if sum(digs) % 2 == 0 else 'Odd'
         prev_pattern.extend([sum_category(sum(digs)), parity])
-    prev_pattern = tuple(prev_pattern)
+prev_pattern = tuple(prev_pattern)
 
-    def gen_ctx(cdigits):
+def gen_ctx(cdigits):
         csum = sum(cdigits)
         return {
             'seed_value': int(seed),
