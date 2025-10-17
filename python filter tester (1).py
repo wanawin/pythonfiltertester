@@ -317,13 +317,12 @@ def gen_ctx(cdigits):
         }
 
             # ----- Generate pool -----
-            combos = generate_combinations(seed, method)
-           # Save to session so the footer can see it (normalize defensively)
-           st.session_state['combo_pool'] = [str(c).zfill(5) for c in combos if str(c).isdigit() and len(str(c)) == 5]
-
-            # ----- Run filters (initial elimination pass) -----
-            eliminated = {}
-            survivors = []
+    combos = generate_combinations(seed, method)
+    # Save to session so the footer can see it (normalize defensively)
+    st.session_state['combo_pool'] = [str(c).zfill(5) for c in combos if str(c).isdigit() and len(str(c)) == 5]
+    # ----- Run filters (initial elimination pass) -----
+     eliminated = {}
+    survivors = []
    for combo in combos:
         cdigits = [int(c) for c in combo]
         ctx = gen_ctx(cdigits)
