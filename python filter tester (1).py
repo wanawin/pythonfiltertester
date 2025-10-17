@@ -401,15 +401,14 @@ def ord(x):
     st.markdown(f"**Initial Manual Filters Count:** {len(display_filters)}")
 
     # ----- Dynamic apply based on toggles -----
-    pool = list(combos)
+    survivors_pool = []
+        if active:pool = list(combos)
     dynamic_counts = {}
     for flt in display_filters:
         key = f"filter_{flt['id']}"
         active = st.session_state.get(key, select_all and flt['enabled_default'])
         dc = 0
-        survivors_pool = []
-        if active:
-        
+             
     # ----- Per-combo diagnostics (on demand) -----
     if check_combo:
         test_digits = [int(c) for c in check_combo if c.isdigit()]
