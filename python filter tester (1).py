@@ -402,7 +402,7 @@ def ord(x):
 
     # ----- Dynamic apply based on toggles -----
     survivors_pool = []
-        if active:
+    if active:
         pool = list(combos)
         dynamic_counts = {}
         for flt in display_filters:
