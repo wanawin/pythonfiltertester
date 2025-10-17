@@ -239,7 +239,8 @@ def main():
     filters = load_filters()
     st.sidebar.header("🔢 DC-5 Filter Tracker Full")
     select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
-
+    
+due_input = st.sidebar.text_input("Due digits (comma-separated, optional):", key="due_input").strip()
     if due_input:
          due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
     else:
