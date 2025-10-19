@@ -4,7 +4,7 @@ import traceback
 import os
 
 # ---------------------------------------------------------
-# DC5 Filter Tester — FULL APP (Original UI Preserved)
+# DC5 Filter Tester — FULL ORIGINAL APP WITH LOSER LIST SUPPORT
 # ---------------------------------------------------------
 st.set_page_config(page_title="DC-5 Filter Tracker Full", layout="wide")
 
@@ -46,19 +46,50 @@ except Exception as e:
     st.stop()
 
 # ---------------------------------------------------------
-# NORMALIZER: Make Loser List filters readable
+# NORMALIZER: Make all Loser List filters compatible
 # ---------------------------------------------------------
 
 def normalize_expression(expr):
     if not isinstance(expr, str):
         return ""
     expr = expr.strip()
-    expr = expr.replace(" combo_digits", " combo_digits")
-    expr = expr.replace(" seed_digits", " seed_digits")
-    expr = expr.replace("combo contains", "any(d in combo_digits for d in [")
-    expr = expr.replace("combo lacks", "all(d not in combo_digits for d in [")
-    expr = expr.replace("])", ")")
-    expr = expr.replace(",", ", ")
+
+    # Fix spacing and basic syntax
+    expr = expr.replace(" and  ", " and ").replace("  or  ", " or ")
+
+    # Handle Loser List phrasing variants
+    replacements = {
+        'combo contains': 'any(d in combo_digits for d in [',
+        'combo lacks': 'all(d not in combo_digits for d in [',
+        'if seed has': 'any(s in seed_digits for s in [',
+        'seed contains': 'any(s in seed_digits for s in [',
+        'seed lacks': 'all(s not in seed_digits for s in [',
+        'digits include': 'any(d in combo_digits for d in [',
+        'digits exclude': 'all(d not in combo_digits for d in [',
+        'combo include': 'any(d in combo_digits for d in [',
+        'combo exclude': 'all(d not in combo_digits for d in [',
+        'combo has': 'any(d in combo_digits for d in [',
+        'combo have': 'any(d in combo_digits for d in [',
+        'combo missing': 'all(d not in combo_digits for d in [',
+        'if combo includes': 'any(d in combo_digits for d in [',
+        'if combo excludes': 'all(d not in combo_digits for d in [',
+        'contains none of': 'all(d not in combo_digits for d in [',
+        'contains any of': 'any(d in combo_digits for d in [',
+        'missing any of': 'any(d not in combo_digits for d in [',
+        'missing all of': 'all(d not in combo_digits for d in [',
+        'include any of': 'any(d in combo_digits for d in [',
+        'include all of': 'all(d in combo_digits for d in [',
+        'exclude any of': 'any(d not in combo_digits for d in [',
+        'exclude all of': 'all(d not in combo_digits for d in ['
+    }
+
+    for k, v in replacements.items():
+        expr = expr.replace(k, v)
+
+    # Ensure closing brackets
+    if '[' in expr and not expr.endswith('])'):
+        expr = expr + '])'
+
     return expr
 
 filters_df['expression'] = filters_df['expression'].fillna("").apply(normalize_expression)
@@ -88,7 +119,7 @@ def run_filters(combo_digits, seed_digits):
     return results
 
 # ---------------------------------------------------------
-# Input + Execution
+# Input + Execution (Original Logic Preserved)
 # ---------------------------------------------------------
 
 combo_input = st.text_input("Enter combo to test (e.g., 27500):")
