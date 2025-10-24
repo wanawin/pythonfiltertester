@@ -738,8 +738,6 @@ New726,eliminate combos that have 0, True,True,(0 in [int(x) for x in combo_digi
 NEW727,eliminate combos that have 2,True,(2 in [int(x) for x in combo_digits]),,,,,,,,,,,
 NEWF728,Eliminate IF combo has no 7," ""True""",7 not in combo_digits,,,,,,,,,,,
 731,"Eliminate if ≥4 prime digits (2,3,5,7)",True,True,"sum(1 for d in combo_digits if d in {2,3,5,7}) >= 4",,,,,,,,,,
-name,description,expression
-id,name,enabled,applicable_if,expression,Unnamed: 5,Unnamed: 6,Unnamed: 7,Unnamed: 8,Unnamed: 9,Unnamed: 10,Unnamed: 11,Unnamed: 12,Unnamed: 13,Unnamed: 14
 LL002,Eliminate if loser 7–9 count == 5,True,,"sum(1 for d in combo_digits if d  in ['3','4','9']) == 5",,,,,,,,,,
 LL002a,Eliminate if loser 7–9 count >= 5,True,,"sum(1 for d in combo_digits if d  in ['3','4','9']) >= 5",,,,,,,,,,
 LL002b,Eliminate if loser 7–9 count > 4,True,,"sum(1 for d in combo_digits if d  in ['3','4','9']) > 4",,,,,,,,,,
