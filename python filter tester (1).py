@@ -197,7 +197,7 @@ def main():
     def gen_ctx(cdigits):
     csum = sum(cdigits)
     ctx = {
-        # --- seed / history facts you already compute above ---
+        # --- existing facts you already compute ---
         "seed_value": int(seed),
         "seed_sum": seed_sum,
         "prev_seed_sum": sum(prev_digits) if prev_digits else None,
@@ -237,8 +237,8 @@ def main():
         "combo_structure": structure_of(cdigits),
         "winner_structure": structure_of(seed_digits),
 
-        # --- aliases & safety shims USED BY CSV ROWS ---
-        "MIRROR": MIRROR,                # dict {0:5, 1:6, ...}
+        # --- aliases CSV rows expect ---
+        "MIRROR": MIRROR,                # dict {0:5,1:6,...}
         "mirror": MIRROR,
         "MIRROR_PAIRS": MIRROR_PAIRS,
 
@@ -247,16 +247,17 @@ def main():
         "V_TRAC": V_TRAC_GROUPS,
         "vtrac": V_TRAC_GROUPS,
 
-        # heatmap/letter gating — safe defaults
-        "digit_prev_letters": {},        # e.g. {'0':'A', ...} if you provide later
+        # --- safe defaults for letter/heatmap-based rows ---
+        "digit_prev_letters": {},        # e.g. {'0':'A', ...} when available
         "digit_current_letters": {},
         "prev_core_letters": set(),
         "core_letters_prevmap": [],
 
-        # some bad CSVs accidentally put the literal 'applicable_if' in the column
+        # stray CSVs that literally put 'applicable_if' in the cell
         "applicable_if": True,
     }
     return ctx
+
 
         # --- Names often referenced by CSVs; provide safe defaults ---
         "MIRROR": MIRROR, "mirror": MIRROR, "MIRROR_PAIRS": MIRROR_PAIRS,
