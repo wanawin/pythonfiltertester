@@ -124,15 +124,36 @@ def generate_combinations(seed: str, method: str) -> list:
 
 def main():
     filters = load_filters()
+
     st.sidebar.header("🔢 DC-5 Filter Tracker Full")
     select_all = st.sidebar.checkbox("Select/Deselect All Filters", value=True)
-    seed = st.sidebar.text_input("Draw 1-back (required):", help="Enter the draw immediately before the combo to test").strip()
-    prev_seed = st.sidebar.text_input("Draw 2-back (optional):", help="Enter the draw two draws before the combo").strip()
-    prev_prev = st.sidebar.text_input("Draw 3-back (optional):", help="Enter the draw three draws before the combo").strip()
-    prev_prev_prev = st.sidebar.text_input("Draw 4-back (optional):", help="Enter the draw four draws before the combo").strip()
+
+    seed = st.sidebar.text_input(
+        "Draw 1-back (required):",
+        help="Enter the draw immediately before the combo to test"
+    ).strip()
+
+    prev_seed = st.sidebar.text_input(
+        "Draw 2-back (optional):",
+        help="Enter the draw two draws before the combo"
+    ).strip()
+
+    prev_prev = st.sidebar.text_input(
+        "Draw 3-back (optional):",
+        help="Enter the draw three draws before the combo"
+    ).strip()
+
+    prev_prev_prev = st.sidebar.text_input(
+        "Draw 4-back (optional):",
+        help="Enter the draw four draws before the combo"
+    ).strip()
+
+    # ✅ Full, closed call — adds the two +1 methods
     method = st.sidebar.selectbox(
         "Generation Method:",
-        ["1-digit", "2-digit pair", "1-digit (seed+1)", "2-digit pair (seed+1)"]
+        ["1-digit", "2-digit pair", "1-digit (+1)", "2-digit pair (+1)"]
+    )
+
     hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
     cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
 
