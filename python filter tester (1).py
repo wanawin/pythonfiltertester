@@ -194,10 +194,10 @@ def main():
         prev_pattern.extend([sum_category(sum(digs)), parity])
     prev_pattern = tuple(prev_pattern)
 
-    def gen_ctx(cdigits):
+   def gen_ctx(cdigits):
     csum = sum(cdigits)
     ctx = {
-        # --- existing facts you already compute ---
+        # --- existing facts ---
         "seed_value": int(seed),
         "seed_sum": seed_sum,
         "prev_seed_sum": sum(prev_digits) if prev_digits else None,
@@ -238,25 +238,26 @@ def main():
         "winner_structure": structure_of(seed_digits),
 
         # --- aliases CSV rows expect ---
-        "MIRROR": MIRROR,                # dict {0:5,1:6,...}
+        "MIRROR": MIRROR,
         "mirror": MIRROR,
         "MIRROR_PAIRS": MIRROR_PAIRS,
 
-        "V_TRAC_GROUPS": V_TRAC_GROUPS,  # dict digit -> group
+        "V_TRAC_GROUPS": V_TRAC_GROUPS,
         "VTRAC_GROUPS": V_TRAC_GROUPS,
         "V_TRAC": V_TRAC_GROUPS,
         "vtrac": V_TRAC_GROUPS,
 
-        # --- safe defaults for letter/heatmap-based rows ---
-        "digit_prev_letters": {},        # e.g. {'0':'A', ...} when available
+        # --- safe defaults for heatmap/letters rows ---
+        "digit_prev_letters": {},
         "digit_current_letters": {},
         "prev_core_letters": set(),
         "core_letters_prevmap": [],
 
-        # stray CSVs that literally put 'applicable_if' in the cell
+        # stray CSV that literally has 'applicable_if' as text
         "applicable_if": True,
     }
     return ctx
+
 
 
         # --- Names often referenced by CSVs; provide safe defaults ---
