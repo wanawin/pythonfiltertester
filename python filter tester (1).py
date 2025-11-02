@@ -10,7 +10,11 @@ V_TRAC_GROUPS = {0:1,5:1,1:2,6:2,2:3,7:3,3:4,8:4,4:5,9:5}
 MIRROR_PAIRS = {0:5,5:0,1:6,6:1,2:7,7:2,3:8,8:3,4:9,9:4}
 MIRROR = MIRROR_PAIRS
 mirror = MIRROR  # keep lowercase for CSV expressions
-
+MIRROR = MIRROR_PAIRS
+mirror = MIRROR
+V_TRAC = V_TRAC_GROUPS
+VTRAC_GROUPS = V_TRAC_GROUPS
+vtrac = V_TRAC_GROUPS
 def sum_category(total: int) -> str:
     if 0 <= total <= 15:
         return 'Very Low'
@@ -224,7 +228,19 @@ def main():
             'combo_structure': structure_of(cdigits),
             'winner_structure': structure_of(seed_digits),
         }
+# --- Names often referenced by CSVs; provide safe defaults ---
+        "MIRROR": MIRROR, "mirror": MIRROR, "MIRROR_PAIRS": MIRROR_PAIRS,
+        "V_TRAC_GROUPS": V_TRAC_GROUPS, "VTRAC_GROUPS": V_TRAC_GROUPS,
+        "V_TRAC": V_TRAC_GROUPS, "vtrac": V_TRAC_GROUPS,
 
+        # Heatmap/letter map placeholders (Builder rows sometimes reference these)
+        "digit_prev_letters": {},           # e.g., {'0':'A','1':'B',...} if provided
+        "digit_current_letters": {},        # safe default: empty
+        "prev_core_letters": set(),         # safe default for core-letter gate checks
+        "core_letters_prevmap": [],         # safe default
+
+        # Some rows mistakenly put the literal word 'applicable_if' in the column
+        "applicable_if": True,
     combos = generate_combinations(seed, method)
     eliminated = {}
     survivors = []
