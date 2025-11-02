@@ -228,7 +228,7 @@ def main():
             'combo_structure': structure_of(cdigits),
             'winner_structure': structure_of(seed_digits),
         }
-# --- Names often referenced by CSVs; provide safe defaults ---
+        # --- Names often referenced by CSVs; provide safe defaults ---
         "MIRROR": MIRROR, "mirror": MIRROR, "MIRROR_PAIRS": MIRROR_PAIRS,
         "V_TRAC_GROUPS": V_TRAC_GROUPS, "VTRAC_GROUPS": V_TRAC_GROUPS,
         "V_TRAC": V_TRAC_GROUPS, "vtrac": V_TRAC_GROUPS,
