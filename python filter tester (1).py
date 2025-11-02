@@ -65,55 +65,59 @@ def load_filters(path: str='lottery_filters_batch10.csv') -> list:
             filters.append(row)
     return filters
 
-from itertools import product
+from itertools import product  # ensure this import is present at top
 
 def generate_combinations(seed: str, method: str) -> list:
     """
-    method:
-      - '1-digit'                    -> choose 1 of the original seed digits + 4 free digits
-      - '2-digit pair'               -> choose a pair from the original seed digits + 3 free digits
-      - '1-digit (seed+1)'           -> choose 1 of (seed digits shifted +1 mod 10) + 4 free digits
-      - '2-digit pair (seed+1)'      -> choose a pair from (seed digits shifted +1 mod 10) + 3 free digits
+    Generation methods:
+      - '1-digit'            : choose 1 of the original seed digits + 4 free digits
+      - '2-digit pair'       : choose a pair from the original seed digits + 3 free digits
+      - '1-digit (+1)'       : choose 1 of (seed digits +1 mod 10) + 4 free digits
+      - '2-digit pair (+1)'  : choose a pair from (seed digits +1 mod 10) + 3 free digits
     """
     all_digits = '0123456789'
     combos_set = set()
-    sorted_seed = ''.join(sorted(seed))
+
+    # normalize & sort the incoming seed
+    seed_only = ''.join(ch for ch in seed if ch.isdigit())
+    if len(seed_only) != 5:
+        # keep existing behavior: you can guard/raise if you prefer
+        seed_only = seed_only.zfill(5)
+    sorted_seed = ''.join(sorted(seed_only))
+
+    # build the (+1 mod 10) shifted version once
+    shifted = ''.join(str((int(d) + 1) % 10) for d in sorted_seed)
 
     if method == '1-digit':
-        # original behavior
         for d in sorted_seed:
             for p in product(all_digits, repeat=4):
                 combos_set.add(''.join(sorted(d + ''.join(p))))
 
     elif method == '2-digit pair':
-        # original behavior
         pairs = {
             ''.join(sorted((sorted_seed[i], sorted_seed[j])))
-            for i in range(len(sorted_seed)) for j in range(i+1, len(sorted_seed))
+            for i in range(len(sorted_seed)) for j in range(i + 1, len(sorted_seed))
         }
         for pair in pairs:
             for p in product(all_digits, repeat=3):
                 combos_set.add(''.join(sorted(pair + ''.join(p))))
 
-    elif method == '1-digit (seed+1)':
-        # shift each seed digit by +1 mod 10 (e.g., 9 -> 0), then use as required digit
-        shifted = ''.join(sorted({str((int(d) + 1) % 10) for d in seed if d.isdigit()}))
+    elif method == '1-digit (+1)':
         for d in shifted:
             for p in product(all_digits, repeat=4):
                 combos_set.add(''.join(sorted(d + ''.join(p))))
 
-    elif method == '2-digit pair (seed+1)':
-        # choose any pair from the shifted set, then add 3 free digits
-        shifted = ''.join(sorted({str((int(d) + 1) % 10) for d in seed if d.isdigit()}))
+    elif method == '2-digit pair (+1)':
         pairs = {
             ''.join(sorted((shifted[i], shifted[j])))
-            for i in range(len(shifted)) for j in range(i+1, len(shifted))
+            for i in range(len(shifted)) for j in range(i + 1, len(shifted))
         }
         for pair in pairs:
             for p in product(all_digits, repeat=3):
                 combos_set.add(''.join(sorted(pair + ''.join(p))))
+
     else:
-        raise ValueError(f"Unknown generation method: {method}")
+        raise ValueError(f"Unknown method: {method}")
 
     return sorted(combos_set)
 
