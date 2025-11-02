@@ -238,7 +238,12 @@ def main():
         "digit_current_letters": {},        # safe default: empty
         "prev_core_letters": set(),         # safe default for core-letter gate checks
         "core_letters_prevmap": [],         # safe default
+        applicable = row.get('applicable_if') or 'True'
+        expr = row.get('expression') or 'False'
 
+        # Some rows accidentally contain the literal string "applicable_if"
+        if str(applicable).strip().lower() in {"applicable_if", "none"}:
+        applicable = "True"
         # Some rows mistakenly put the literal word 'applicable_if' in the column
         "applicable_if": True,
     combos = generate_combinations(seed, method)
