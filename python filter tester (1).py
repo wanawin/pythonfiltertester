@@ -65,21 +65,58 @@ def load_filters(path: str='lottery_filters_batch10.csv') -> list:
             filters.append(row)
     return filters
 
+from itertools import product
+
 def generate_combinations(seed: str, method: str) -> list:
+    """
+    method:
+      - '1-digit'                    -> choose 1 of the original seed digits + 4 free digits
+      - '2-digit pair'               -> choose a pair from the original seed digits + 3 free digits
+      - '1-digit (seed+1)'           -> choose 1 of (seed digits shifted +1 mod 10) + 4 free digits
+      - '2-digit pair (seed+1)'      -> choose a pair from (seed digits shifted +1 mod 10) + 3 free digits
+    """
     all_digits = '0123456789'
     combos_set = set()
     sorted_seed = ''.join(sorted(seed))
+
     if method == '1-digit':
+        # original behavior
         for d in sorted_seed:
             for p in product(all_digits, repeat=4):
                 combos_set.add(''.join(sorted(d + ''.join(p))))
-    else:
-        pairs = {''.join(sorted((sorted_seed[i], sorted_seed[j])))
-                 for i in range(len(sorted_seed)) for j in range(i+1, len(sorted_seed))}
+
+    elif method == '2-digit pair':
+        # original behavior
+        pairs = {
+            ''.join(sorted((sorted_seed[i], sorted_seed[j])))
+            for i in range(len(sorted_seed)) for j in range(i+1, len(sorted_seed))
+        }
         for pair in pairs:
             for p in product(all_digits, repeat=3):
                 combos_set.add(''.join(sorted(pair + ''.join(p))))
+
+    elif method == '1-digit (seed+1)':
+        # shift each seed digit by +1 mod 10 (e.g., 9 -> 0), then use as required digit
+        shifted = ''.join(sorted({str((int(d) + 1) % 10) for d in seed if d.isdigit()}))
+        for d in shifted:
+            for p in product(all_digits, repeat=4):
+                combos_set.add(''.join(sorted(d + ''.join(p))))
+
+    elif method == '2-digit pair (seed+1)':
+        # choose any pair from the shifted set, then add 3 free digits
+        shifted = ''.join(sorted({str((int(d) + 1) % 10) for d in seed if d.isdigit()}))
+        pairs = {
+            ''.join(sorted((shifted[i], shifted[j])))
+            for i in range(len(shifted)) for j in range(i+1, len(shifted))
+        }
+        for pair in pairs:
+            for p in product(all_digits, repeat=3):
+                combos_set.add(''.join(sorted(pair + ''.join(p))))
+    else:
+        raise ValueError(f"Unknown generation method: {method}")
+
     return sorted(combos_set)
+
 
 def main():
     filters = load_filters()
@@ -89,7 +126,9 @@ def main():
     prev_seed = st.sidebar.text_input("Draw 2-back (optional):", help="Enter the draw two draws before the combo").strip()
     prev_prev = st.sidebar.text_input("Draw 3-back (optional):", help="Enter the draw three draws before the combo").strip()
     prev_prev_prev = st.sidebar.text_input("Draw 4-back (optional):", help="Enter the draw four draws before the combo").strip()
-    method = st.sidebar.selectbox("Generation Method:", ["1-digit", "2-digit pair"])
+    method = st.sidebar.selectbox(
+        "Generation Method:",
+        ["1-digit", "2-digit pair", "1-digit (seed+1)", "2-digit pair (seed+1)"]
     hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
     cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
 
