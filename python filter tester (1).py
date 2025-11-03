@@ -260,11 +260,11 @@ def gen_ctx(cdigits):
         "digit_current_letters": {},        # safe default: empty
         "prev_core_letters": set(),         # safe default for core-letter gate checks
         "core_letters_prevmap": [],         # safe default   
+            }
+    return ctx
+    
         applicable = row.get('applicable_if') or 'True'
         expr = row.get('expression') or 'False'   
-    }
-    return ctx
-
          # Some rows accidentally contain the literal string "applicable_if"
         if str(applicable).strip().lower() in {"applicable_if", "none"}:
         applicable = "True"
