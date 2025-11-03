@@ -255,18 +255,17 @@ def gen_ctx(cdigits):
 
         # stray CSV that literally has 'applicable_if' as text
         "applicable_if": True,
-    }
-    return ctx
-
-   # Heatmap/letter map placeholders (Builder rows sometimes reference these)
+         # Heatmap/letter map placeholders (Builder rows sometimes reference these)
         "digit_prev_letters": {},           # e.g., {'0':'A','1':'B',...} if provided
         "digit_current_letters": {},        # safe default: empty
         "prev_core_letters": set(),         # safe default for core-letter gate checks
         "core_letters_prevmap": [],         # safe default   
         applicable = row.get('applicable_if') or 'True'
         expr = row.get('expression') or 'False'   
+    }
+    return ctx
 
-        # Some rows accidentally contain the literal string "applicable_if"
+         # Some rows accidentally contain the literal string "applicable_if"
         if str(applicable).strip().lower() in {"applicable_if", "none"}:
         applicable = "True"
         # Some rows mistakenly put the literal word 'applicable_if' in the column
