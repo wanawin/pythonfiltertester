@@ -258,10 +258,11 @@ def gen_ctx(cdigits):
     }
     return ctx
 
-    # --- Names often referenced by CSVs; provide safe defaults ---
-    "MIRROR": MIRROR, "mirror": MIRROR, "MIRROR_PAIRS": MIRROR_PAIRS,
-    "V_TRAC_GROUPS": V_TRAC_GROUPS, "VTRAC_GROUPS": V_TRAC_GROUPS,
-    "V_TRAC": V_TRAC_GROUPS, "vtrac": V_TRAC_GROUPS,
+ # --- Names often referenced by CSVs; provide safe defaults ---
+"MIRROR": MIRROR, "mirror": MIRROR, "MIRROR_PAIRS": MIRROR_PAIRS,
+"V_TRAC_GROUPS": V_TRAC_GROUPS, "VTRAC_GROUPS": V_TRAC_GROUPS,
+"V_TRAC": V_TRAC_GROUPS, "vtrac": V_TRAC_GROUPS,   
+   
 
         # Heatmap/letter map placeholders (Builder rows sometimes reference these)
         "digit_prev_letters": {},           # e.g., {'0':'A','1':'B',...} if provided
