@@ -59,6 +59,13 @@ def load_filters(path: str='lottery_filters_batch10.csv') -> list:
             row['expression'] = row.get('expression', '').replace('!==', '!=')
             applicable = row.get('applicable_if') or 'True'
             expr = row.get('expression') or 'False'
+
+            # Some rows accidentally contain the literal string "applicable_if"
+            if str(applicable).strip().lower() in {"applicable_if", "none"}:
+                applicable = "True"
+                # Some rows mistakenly put the literal word 'applicable_if' in the column
+                applicable_if = True  # (kept line; bound locally to avoid NameError)
+
             try:
                 row['applicable_code'] = compile(applicable, '<applicable>', 'eval')
                 row['expr_code'] = compile(expr, '<expr>', 'eval')
@@ -194,83 +201,75 @@ def main():
         prev_pattern.extend([sum_category(sum(digs)), parity])
     prev_pattern = tuple(prev_pattern)
 
-def gen_ctx(cdigits):
-    csum = sum(cdigits)
-    ctx = {
-        # --- existing facts ---
-        "seed_value": int(seed),
-        "seed_sum": seed_sum,
-        "prev_seed_sum": sum(prev_digits) if prev_digits else None,
-        "prev_prev_seed_sum": sum(prev_prev_digits) if prev_prev_digits else None,
-        "prev_prev_prev_seed_sum": sum(prev_prev_prev_digits) if prev_prev_prev_digits else None,
+    def gen_ctx(cdigits):
+        csum = sum(cdigits)
+        ctx = {
+            # --- existing facts ---
+            "seed_value": int(seed),
+            "seed_sum": seed_sum,
+            "prev_seed_sum": sum(prev_digits) if prev_digits else None,
+            "prev_prev_seed_sum": sum(prev_prev_digits) if prev_prev_digits else None,
+            "prev_prev_prev_seed_sum": sum(prev_prev_prev_digits) if prev_prev_prev_digits else None,
 
-        "seed_digits_1": prev_digits,
-        "seed_digits_2": prev_prev_digits,
-        "seed_digits_3": prev_prev_prev_digits,
+            "seed_digits_1": prev_digits,
+            "seed_digits_2": prev_prev_digits,
+            "seed_digits_3": prev_prev_prev_digits,
 
-        "nan": float("nan"),
+            "nan": float("nan"),
 
-        "seed_digits": seed_digits,
-        "prev_seed_digits": prev_digits,
-        "prev_prev_seed_digits": prev_prev_digits,
-        "prev_prev_prev_seed_digits": prev_prev_prev_digits,
+            "seed_digits": seed_digits,
+            "prev_seed_digits": prev_digits,
+            "prev_prev_seed_digits": prev_prev_digits,
+            "prev_prev_prev_seed_digits": prev_prev_prev_digits,
 
-        "new_seed_digits": new_digits,
-        "prev_pattern": prev_pattern,
+            "new_seed_digits": new_digits,
+            "prev_pattern": prev_pattern,
 
-        "hot_digits": hot_digits,
-        "cold_digits": cold_digits,
-        "due_digits": due_digits,
+            "hot_digits": hot_digits,
+            "cold_digits": cold_digits,
+            "due_digits": due_digits,
 
-        "seed_counts": seed_counts,
-        "combo_digits": cdigits,
-        "combo_sum": csum,
-        "combo_sum_cat": sum_category(csum),
+            "seed_counts": seed_counts,
+            "combo_digits": cdigits,
+            "combo_sum": csum,
+            "combo_sum_cat": sum_category(csum),
 
-        "seed_vtracs": set(V_TRAC_GROUPS[d] for d in seed_digits),
-        "combo_vtracs": set(V_TRAC_GROUPS[d] for d in cdigits),
+            "seed_vtracs": set(V_TRAC_GROUPS[d] for d in seed_digits),
+            "combo_vtracs": set(V_TRAC_GROUPS[d] for d in cdigits),
 
-        "common_to_both": set(seed_digits) & set(prev_digits),
-        "last2": set(seed_digits) | set(prev_digits),
+            "common_to_both": set(seed_digits) & set(prev_digits),
+            "last2": set(seed_digits) | set(prev_digits),
 
-        "Counter": Counter,
-        "combo_structure": structure_of(cdigits),
-        "winner_structure": structure_of(seed_digits),
+            "Counter": Counter,
+            "combo_structure": structure_of(cdigits),
+            "winner_structure": structure_of(seed_digits),
 
-        # --- aliases CSV rows expect ---
-        "MIRROR": MIRROR,
-        "mirror": MIRROR,
-        "MIRROR_PAIRS": MIRROR_PAIRS,
+            # --- aliases CSV rows expect ---
+            "MIRROR": MIRROR,
+            "mirror": MIRROR,
+            "MIRROR_PAIRS": MIRROR_PAIRS,
 
-        "V_TRAC_GROUPS": V_TRAC_GROUPS,
-        "VTRAC_GROUPS": V_TRAC_GROUPS,
-        "V_TRAC": V_TRAC_GROUPS,
-        "vtrac": V_TRAC_GROUPS,
+            "V_TRAC_GROUPS": V_TRAC_GROUPS,
+            "VTRAC_GROUPS": V_TRAC_GROUPS,
+            "V_TRAC": V_TRAC_GROUPS,
+            "vtrac": V_TRAC_GROUPS,
 
-        # --- safe defaults for heatmap/letters rows ---
-        "digit_prev_letters": {},
-        "digit_current_letters": {},
-        "prev_core_letters": set(),
-        "core_letters_prevmap": [],
+            # --- safe defaults for heatmap/letters rows ---
+            "digit_prev_letters": {},
+            "digit_current_letters": {},
+            "prev_core_letters": set(),
+            "core_letters_prevmap": [],
 
-        # stray CSV that literally has 'applicable_if' as text
-        "applicable_if": True,
-         # Heatmap/letter map placeholders (Builder rows sometimes reference these)
-        "digit_prev_letters": {},           # e.g., {'0':'A','1':'B',...} if provided
-        "digit_current_letters": {},        # safe default: empty
-        "prev_core_letters": set(),         # safe default for core-letter gate checks
-        "core_letters_prevmap": [],         # safe default   
-            }
-    return ctx
-applicable = row.get('applicable_if') or 'True'
-expr = row.get('expression') or 'False'   
-  
-         # Some rows accidentally contain the literal string "applicable_if"
-if str(applicable).strip().lower() in {"applicable_if", "none"}:
-        applicable = "True"
-        # Some rows mistakenly put the literal word 'applicable_if' in the column
-        "applicable_if": True,             
-         
+            # stray CSV that literally has 'applicable_if' as text
+            "applicable_if": True,
+            # Heatmap/letter map placeholders (Builder rows sometimes reference these)
+            "digit_prev_letters": {},           # e.g., {'0':'A','1':'B',...} if provided
+            "digit_current_letters": {},        # safe default: empty
+            "prev_core_letters": set(),         # safe default for core-letter gate checks
+            "core_letters_prevmap": [],         # safe default
+        }
+        return ctx
+
     combos = generate_combinations(seed, method)
     eliminated = {}
     survivors = []
