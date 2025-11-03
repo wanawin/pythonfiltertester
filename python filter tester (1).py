@@ -194,7 +194,7 @@ def main():
         prev_pattern.extend([sum_category(sum(digs)), parity])
     prev_pattern = tuple(prev_pattern)
 
-   def gen_ctx(cdigits):
+ def gen_ctx(cdigits):
     csum = sum(cdigits)
     ctx = {
         # --- existing facts ---
@@ -257,7 +257,6 @@ def main():
         "applicable_if": True,
     }
     return ctx
-
 
 
         # --- Names often referenced by CSVs; provide safe defaults ---
