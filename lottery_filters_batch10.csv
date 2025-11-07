@@ -762,7 +762,7 @@ xG3 GEN_SEED2_REQ 70PWK,Require ≥2 original seed digits,TRUE,,"sum(1 for d in 
 V1 VTRAC_REQ2,Require ≥2 digits in seed’s V-TRAC groups,TRUE,,"sum(1 for d in combo_digits if V_TRAC_GROUPS[d] in seed_vtracs) < 2",,,,,,,,,,
 xV2 VTRAC_REQ3,Require ≥3 digits in seed’s V-TRAC groups,TRUE,,"sum(1 for d in combo_digits if V_TRAC_GROUPS[d] in seed_vtracs) < 3",,,,,,,,,,
 M1 MIRROR_ANY_REQ 94PWK,Require ≥1 mirror of a seed digit,TRUE,,"sum(1 for d in combo_digits if d in [mirror.get(s,-1) for s in seed_digits]) == 0",,,,,,,,,,
-S1 SHARED_CONSEC_ELIM 79PWK,Eliminate if shared set has a consecutive pair,TRUE,,"(lambda S: any((((x+1)%10) in S) for x in S))(set([d for d in combo_digits if d in seed_digits]))",,,,,,,,,,
+XS1 SHARED_CONSEC_ELIM 79PWK,Eliminate if shared set has a consecutive pair,TRUE,,"(lambda S: any((((x+1)%10) in S) for x in S))(set([d for d in combo_digits if d in seed_digits]))",,,,,,,,,,
 xS2 SHARED_SOLO_VTRAC_ELIM 34PWK,Eliminate if a shared seed digit has no V-TRAC partner in seed,TRUE,,"any((sum(1 for t in seed_digits if V_TRAC_GROUPS[t]==V_TRAC_GROUPS[s])==1) for s in combo_digits if s in seed_digits)",,,,,,,,,,
 S3 SHARED_HAS_MIRROR_IN_SEED_ELIM 51PWK,Eliminate if a shared seed digit’s mirror is also in seed,TRUE,,"any((s in seed_digits) and (mirror.get(s,-1) in seed_digits) for s in combo_digits)",,,,,,,,,,
 xS4 SHARED_ODD_ELIM 38PWK,Eliminate if any odd shared digit,TRUE,,"any((d in seed_digits) and (d%2==1) for d in combo_digits)",,,,,,,,,,
