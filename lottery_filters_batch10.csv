@@ -758,7 +758,7 @@ F_VTRAC_OVERLAP_GE1 99PWK,ELIMINATE if combo shares 0 V-TRAC groups with seed,TR
 xF_UNION_GE3 79PWK,ELIMINATE if combo has FEWER THAN 3 of {seed ∪ (seed+1)},TRUE,,"sum(1 for d in combo_digits if d in (set(seed_digits) | set(((x+1)%10 for x in seed_digits)))) < 3",,,,,,,,,,
 xF_SEED_GE3 35PWK,ELIMINATE if combo has FEWER THAN 3 of {seed digits},TRUE,,"sum(1 for d in combo_digits if d in seed_digits) < 3",,,,,,,,,,
 xF_UNION_CAP_GE4 50PWK,ELIMINATE if combo has ≥4 of {seed ∪ (seed+1)} (over-concentration cap),TRUE,,"sum(1 for d in combo_digits if d in (set(seed_digits) | set(((x+1)%10 for x in seed_digits)))) >= 4",,,,,,,,,,
-G1 GEN_UNION2_REQ 93PWK,Require ≥2 from seed ∪ (seed+1),TRUE,,"sum(1 for d in combo_digits if ((d in seed_digits) or (d in set(((x+1)%10) for x in seed_digits)))) < 2",,,,,,,,,,
+xG1 GEN_UNION2_REQ 93PWK,Require ≥2 from seed ∪ (seed+1),TRUE,,"sum(1 for d in combo_digits if ((d in seed_digits) or (d in set(((x+1)%10) for x in seed_digits)))) < 2",,,,,,,,,,
 xG2 GEN_UNION3_REQ 79PWK,Require ≥3 from seed ∪ (seed+1),TRUE,,"sum(1 for d in combo_digits if ((d in seed_digits) or (d in set(((x+1)%10) for x in seed_digits)))) < 3",,,,,,,,,,
 xG3 GEN_SEED2_REQ 70PWK,Require ≥2 original seed digits,TRUE,,"sum(1 for d in combo_digits if d in seed_digits) < 2",,,,,,,,,,
 V1 VTRAC_REQ2,Require ≥2 digits in seed’s V-TRAC groups,TRUE,,"sum(1 for d in combo_digits if V_TRAC_GROUPS[d] in seed_vtracs) < 2",,,,,,,,,,
