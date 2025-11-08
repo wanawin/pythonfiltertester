@@ -730,7 +730,7 @@ F728,"Eliminate If (abs(combo_sum - round((seed_sum**0.5) * 2.0, 2)) <= 2)",True
 F729,"NO Eliminate If (abs(combo_sum - round((seed_sum**0.5) * 2.5, 2)) <= 2)",True,True,"(abs(combo_sum - round((seed_value**0.5) * 2.5, 2)) <= 2)",,,,,,,,,,
 F730,"Eliminate If (abs(combo_sum - round((seed_sum**0.5) * 3.0, 2)) <= 2)",True,True,"(abs(combo_sum - round((seed_value**0.5) * 3.0, 2)) <= 2)",,,,,,,,,,
 F724C,Eliminate If (seed root/3 is integer & in combo),True,True,(((seed_value % 9 or 9) % 3 == 0) and (((seed_value % 9 or 9) // 3) in combo_digits)),,,,,,,,,,
-NEWF725,"Eliminate IF combo has neither 6,2 nor 6", True," ""True",2 not in combo_digits and 2 not in combo_digits and 6 not in combo_digits,,,,,,,,,, 
+NEWF725,"Eliminate IF combo has neither 8,7 nor 1", True," ""True",8 not in combo_digits and 7 not in combo_digits and 1 not in combo_digits,,,,,,,,,, 
 A201R,"Eliminate combos that have 8 AND at least one of {7,1}; keep others",True,True,"((8 in [int(x) for x in combo_digits]) and any(int(d) in {7,1} for d in combo_digits))",,,,,,,,,,
 xB200,"Keep combos with ≥2 of {0,4,5,8}; eliminate others",True,True,"(sum(int(d) in {0,4,5,8} for d in combo_digits) < 2)",,,,,,,,,,
 C201R,"Eliminate combos that have 7 AND at least one of {1,8}; keep others",True,True,"((7 in [int(x) for x in combo_digits]) and any(int(d) in {1,8} for d in combo_digits))",,,,,,,,,,
