@@ -740,7 +740,7 @@ xB202R,"Eliminate combos with ≥3 of {0,4,5,8}; keep others",True,True,"(sum(in
 New726,eliminate combos that have 0, True,True,(0 in [int(x) for x in combo_digits]),,,,,,,,,, 
 NEW727,eliminate combos that have 0,True,(0 in [int(x) for x in combo_digits]),,,,,,,,,,,
 NEWF728,Eliminate IF combo has no 7," ""True""",7 not in combo_digits,,,,,,,,,,,
-731,"Eliminate if ≥4 prime digits (2,3,5,7)",True,True,"sum(1 for d in combo_digits if d in {2,3,5,7}) >= 4",,,,,,,,,,
+x731,"Eliminate if ≥4 prime digits (2,3,5,7)",True,True,"sum(1 for d in combo_digits if d in {2,3,5,7}) >= 4",,,,,,,,,,
 H1_SEED1_OR_PLUS1_2 97PWK,Keep if seed≥1 OR +1≥2,TRUE,,"( (sum(1 for d in combo_digits if d in set(seed_digits)) < 1) and (sum(1 for d in combo_digits if d in set(((x+1)%10 for x in seed_digits))) < 2) )",,,,,,,,,,
 H3_SEED1_AND_PLUS1_1 86PWK,Keep if seed≥1 AND +1≥1,TRUE,,"( (sum(1 for d in combo_digits if d in set(seed_digits)) < 1) or (sum(1 for d in combo_digits if d in set(((x+1)%10 for x in seed_digits))) < 1) )",,,,,,,,,,
 XH2_SEED2_OR_PLUS1_2 88PWK,Keep if seed≥2 OR +1≥2,TRUE,,"( (sum(1 for d in combo_digits if d in set(seed_digits)) < 2) and (sum(1 for d in combo_digits if d in set(((x+1)%10 for x in seed_digits))) < 2) )",,,,,,,,,,
