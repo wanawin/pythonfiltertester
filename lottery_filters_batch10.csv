@@ -749,7 +749,7 @@ TRAP_H1,ELIMINATE if (<1 from seed AND <2 from seed+1),TRUE,,"(sum(1 for d in co
 xF_SEED_GE2 70PWK,ELIMINATE if <2 seed digits,TRUE,,"sum(1 for d in combo_digits if d in seed_digits) < 2",,,,,,,,,,
 F_SEED_GE1 93PWK,ELIMINATE if combo has 0 of {seed digits},TRUE,,"sum(1 for d in combo_digits if d in seed_digits) == 0",,,,,,,,,,
 F_SEEDP1_GE1 92PWK,ELIMINATE if combo has 0 of {(seed+1 mod 10) digits},TRUE,,"sum(1 for d in combo_digits if d in [(x+1)%10 for x in seed_digits]) == 0",,,,,,,,,,
-F_UNION_GE2 93PWK,ELIMINATE if combo has FEWER THAN 2 of {seed ∪ (seed+1)},TRUE,,"sum(1 for d in combo_digits if d in (set(seed_digits) | set(((x+1)%10 for x in seed_digits)))) < 2",,,,,,,,,,
+xF_UNION_GE2 93PWK,ELIMINATE if combo has FEWER THAN 2 of {seed ∪ (seed+1)},TRUE,,"sum(1 for d in combo_digits if d in (set(seed_digits) | set(((x+1)%10 for x in seed_digits)))) < 2",,,,,,,,,,
 F_UNION_PATTERN_1SEED_1P1 86PWK,ELIMINATE unless combo has ≥1 seed **AND** ≥1 (seed+1),TRUE,,"(sum(1 for d in combo_digits if d in seed_digits) < 1) or (sum(1 for d in combo_digits if d in [(x+1)%10 for x in seed_digits]) < 1)",,,,,,,,,,
 x2F_SEED_GE2 70PWK,ELIMINATE if combo has FEWER THAN 2 of {seed digits},TRUE,,"sum(1 for d in combo_digits if d in seed_digits) < 2",,,,,,,,,,
 F_MIRROR_PREV_GE1,ELIMINATE if combo has 0 of {mirror(prev-seed) digits},TRUE,,"sum(1 for d in combo_digits if d in [MIRROR[x] for x in prev_seed_digits]) == 0",,,,,,,,,,
