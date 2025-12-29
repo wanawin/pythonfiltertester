@@ -15,6 +15,7 @@ mirror = MIRROR
 V_TRAC = V_TRAC_GROUPS
 VTRAC_GROUPS = V_TRAC_GROUPS
 vtrac = V_TRAC_GROUPS
+
 def sum_category(total: int) -> str:
     if 0 <= total <= 15:
         return 'Very Low'
@@ -63,8 +64,7 @@ def load_filters(path: str='lottery_filters_batch10.csv') -> list:
             # Some rows accidentally contain the literal string "applicable_if"
             if str(applicable).strip().lower() in {"applicable_if", "none"}:
                 applicable = "True"
-                # Some rows mistakenly put the literal word 'applicable_if' in the column
-                applicable_if = True  # (kept line; bound locally to avoid NameError)
+                applicable_if = True  # avoid NameError in legacy rows
 
             try:
                 row['applicable_code'] = compile(applicable, '<applicable>', 'eval')
@@ -85,18 +85,15 @@ def generate_combinations(seed: str, method: str, bucket_digits: str = "") -> li
       - '2-digit pair'       : choose a pair from the original seed digits + 3 free digits
       - '1-digit (+1)'       : choose 1 of (seed digits +1 mod 10) + 4 free digits
       - '2-digit pair (+1)'  : choose a pair from (seed digits +1 mod 10) + 3 free digits
+      - 'Bucket (1+4)'       : each bucket digit + any 4 digits (with repetition)
     """
     all_digits = '0123456789'
     combos_set = set()
 
-    # normalize & sort the incoming seed
     seed_only = ''.join(ch for ch in seed if ch.isdigit())
     if len(seed_only) != 5:
-        # keep existing behavior: you can guard/raise if you prefer
         seed_only = seed_only.zfill(5)
     sorted_seed = ''.join(sorted(seed_only))
-
-    # build the (+1 mod 10) shifted version once
     shifted = ''.join(str((int(d) + 1) % 10) for d in sorted_seed)
 
     if method == '1-digit':
@@ -126,8 +123,8 @@ def generate_combinations(seed: str, method: str, bucket_digits: str = "") -> li
         for pair in pairs:
             for p in product(all_digits, repeat=3):
                 combos_set.add(''.join(sorted(pair + ''.join(p))))
+
     elif method == 'Bucket (1+4)':
-        # Each bucket digit paired with EVERY 4-digit combination of 0–9 (with repetition).
         raw = ''.join(ch for ch in (bucket_digits or '') if ch.isdigit())
         bucket = ''.join(sorted(set(raw)))
         if not bucket:
@@ -135,13 +132,10 @@ def generate_combinations(seed: str, method: str, bucket_digits: str = "") -> li
         for d in bucket:
             for p in product(all_digits, repeat=4):
                 combos_set.add(''.join(sorted(d + ''.join(p))))
-
-
     else:
         raise ValueError(f"Unknown method: {method}")
 
     return sorted(combos_set)
-
 
 def main():
     filters = load_filters()
@@ -169,7 +163,6 @@ def main():
         help="Enter the draw four draws before the combo"
     ).strip()
 
-    # ✅ Full, closed call — adds the two +1 methods
     method = st.sidebar.selectbox(
         "Generation Method:",
         ["1-digit", "2-digit pair", "1-digit (+1)", "2-digit pair (+1)", "Bucket (1+4)"]
@@ -177,11 +170,7 @@ def main():
 
     hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
     cold_input = st.sidebar.text_input("Cold digits (comma-separated):").strip()
-
-    # NEW: manual due digits override
     due_input = st.sidebar.text_input("Due digits (comma-separated, optional):").strip()
-
-    # Bucket digits input (only used for Bucket (1+4))
     bucket_input = st.sidebar.text_input("Bucket digits (for Bucket 1+4)", help="Enter digits 0–9 as 0138 or 0,1,3,8").strip()
 
     check_combo = st.sidebar.text_input("Check specific combo:").strip()
@@ -199,7 +188,6 @@ def main():
     hot_digits = [int(x) for x in hot_input.split(',') if x.strip().isdigit()]
     cold_digits = [int(x) for x in cold_input.split(',') if x.strip().isdigit()]
 
-    # use manual due digits if provided
     if due_input:
         due_digits = [int(x) for x in due_input.split(',') if x.strip().isdigit()]
     else:
@@ -217,7 +205,6 @@ def main():
     def gen_ctx(cdigits):
         csum = sum(cdigits)
         ctx = {
-            # --- existing facts ---
             "seed_value": int(seed),
             "seed_sum": seed_sum,
             "prev_seed_sum": sum(prev_digits) if prev_digits else None,
@@ -257,7 +244,6 @@ def main():
             "combo_structure": structure_of(cdigits),
             "winner_structure": structure_of(seed_digits),
 
-            # --- aliases CSV rows expect ---
             "MIRROR": MIRROR,
             "mirror": MIRROR,
             "MIRROR_PAIRS": MIRROR_PAIRS,
@@ -267,19 +253,16 @@ def main():
             "V_TRAC": V_TRAC_GROUPS,
             "vtrac": V_TRAC_GROUPS,
 
-            # --- safe defaults for heatmap/letters rows ---
             "digit_prev_letters": {},
             "digit_current_letters": {},
             "prev_core_letters": set(),
             "core_letters_prevmap": [],
 
-            # stray CSV that literally has 'applicable_if' as text
             "applicable_if": True,
-            # Heatmap/letter map placeholders (Builder rows sometimes reference these)
-            "digit_prev_letters": {},           # e.g., {'0':'A','1':'B',...} if provided
-            "digit_current_letters": {},        # safe default: empty
-            "prev_core_letters": set(),         # safe default for core-letter gate checks
-            "core_letters_prevmap": [],         # safe default
+            "digit_prev_letters": {},
+            "digit_current_letters": {},
+            "prev_core_letters": set(),
+            "core_letters_prevmap": [],
         }
         return ctx
 
@@ -287,6 +270,7 @@ def main():
         combos = generate_combinations(seed, method, bucket_input)
     else:
         combos = generate_combinations(seed, method)
+
     eliminated = {}
     survivors = []
     for combo in combos:
@@ -406,28 +390,34 @@ def main():
             ).strip()
         )
 
+    # >>> FIXED HOT/COLD/DUE LOGIC — ONLY THIS BLOCK CHANGED <<<
     if all(len(d) == 5 and d.isdigit() for d in calc_draws):
+        # Count digit frequencies across the 10 reference draws
         seq = "".join(calc_draws)
-        cnt = Counter(int(ch) for ch in seq)
+        cnt_raw = Counter(int(ch) for ch in seq)
 
-        auto_hot, auto_cold, auto_due = [], [], []
-        if cnt:
-            hot_cutoff = cnt.most_common(3)[-1][1] if len(cnt) >= 3 else cnt.most_common()[-1][1]
-            auto_hot = sorted([d for d, c in cnt.items() if c >= hot_cutoff])
+        # Fill in zeros for digits that never appeared
+        counts_full = {d: cnt_raw.get(d, 0) for d in range(10)}
 
-            sorted_asc = sorted(cnt.items(), key=lambda kv: (kv[1], kv[0]))
-            cold_cutoff = sorted_asc[min(2, len(sorted_asc)-1)][1] if len(sorted_asc) >= 3 else sorted_asc[-1][1]
-            auto_cold = sorted([d for d, c in cnt.items() if c <= cold_cutoff])
+        # HOT = exactly top-3 by frequency (ties broken by digit asc)
+        hot_sorted = sorted(counts_full.items(), key=lambda kv: (-kv[1], kv[0]))
+        auto_hot = sorted([d for d, _ in hot_sorted[:3]])
 
-        last2 = "".join(calc_draws[:2])
-        seen = {int(x) for x in last2}
-        auto_due = [d for d in range(10) if d not in seen]
+        # COLD = exactly bottom-3 by frequency (ties broken by digit asc)
+        cold_sorted = sorted(counts_full.items(), key=lambda kv: (kv[1], kv[0]))
+        auto_cold = sorted([d for d, _ in cold_sorted[:3]])
+
+        # DUE = digits missing from the last TWO draws only
+        last2 = "".join(calc_draws[:2])  # 10-back and 9-back
+        seen_last2 = {int(x) for x in last2}
+        auto_due = sorted([d for d in range(10) if d not in seen_last2])
 
         st.sidebar.write(f"**Hot:** {auto_hot}")
         st.sidebar.write(f"**Cold:** {auto_cold}")
         st.sidebar.write(f"**Due:** {auto_due}")
     else:
         st.sidebar.info("Enter all **10** past draws (5 digits each) to calculate Hot/Cold/Due.")
+    # <<< END FIX >>>
 
 if __name__ == '__main__':
     main()
