@@ -78,7 +78,7 @@ def load_filters(path: str='lottery_filters_batch10.csv') -> list:
 
 from itertools import product  # ensure this import is present at top
 
-def generate_combinations(seed: str, method: str, bucket_digits: str = "") -> list:
+def generate_combinations(seed: str, method: str, bucket_digits: str = "", bucketA: str = "", bucketB: str = "") -> list:
     """
     Generation methods:
       - '1-digit'            : choose 1 of the original seed digits + 4 free digits
@@ -136,6 +136,34 @@ def generate_combinations(seed: str, method: str, bucket_digits: str = "") -> li
         raise ValueError(f"Unknown method: {method}")
 
     return sorted(combos_set)
+    elif method == "BucketA1_BucketB2_+_AllBoxPairs":
+        # Parse buckets as digits; accept "0,1,3" or "013"
+        def _parse_bucket(s):
+            raw = ''.join(ch for ch in (s or '') if ch.isdigit())
+            return ''.join(sorted(set(raw)))  # unique, sorted
+
+        A = _parse_bucket(bucketA)
+        B = _parse_bucket(bucketB)
+
+        if len(A) < 1 or len(B) < 2:
+            return []
+
+        from itertools import combinations, combinations_with_replacement
+        combos_set = set()
+
+        # 2-digit box pairs with repeats (unordered): 00..99 → 55 total
+        box_pairs = list(combinations_with_replacement('0123456789', 2))
+
+        # pick 1 from A, 2 from B (no repetition within B selection)
+        for a in A:
+            for b1, b2 in combinations(B, 2):  # change to combinations_with_replacement(B, 2) if B repeats allowed
+                base3 = a + b1 + b2
+                for x, y in box_pairs:
+                    s5 = ''.join(sorted(base3 + x + y))
+                    combos_set.add(s5)
+
+        return sorted(combos_set)
+
 
 def main():
     filters = load_filters()
@@ -165,7 +193,7 @@ def main():
 
     method = st.sidebar.selectbox(
         "Generation Method:",
-        ["1-digit", "2-digit pair", "1-digit (+1)", "2-digit pair (+1)", "Bucket (1+4)"]
+        ["1-digit", "2-digit pair", "1-digit (+1)", "2-digit pair (+1)", "Bucket (1+4)", "BucketA1_BucketB2_+_AllBoxPairs"]
     )
 
     hot_input = st.sidebar.text_input("Hot digits (comma-separated):").strip()
@@ -267,9 +295,12 @@ def main():
         return ctx
 
     if method == 'Bucket (1+4)':
-        combos = generate_combinations(seed, method, bucket_input)
+        combos = generate_combinations(seed, method, bucket_input, bucketA=bucketA_input, bucketB=bucketB_input)
+    elif method == 'BucketA1_BucketB2_+_AllBoxPairs':
+        combos = generate_combinations(seed, method, bucketA=bucketA_input, bucketB=bucketB_input)
     else:
-        combos = generate_combinations(seed, method)
+        combos = generate_combinations(seed, method, bucketA=bucketA_input, bucketB=bucketB_input)
+
 
     eliminated = {}
     survivors = []
