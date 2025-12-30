@@ -401,20 +401,11 @@ def main():
 
         # HOT = exactly top-3 by frequency (ties broken by digit asc)
         hot_sorted = sorted(counts_full.items(), key=lambda kv: (-kv[1], kv[0]))
-        hot_pick = [d for d, _ in hot_sorted[:3]]
-        auto_hot = sorted(hot_pick)
+        auto_hot = sorted([d for d, _ in hot_sorted[:3]])
 
-        # COLD = bottom-3 by frequency EXCLUDING anything already in HOT
+        # COLD = exactly bottom-3 by frequency (ties broken by digit asc)
         cold_sorted = sorted(counts_full.items(), key=lambda kv: (kv[1], kv[0]))
-        auto_cold = []
-        hot_set = set(hot_pick)
-        for d, _ in cold_sorted:
-            if d in hot_set:
-                continue
-            auto_cold.append(d)
-            if len(auto_cold) == 3:
-                break
-        auto_cold = sorted(auto_cold)
+        auto_cold = sorted([d for d, _ in cold_sorted[:3]])
 
         # DUE = digits missing from the last TWO draws only
         last2 = "".join(calc_draws[:2])  # 10-back and 9-back
